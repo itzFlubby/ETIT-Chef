@@ -254,16 +254,13 @@ async def help(botti, message, botData):
     
     allHelpStrings.append(helpStr)
         
-    helpCommand = ":question: Nutze den Befehl `!command {Unterbefehl}`, um Informationen über einen Befehl, wie dessen Ausführung ein Beispiel Eingaben zu erhalten!\n:question: Nutze zum Beispiel `!command !help`"
     if botti.get_user(message.author.id).dm_channel is None:
         await botti.get_user(message.author.id).create_dm()
          
     for string in allHelpStrings:
         await botti.get_user(message.author.id).dm_channel.send(string + "```")
-
-    await botti.get_user(message.author.id).dm_channel.send("{}".format(helpCommand))
     
-    await modules.bottiHelper._sendMessagePingAuthor(message, ":question: Dir wurde eine Hilfe zugesandt!")
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":question: Dir wurde eine Hilfe zugesandt!\n:question: Nutze den Befehl `!command {Unterbefehl}`, um Informationen über einen Befehl, wie dessen Ausführung ein Beispiel Eingaben zu erhalten!\n:question: Nutze zum Beispiel `!command !help`")
 
 async def invite(botti, message, botData):
     """ 

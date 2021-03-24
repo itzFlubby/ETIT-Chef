@@ -26,7 +26,7 @@ async def balancekeeper(botti, message, botData):
     await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: Alle registrierten Kontostände: ")
     
     
-    totalString = "```\nUSERNAME#DISCRIMINATOR |       USERID       |  BALANCE  \n"
+    totalString = "```prolog\nUSERNAME#DISCRIMINATOR |       USERID       |  BALANCE  \n"
     
     for entry in sortedList:
         
@@ -154,7 +154,7 @@ async def lastcommands(botti, message, botData):
 async def maintenance(botti, message, botData):
     """ 
     Reserviert für Entwickler 
-    Dieser Befehl ändern den Maintenance-Mode.
+    Dieser Befehl ändert den Maintenance-Mode.
     !maintenance
     """
     if botData.maintenanceMode is True:
@@ -167,6 +167,41 @@ async def maintenance(botti, message, botData):
         await modules.bottiHelper._sendMessage(message, ":tools: Die Wartungsarbeiten haben **begonnen**!")
         await botti.change_presence(activity = discord.Game(name = "⚒ Wartungsarbeiten ⚒"), status = discord.Status.idle)
         modules.bottiHelper._maintenanceChange(botData.configFile)
+
+async def mdtext(botti, message, botData):
+    """ 
+    Reserviert für Entwickler 
+    Dieser Befehl zeigt einen String in unterschiedlichen Markdown-Typen an.
+    !mdtext {INLINE} {TEXT} 
+    {INLINE} "-n" [Not inline]
+    {TEXT} String
+    !mdtext !"§$%&/()=?\r!mdtext -n !"§$%&/()=?
+    """    
+    try:
+        parameters = modules.bottiHelper._getParametersFromMessage(message.content, 10)
+        textStart = 8 if len(parameters) == 0 else 11
+        showInline = False if "n" in parameters else True
+        
+        text = message.content[textStart:]
+        markdownTypes = [ "asciidoc", "autohotkey", "bash", "coffescript", "cpp", "cs", "css", "diff", "fix", "glsl", "ini", "json", "md", "ml", "prolog", "py", "tex", "xl", "xml" ]
+        
+        data = discord.Embed(
+            title = "",
+            description = "",
+            color = 0x009aff
+        )
+        
+
+        for markdownType in markdownTypes:
+            data.add_field(name = markdownType, value = "```" + markdownType + "\n" + text + "```", inline = showInline)
+        
+        data.set_author(name = "🖊️ Markdown-Typen")
+        data.set_thumbnail(url = botti.user.avatar_url)
+
+        await modules.bottiHelper._sendEmbedPingAuthor(message, "", data)
+    except:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!mdtext"))      
+        return   
 
 async def modulelist(botti, message, botData):
     """
