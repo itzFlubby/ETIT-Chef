@@ -31,7 +31,7 @@ async def botinfo(botti, message, botData):
     
     data.set_author(name = "🤖 Bot-Info")
     data.set_thumbnail(url = botti.user.avatar_url)
-    data.set_footer(text = "ID: {0}\nBei Verbesserungsvorschlägen: !message <NACHRICHT>\nStand: {1}".format(str(botti.user.id), modules.bottiHelper._getTimestamp()))
+    data.set_footer(text = "ID: {0}\nBei Verbesserungsvorschlägen: !vorschlag <NACHRICHT>\nStand: {1}".format(str(botti.user.id), modules.bottiHelper._getTimestamp()))
     
     await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
 
