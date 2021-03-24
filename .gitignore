@@ -112,3 +112,16 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+modules/data/ids.py
+modules/data/botData.py
+*.png
+*.xcf
+*.ttf
+*.jpg
+modules/data/klausuren/klausuren.txt
+modules/data/mensa/mensaData.txt
+modules/data/images/fonts/Hannah-Regular.otf
+modules/data/images/fonts/readme.txt
+modules/data/images/thisisfine.gif
+*.xls
+updateSlashCommand.py
