@@ -26,7 +26,7 @@ async def balancekeeper(botti, message, botData):
     await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: Alle registrierten Kontostände: ")
     
     
-    totalString = "```prolog\nUSERNAME#DISCRIMINATOR |       USERID       |  BALANCE  \n"
+    totalString = "```ml\nUSERNAME#DISCRIMINATOR |       USERID       |  BALANCE  \n"
     
     for entry in sortedList:
         
@@ -46,7 +46,7 @@ async def balancekeeper(botti, message, botData):
         if len(totalString) > 1900:
             wasTooLongForSingleMessage = True
             totalStrings.append(totalString + "```")
-            totalString = "```\n"
+            totalString = "```ml\n"
             
     if wasTooLongForSingleMessage:
         totalStrings.append(totalString + "```")

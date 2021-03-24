@@ -29,6 +29,8 @@ async def botinfo(botti, message, botData):
     data.add_field(name = "Latenz", value = str(round((botti.latency * 1000), 2)) + "ms")
     data.add_field(name = "Entwickler", value = "itzFlubby")
     
+    data.add_field(name = "GitHub", value = "https://github.com/itzFlubby/ETIT-Chef/", inline = False)
+    
     data.set_author(name = "🤖 Bot-Info")
     data.set_thumbnail(url = botti.user.avatar_url)
     data.set_footer(text = "ID: {0}\nBei Verbesserungsvorschlägen: !vorschlag <NACHRICHT>\nStand: {1}".format(str(botti.user.id), modules.bottiHelper._getTimestamp()))

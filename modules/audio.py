@@ -66,6 +66,9 @@ async def pause(botti, botData, message):
         await modules.bottiHelper._sendMessagePingAuthor(message, ":pause_button: Playback pausiert!")
         voiceClient.pause()
 
+def _downloadVideoJSON(botData, url):
+    return os.system("youtube-dl --quiet --no-playlist --write-info-json --skip-download --output \"{0}/temp/%(id)s\" {1}".format(botData.modulesDirectory, url))    
+
 async def play(botti, botData, message):
     """
     Reserviert für Entwickler
@@ -97,15 +100,16 @@ async def play(botti, botData, message):
     url = message.content[subcommand:]
     
     await modules.bottiHelper._sendMessagePingAuthor(message, ":arrow_down: Lade herunter... Dies kann eine kurze Weile dauern!")
+    _downloadVideoJSON(botData, url)
     status = os.system("youtube-dl --quiet --no-playlist --write-info-json --extract-audio --audio-format opus --audio-quality 0 --output \"{0}/temp/%(id)s.opus\" {1}".format(botData.modulesDirectory, url))
     global audioSourceFile
     try:
         if status == 1:
             raise FileNotFoundError()
         id = message.content.split("=")[1]
-        audioSourceFile = botData.modulesDirectory + "/temp/{}.opus".format(id)
+        audioSourceFile = botData.modulesDirectory + "temp/{}.opus".format(id)
         voiceClient.play(discord.FFmpegPCMAudio(source = audioSourceFile))
-        with open(botData.modulesDirectory + "/data/config/FFmpegPlayer.botti") as volumeFile:
+        with open(botData.modulesDirectory + "data/config/FFmpegPlayer.botti") as volumeFile:
             volumeLevel = volumeFile.readline().rstrip()
         voiceClient.source = discord.PCMVolumeTransformer(voiceClient.source)
         voiceClient.source.volume = float(volumeLevel)
@@ -113,7 +117,7 @@ async def play(botti, botData, message):
         if "q" in parameters:
             await modules.bottiHelper._sendMessagePingAuthor(message, ":play_pause: Spiele Musik mit Lautsärke **{0}**...".format(float(volumeLevel)))
         else:
-            with open(botData.modulesDirectory + "/temp/" + id + ".opus.info.json") as jsonInfo:
+            with open(botData.modulesDirectory + "temp/" + id + ".info.json") as jsonInfo:
                 jsonData = json.load(jsonInfo)
                 
                 data = discord.Embed(
@@ -161,14 +165,23 @@ async def queue(botti, botData, message):
         else:
             queueElements = "```markdown\n"
             for i in range(0, len(musicQueue)):
-                queueElements += str(i + 1) + ") " + musicQueue[i] + "\n"
+                with open(botData.modulesDirectory + "temp/" + musicQueue[i].split("?v=")[1] + ".info.json") as jsonInfo:
+                    jsonData = json.load(jsonInfo)
+                    queueElements += str(i + 1) + ") " + jsonData['title'] + " [" + jsonData['uploader'] + "] | " + musicQueue[i] + "\n"
             queueElements += "```"
             await modules.bottiHelper._sendMessagePingAuthor(message, ":minidisc: Die Warteschlange ist:\n{}".format(queueElements))
             return
     elif option == "add":
-        musicQueue.append(message.content.split(" ")[2])
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":minidisc: {} wurde zur Warteschlange hinzugefügt!".format(message.content.split(" ")[2]))
-        return
+        try:
+            status = _downloadVideoJSON(botData, message.content.split(" ")[2])
+            if status == 1:
+                raise FileNotFoundError()
+            musicQueue.append(message.content.split(" ")[2])
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":minidisc: Video mit ID `{}` wurde zur Warteschlange hinzugefügt!".format(message.content.split(" ")[2].split("?v=")[1]))
+            return
+        except FileNotFoundError:
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Es ist ein Fehler aufgetreten! Achte darauf, dass die URL richtig ist, und nur die Video-ID darin enhalten ist (also z.B. kein `&t=`)")
+            return
     elif option == "remove":
         try:
             removeIndex = int(message.content.split(" ")[2])
@@ -255,12 +268,12 @@ async def volume(botti, botData, message):
     try:
         volumeLevel = message.content.split(" ")[1]
         voiceClient.source.volume = float(volumeLevel)
-        with open(botData.modulesDirectory + "/data/config/FFmpegPlayer.botti", "w") as volumeFile:
+        with open(botData.modulesDirectory + "data/config/FFmpegPlayer.botti", "w") as volumeFile:
             volumeFile.write(volumeLevel)
         
         await modules.bottiHelper._sendMessagePingAuthor(message, ":loud_sound: Lautsärke auf **{0}** gesetzt!".format(volumeLevel))
     except IndexError:
-        with open(botData.modulesDirectory + "/data/config/FFmpegPlayer.botti", "r") as volumeFile:
+        with open(botData.modulesDirectory + "data/config/FFmpegPlayer.botti", "r") as volumeFile:
             volumeLevel = volumeFile.readline().rstrip()
         
         await modules.bottiHelper._sendMessagePingAuthor(message, ":loud_sound: Lautsärke bei **{0}**!".format(volumeLevel))
