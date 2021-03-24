@@ -1,0 +1,9 @@
+discord-py-slash-commands
+discord.py
+Pillow
+psutil
+requests
+xlrd
+xlutils
+xlwt
+youtube-dl
