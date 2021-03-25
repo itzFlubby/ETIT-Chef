@@ -101,7 +101,7 @@ async def play(botti, botData, message):
     
     await modules.bottiHelper._sendMessagePingAuthor(message, ":arrow_down: Lade herunter... Dies kann eine kurze Weile dauern!")
     _downloadVideoJSON(botData, url)
-    status = os.system("youtube-dl --quiet --no-playlist --write-info-json --extract-audio --audio-format opus --audio-quality 0 --output \"{0}/temp/%(id)s.opus\" {1}".format(botData.modulesDirectory, url))
+    status = os.system("youtube-dl --quiet --no-playlist --extract-audio --audio-format opus --audio-quality 0 --output \"{0}/temp/%(id)s.opus\" {1}".format(botData.modulesDirectory, url))
     global audioSourceFile
     try:
         if status == 1:
