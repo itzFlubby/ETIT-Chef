@@ -236,8 +236,8 @@ async def on_message(message):
                 await getattr(modules.audio, commandName)(botti, botData, message)
         # DEV
         elif command in botData.devCommandList:
-            if await modules.guard._checkPerms(botti, message, [ ] ):
-                if (message.author.id == ids.userIDs.Christoph_ID) and (command not in [ "!balancekeeper", "!lastcommands", "!commandlist" ]):
+            if await modules.guard._checkPerms(botti, message, [ ], True ):
+                if (message.author.id != ids.userIDs.Christoph_ID) or (command not in [ "!balancekeeper", "!lastcommands", "!commandlist" ]):
                     await modules.bottiHelper._sendMessagePingAuthor(message, "[:shield:] `Guard`: **Fehlende Berechtigung!**")
                     return
                 await getattr(modules.dev, commandName)(botti, message, botData)
