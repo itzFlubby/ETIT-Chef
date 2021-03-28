@@ -109,7 +109,7 @@ async def play(botti, botData, message):
         id = message.content.split("=")[1]
         audioSourceFile = botData.modulesDirectory + "temp/{}.opus".format(id)
         voiceClient.play(discord.FFmpegPCMAudio(source = audioSourceFile))
-        with open(botData.modulesDirectory + "data/config/FFmpegPlayer.botti") as volumeFile:
+        with open(botData.configDirectory + "FFmpegPlayer.botti") as volumeFile:
             volumeLevel = volumeFile.readline().rstrip()
         voiceClient.source = discord.PCMVolumeTransformer(voiceClient.source)
         voiceClient.source.volume = float(volumeLevel)
@@ -268,12 +268,12 @@ async def volume(botti, botData, message):
     try:
         volumeLevel = message.content.split(" ")[1]
         voiceClient.source.volume = float(volumeLevel)
-        with open(botData.modulesDirectory + "data/config/FFmpegPlayer.botti", "w") as volumeFile:
+        with open(botData.configDirectory + "FFmpegPlayer.botti", "w") as volumeFile:
             volumeFile.write(volumeLevel)
         
         await modules.bottiHelper._sendMessagePingAuthor(message, ":loud_sound: Lautsärke auf **{0}** gesetzt!".format(volumeLevel))
     except IndexError:
-        with open(botData.modulesDirectory + "data/config/FFmpegPlayer.botti", "r") as volumeFile:
+        with open(botData.modulesDirectory + "FFmpegPlayer.botti", "r") as volumeFile:
             volumeLevel = volumeFile.readline().rstrip()
         
         await modules.bottiHelper._sendMessagePingAuthor(message, ":loud_sound: Lautsärke bei **{0}**!".format(volumeLevel))
