@@ -280,3 +280,5 @@ async def volume(botti, botData, message):
             volumeLevel = volumeFile.readline().rstrip()
         
         await modules.bottiHelper._sendMessagePingAuthor(message, ":loud_sound: Lautsärke bei **{0}**!".format(volumeLevel))
+    except ValueError:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!volume"))

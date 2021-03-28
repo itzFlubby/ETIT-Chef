@@ -6,7 +6,7 @@ devIDs = [ ids.userIDs.itzFlubby_ID, ids.userIDs.WUB_ID ]
 
 allowedIDs = [ ids.userIDs.itzFlubby_ID, ids.userIDs.WUB_ID ]
 
-trustetIDs = [ ids.userIDs.Christoph_ID, ids.userIDs.Titra_ID ]
+trustetIDs = [ ids.userIDs.Christoph_ID, ids.userIDs.Titra_ID, ids.userIDs.Leo_ID ]
 
 allowed_roles = [ "Admin", "Dev", "Fachschaft ETEC", "Tutoren" ]
 
