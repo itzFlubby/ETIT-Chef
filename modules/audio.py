@@ -173,6 +173,7 @@ async def queue(botti, botData, message):
             return
     elif option == "add":
         try:
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":minidisc: Video wird zu Warteschlange hinzugefügt...".format(message.content.split(" ")[2].split("?v=")[1]))
             status = _downloadVideoJSON(botData, message.content.split(" ")[2])
             if status == 1:
                 raise FileNotFoundError()
@@ -202,8 +203,11 @@ async def queue(botti, botData, message):
         await modules.bottiHelper._sendMessagePingAuthor(message, ":minidisc: Es wird zum nächsten Lied gesprungen!")
     elif option == "play":
         dummyMessage = modules.bottiHelper._createDummyMessage(message.author, message.channel, "!play " + musicQueue[0])
+        del musicQueue[0]
         await play(botti, botData, dummyMessage)
         pass
+    else:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!queue"))
 
 async def reconnect(botti, botData, message):
     """
