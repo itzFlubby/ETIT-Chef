@@ -80,7 +80,6 @@ async def play(botti, botData, message):
     """
     voiceClients = botti.voice_clients
     if not voiceClients:
-        
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Bot befindet sich in keinem Sprach-Kanal. Versuche zu dir zu verbinden...")
         if await connect(botti, botData, message) is not True:
             return
@@ -191,9 +190,9 @@ async def queue(botti, botData, message):
                 return
         except:
             await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!queue"))      
-            return              
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":minidisc: {} wird aus der Warteschlange entfernt!".format(musicQueue[removeIndex - 1]))
+            return    
         del musicQueue[removeIndex - 1]
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":minidisc: Video mit ID `{}` wurde aus der Warteschlange entfernt!".format(musicQueue[removeIndex - 1].split("?v=")[1]))
         return
     elif option == "next":
         if len(musicQueue) <= 1:
