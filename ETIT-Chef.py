@@ -204,7 +204,7 @@ async def on_message(message):
             
         await modules.bottiHelper._checkPingTrigger(message, botti)
         
-        if message.content.startswith(botData.botPrefix) is not True:
+        if message.content.startswith(botData.botPrefix) is False:
             return
             
         if modules.bottiHelper._logCommand(message, botData) == -1:
