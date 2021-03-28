@@ -23,10 +23,7 @@ async def balancekeeper(botti, message, botData):
     totalStrings = []
     wasTooLongForSingleMessage = False
     
-    await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: Alle registrierten Kontostände: ")
-    
-    
-    totalString = "```ml\nUSERNAME#DISCRIMINATOR |       USERID       |  BALANCE  \n"
+    totalString = ":cookie: Alle registrierten Kontostände: \n```ml\nUSERNAME#DISCRIMINATOR |       USERID       |  BALANCE  \n"
     
     for entry in sortedList:
         
@@ -41,8 +38,8 @@ async def balancekeeper(botti, message, botData):
         if len(userNameAndDiscriminator) > 22:
             userNameAndDiscriminator = userNameAndDiscriminator[:19] + "..."
         
-        totalString = totalString + "{:<23}| {:<18} | {}\n".format(userNameAndDiscriminator, entry[0],  str("{:,}".format(int(entry[1]))).replace(",", " "))
-        
+        totalString += "{:<23}| {:<18} | {}\n".format(userNameAndDiscriminator, entry[0],  modules.bottiHelper._spaceIntToString(int(entry[1])))
+       
         if len(totalString) > 1900:
             wasTooLongForSingleMessage = True
             totalStrings.append(totalString + "```")
@@ -182,7 +179,8 @@ async def mdtext(botti, message, botData):
         textStart = 8 if len(parameters) == 0 else 11
         showInline = False if "n" in parameters else True
         
-        text = message.content[textStart:]
+        text = message.content[textStart:] if message.content[textStart:] is not "" else "Beispiel Text! 1234567890 !\"§$%&/()='#*+-/<>{[]}\\" 
+        
         markdownTypes = [ "asciidoc", "autohotkey", "bash", "coffescript", "cpp", "cs", "css", "diff", "fix", "glsl", "ini", "json", "md", "ml", "prolog", "py", "tex", "xl", "xml" ]
         
         data = discord.Embed(
