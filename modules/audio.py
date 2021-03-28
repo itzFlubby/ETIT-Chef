@@ -270,15 +270,16 @@ async def volume(botti, botData, message):
     global audioSourceFile
     try:
         volumeLevel = message.content.split(" ")[1]
-        voiceClient.source.volume = float(volumeLevel)
+        volumeLevelFloat = float(volumeLevel) # Sollte hier gemacht werden, damit falls input kein float direkt zu ValueError gesprungen werden kann
+        if voiceClient.source is not None:
+            voiceClient.source.volume = volumeLevelFloat
         with open(botData.configDirectory + "FFmpegPlayer.botti", "w") as volumeFile:
             volumeFile.write(volumeLevel)
         
         await modules.bottiHelper._sendMessagePingAuthor(message, ":loud_sound: Lautsärke auf **{0}** gesetzt!".format(volumeLevel))
     except IndexError:
-        with open(botData.modulesDirectory + "FFmpegPlayer.botti", "r") as volumeFile:
+        with open(botData.configDirectory + "FFmpegPlayer.botti", "r") as volumeFile:
             volumeLevel = volumeFile.readline().rstrip()
-        
         await modules.bottiHelper._sendMessagePingAuthor(message, ":loud_sound: Lautsärke bei **{0}**!".format(volumeLevel))
     except ValueError:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!volume"))
