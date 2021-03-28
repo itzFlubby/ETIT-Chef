@@ -130,9 +130,9 @@ async def play(botti, botData, message):
                 data.add_field(name = ":man_raising_hand: Uploader", value = jsonData["uploader"])
                 data.add_field(name = ":clock1: Dauer", value = time.strftime('%H:%M:%S', time.gmtime(int(jsonData["duration"]))))
                 
-                data.add_field(name = ":eyes: Views", value = str("{:,}".format(int(jsonData["view_count"]))).replace(",", " "))
-                data.add_field(name = ":thumbsup: Likes", value = str("{:,}".format(int(jsonData["like_count"]))).replace(",", " "))
-                data.add_field(name = ":thumbsdown: Dislikes", value = str("{:,}".format(int(jsonData["dislike_count"]))).replace(",", " "))
+                data.add_field(name = ":eyes: Views", value = modules.bottiHelper._spaceIntToString(int(jsonData["view_count"])))
+                data.add_field(name = ":thumbsup: Likes", value = modules.bottiHelper._spaceIntToString(int(jsonData["like_count"])))
+                data.add_field(name = ":thumbsdown: Dislikes", value = modules.bottiHelper._spaceIntToString(int(jsonData["dislike_count"])))
 
                 data.add_field(name = ":date: Uploaddatum", value = "{}.{}.{}".format(jsonData["upload_date"][6:8], jsonData["upload_date"][4:6], jsonData["upload_date"][:4]))
                 data.add_field(name = ":dividers: Kategorien", value = jsonData["categories"])
