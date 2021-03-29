@@ -39,17 +39,8 @@ slash = SlashCommand(botti, sync_commands = False)
 async def on_member_join(member):
     roles = []
     guild = botti.get_guild(ids.serverIDs.ETIT_KIT_ServerID)
-    roles.append(guild.get_role(ids.roleIDs.ETIT_Ersti_RoleID))
-    roles.append(guild.get_role(ids.roleIDs.Freizeit_RoleID))
-    roles.append(guild.get_role(ids.roleIDs.Nicht_Vorgestellt_RoleID))
-    roles.append(guild.get_role(ids.roleIDs.Zitate_RoleID))
-    roles.append(guild.get_role(ids.roleIDs.Musik_RoleID))
-    roles.append(guild.get_role(ids.roleIDs.Memes_RoleID))
-    roles.append(guild.get_role(ids.roleIDs.Gaming_RoleID))
-    roles.append(guild.get_role(ids.roleIDs.Katzen_RoleID))
-    roles.append(guild.get_role(ids.roleIDs.tech_talk_RoleID))
-    roles.append(guild.get_role(ids.roleIDs.Spielhalle_RoleID))
-    roles.append(guild.get_role(ids.roleIDs.Vorlesungsspam_RoleID))
+    for role_id in ids.roleIDs.newMemberJoinRoles:
+        roles.append(guild.get_role(role_id))
     await member.edit(roles = roles, reason = "Mitglieder beitritt.")
 
 @botti.event
