@@ -15,8 +15,7 @@ async def balance(botti, message, botData):
     Dieser Befehl zeigt einen Kontostand an.
     !balance {@USER}
     {@USER} leer, Nutzer-Erwähnung
-    !balance
-    !balance @ETIT-Chef
+    !balance\r!balance @ETIT-Chef
     """
     user = message.author
     
@@ -277,6 +276,34 @@ def _loadBalancesToKeeper(botti, botData):
         ids.append(int(sheet.cell_value(rowx = i, colx = 0)))
         botData.balanceKeeper.append([int(sheet.cell_value(rowx = i, colx = 0)), sheet.cell_value(rowx = i, colx = 1)])
 
+async def rank(botti, message, botData):
+    """ 
+    Für alle ausführbar
+    Dieser Befehl zeigt deine Position im Cookie-Ranking an.
+    !rank {@USER}
+    {@USER} leer, Nutzer-Erwähnung
+    !rank\r!rank @ETIT-Chef
+    """
+    
+    user = message.author
+    if len(message.mentions) != 0:
+        user = message.mentions[0]
+        
+    sortedList = sorted(botData.balanceKeeper, key = lambda x: int(x[1]), reverse = True)
+    
+    userRank = 0
+    for i in range(len(sortedList)):
+        userID = int(sortedList[i][0])
+        if userID == user.id:
+            userRank = i
+            break
+    
+    paramString = "Du befindest"
+    if user.id != message.author.id:
+        paramString = "<@" + str(user.id) + "> befindet"
+     
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: " + paramString + " sich im Ranking auf Platz **#" + str(userRank + 1) + "** (von " + str(len(sortedList)) + ") !")
+    
 async def ranking(botti, message, botData):
     """ 
     Für alle ausführbar
