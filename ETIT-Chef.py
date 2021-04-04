@@ -31,6 +31,7 @@ import modules.utils        #as utils
 bottiIntents = discord.Intents.default()
 bottiIntents.members = True
 bottiIntents.reactions = True
+bottiIntents.presences = False
 botti = discord.Client(intents = bottiIntents, guild_subscriptions = True)
 
 slash = SlashCommand(botti, sync_commands = False)
@@ -138,7 +139,6 @@ async def on_message(message):
                 await getattr(modules.banlist, commandName)(botti, message, botData)
         # GAMBLING
         elif command in botData.gambleCommandList:
-            if (message.channel.id != ids.channelIDs.spielhalle_ChannelID) and (command not in [ "!balance", "!ranking", "!transfer" ]):
             if (message.channel.id != ids.channelIDs.spielhalle_ChannelID) and (command not in [ "!balance", "!rank", "!ranking", "!transfer" ]):
                 await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Dieser Befehl darf nur in <#" + str(ids.channelIDs.spielhalle_ChannelID) + "> verwendet werden!")
                 return

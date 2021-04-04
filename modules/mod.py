@@ -291,6 +291,7 @@ async def purge(botti, message, botData):
             await modules.bottiHelper._sendMessagePingAuthor(message, ":recycle: Es wurden **{0}** Nachrichten gelöscht.".format(len(deleted)))
     except:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!purge"))   
+
 async def purgemax(botti, message, botData):
     """
     Reserviert für Moderator oder höher

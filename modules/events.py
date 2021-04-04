@@ -146,3 +146,37 @@ async def on_raw_reaction_add(payload):
                 
             await helpfulMessage.add_reaction("✅")
         pass
+        
+@botti.event
+async def on_member_update(before, after):
+    guild = botti.get_guild(ids.serverIDs.ETIT_KIT_ServerID)
+    
+    channel = guild.get_channel(ids.channelIDs.devInternal1_ChannelID)
+    
+    data = discord.Embed(
+        title = after.name + "#" + str(after.discriminator),
+        color = 0x0066FF,
+        description = "<@" + str(after.id) + "> wurde aktualisiert!"
+    )
+    
+    data.add_field(name = "Status", value = str(before.status) + " -> " + str(after.status), inline = False)
+    data.add_field(name = "Aktivität", value = str(before.activity) + " -> " + str(after.activity), inline = False)
+
+    data.set_author(name = "🔃 Mitglieder-Aktualisierung")
+    data.set_thumbnail(url = after.avatar_url)
+    data.set_footer(text = "Stand: {0}".format(modules.bottiHelper._getTimestamp()))
+    
+    await channel.send(embed = data)
+    
+    if after.id == ids.userIDs.ETIT_Master_ID:
+        if after.status == discord.Status.offline:
+            data = discord.Embed(
+                title = "",
+                description = "",
+                color = 0xFF0000
+            )
+            data.add_field(name = "HEY CHRISTOPH", value = "Da StImMt WaS nIcHt. RePaRiErE dAs!1!!elf!!")
+            data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
+            data.set_thumbnail(url = botti.user.avatar_url)
+            data.set_author(name = "📡 Offline-Detektor")
+            await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.botTestLobby_ChannelID).send(content = "<@192701441188560900>", embed = data)
