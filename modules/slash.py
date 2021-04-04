@@ -173,3 +173,13 @@ async def _vorschlag(ctx: SlashContext, nachricht):
     await sentMessage.add_reaction("❌")
 
     await ctx.send(content = ":bookmark_tabs: Deine Nachricht wurde erfolgreich zugestellt!", hidden = True) 
+    
+@botti.event
+async def on_slash_command_error(ctx, ex):
+    msg = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, "")
+    fullError = ""
+    for i in traceback.format_exception(type(ex), ex, ex.__traceback__):
+        fullError = fullError + i.replace(os.getcwd()[:-10], "..")
+        
+    botData.lastError = ":warning: Traceback _(Timestamp: {})_  • Verursacht durch {} [via Slash-Command]\n```py\n{}```".format(modules.bottiHelper._getTimestamp(), msg.author.mention, fullError)
+    await modules.bottiHelper._errorMessage(botti, msg, botData, ex)
