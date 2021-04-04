@@ -29,13 +29,13 @@ async def balance(botti, message, botData):
             await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Da du noch kein Konto hast, wurde für dich eben eins angelegt. Dein Kontostand beträgt nun **5 000** :cookie:!")
             return
         else:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Dein Kontostand beträgt **{}** :cookie:!".format(str("{:,}".format(int(balance))).replace(",", " ")))
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Dein Kontostand beträgt **{}** :cookie:!".format(modules.bottiHelper._spaceIntToString(int(balance))))
     else:
         if balance == -1:
             await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Nutzer {} hat kein Konto!".format(user.mention))
             return
         else:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Der Kontostand von {} beträgt **{}** :cookie:!".format(user.mention, str("{:,}".format(int(balance))).replace(",", " ")))
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Der Kontostand von {} beträgt **{}** :cookie:!".format(modules.bottiHelper._spaceIntToString(int(balance))))
 
 async def betflip(botti, message, botData):
     """ 
@@ -275,6 +275,42 @@ def _loadBalancesToKeeper(botti, botData):
             continue
         ids.append(int(sheet.cell_value(rowx = i, colx = 0)))
         botData.balanceKeeper.append([int(sheet.cell_value(rowx = i, colx = 0)), sheet.cell_value(rowx = i, colx = 1)])
+
+async def norisknofun(botti, message, botData):
+    """
+    Für alle ausführbar
+    Dieser Befehl geht ein großes Risiko ein. Sei gewarnt!
+    !norisknofun {PARAM}
+    {PARAM} String
+    !norisknofun\r!norisknofun cancel
+    """
+    userBalance = _getBalance(botData, message.author.id)
+
+    if _checkBalance(botData, message.author.id, userBalance) == -1:
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Sieht so aus, als hättest du wohl noch kein Konto. Verwende `!balance`, um eins anzulegen!")
+        return 
+    if userBalance < 1000:
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dafür ist dein Kontostand zu niedring. Mindestens **1 000** :cookie: benötigt!")
+        return   
+                
+    if message.author.id not in botData.noRiskNoFunQueue:
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: Bist du dir sicher, dass du `!norisknofun` ausführen willst?\n:cookie: Wenn du verlierst, dann verlierst du alles!\n:cookie: Zum Ausführen `!norisknofun` erneut eingeben, zum Abbrechen `!norisknofun cancel`!")
+        botData.noRiskNoFunQueue.append(message.author.id)
+    else:
+        try:
+            cancelMessage = message.content.split(" ")[1]
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: `!norisknofun` abgebrochen!")
+            botData.noRiskNoFunQueue.remove(message.author.id)
+        except:
+            randomint = randint(0, 100)
+              
+            if randomint == 3:
+                await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: <@&" + ids.roleIDs.Spielhalle_RoleID + "> UNGLAUBLICHER GEWINN!!! Damit hast du **{}** :cookie: gewonnen!".format(modules.bottiHelper._spaceIntToString(int(userBalance* 100))))
+                _setBalance(botData, message.author.id, userBalance * 100) 
+            else:
+                await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: Damit hast du **{}** :cookie: verloren!".format(modules.bottiHelper._spaceIntToString(userBalance)))
+                _setBalance(botData, message.author.id, -userBalance)  
+            botData.noRiskNoFunQueue.remove(message.author.id)
 
 async def rank(botti, message, botData):
     """ 
