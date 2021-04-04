@@ -303,8 +303,8 @@ async def userinfo(botti, message, botData):
     data.add_field(name = "Bot-User", value = user.bot)
     data.add_field(name = "Höchste Rolle", value = user.top_role)
     
-    data.add_field(name = "Server beigetreten am:", value = modules.bottiHelper._toGermanTimestamp(user.joined_at))
-    data.add_field(name = "Account erstellt am:", value = modules.bottiHelper._toGermanTimestamp(user.created_at))
+    data.add_field(name = "Server beigetreten am", value = modules.bottiHelper._toGermanTimestamp(user.joined_at))
+    data.add_field(name = "Account erstellt am", value = modules.bottiHelper._toGermanTimestamp(user.created_at))
     
     data.add_field(name = "Profilbild", value = user.avatar_url, inline = False)
     
