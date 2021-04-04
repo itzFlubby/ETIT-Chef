@@ -305,7 +305,7 @@ async def norisknofun(botti, message, botData):
             randomint = randint(0, 100)
               
             if randomint == 3:
-                await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: <@&" + ids.roleIDs.Spielhalle_RoleID + "> UNGLAUBLICHER GEWINN!!! Damit hast du **{}** :cookie: gewonnen!".format(modules.bottiHelper._spaceIntToString(int(userBalance* 100))))
+                await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: <@&" + str(ids.roleIDs.Spielhalle_RoleID) + "> UNGLAUBLICHER GEWINN!!! Damit hast du **{}** :cookie: gewonnen!".format(modules.bottiHelper._spaceIntToString(int(userBalance* 100))))
                 _setBalance(botData, message.author.id, userBalance * 100) 
             else:
                 await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: Damit hast du **{}** :cookie: verloren!".format(modules.bottiHelper._spaceIntToString(userBalance)))
