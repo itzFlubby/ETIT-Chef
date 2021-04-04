@@ -276,19 +276,21 @@ async def purge(botti, message, botData):
     {OPTIONS} "-q"
     !purge 100\r!purge 100 -q
     """
-    if not str(message.content.split(" ")[1]).isdigit():
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!purge")) 
-        return
-    if not 0 <= int(message.content.split(" ")[1]) <= 100:
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Du musst eine Zahl zwischen einschließlich **0 und 100** wählen.")
-        return
-    deleted = await message.channel.purge(limit = int(message.content.split(" ")[1]), check = None)
-    
-    parameters = modules.bottiHelper._getParametersFromMessage(message.content, 14)
-    
-    if "q" not in parameters:
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":recycle: Es wurden **{0}** Nachrichten gelöscht.".format(len(deleted)))
-
+    try:
+        if not str(message.content.split(" ")[1]).isdigit():
+            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!purge")) 
+            return
+        if not 0 <= int(message.content.split(" ")[1]) <= 100:
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Du musst eine Zahl zwischen einschließlich **0 und 100** wählen.")
+            return
+        deleted = await message.channel.purge(limit = int(message.content.split(" ")[1]), check = None)
+        
+        parameters = modules.bottiHelper._getParametersFromMessage(message.content, 14)
+        
+        if "q" not in parameters:
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":recycle: Es wurden **{0}** Nachrichten gelöscht.".format(len(deleted)))
+    except:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!purge"))   
 async def purgemax(botti, message, botData):
     """
     Reserviert für Moderator oder höher
