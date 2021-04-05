@@ -125,3 +125,4 @@ modules/data/images/fonts/readme.txt
 modules/data/images/thisisfine.gif
 *.xls
 updateSlashCommand.py
+*.botti
