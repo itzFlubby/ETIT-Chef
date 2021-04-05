@@ -193,7 +193,7 @@ def _directSave(botti, botData):
     wb.save(botData.modulesDirectory + "/data/balances/balances.xls")
     botData.balanceKeeper.clear()
     botData.balanceKeeper[:] = []
-    _loadBalancesToKeeper(botti, botData)   
+    _loadBalancesToKeeper(botti, botData)  
 
 def _getBalance(botData, userID):
     balance = -1
@@ -414,6 +414,7 @@ async def _saveKeeperToFile(botti, botData):
     while True:
         await asyncio.sleep(3600 * 3)
         _directSave(botti, botData)
+        botData.noRiskNoFunQueue.clear()
 
 async def slots(botti, message, botData):    
     """ 
