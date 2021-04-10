@@ -46,7 +46,7 @@ async def on_ready():
         botData.slashCommandList = list(slash.commands)
 
     data = discord.Embed(
-        title = "[:globe_with_meridians:] Online",
+        title = "[<:online:" + str(ids.emojiIDs.online_EmojiID) + ">] Online",
         description = "[:shield:] Guard ist aktiv",
         color = 0x00FF00
     )
@@ -62,7 +62,7 @@ async def on_ready():
     
     if botData.firstBoot == True:
         if botData.maintenanceMode is True:
-            data.title = "[:globe_with_meridians:] Wartungsarbeiten-Modus"
+            data.title = "[<:online:" + str(ids.emojiIDs.online_EmojiID) + ">] Wartungsarbeiten-Modus"
             data.description = "Verbindung etabliert `@" + modules.bottiHelper._getTimestamp() + "`"
             data.color = 0xFF0000
             await botti.change_presence(activity = discord.Game(name = "⚒ Wartungsarbeiten ⚒"), status = discord.Status.dnd)
@@ -80,7 +80,7 @@ async def on_ready():
         
         botData.firstBoot = False
     else:
-        data.title = "[:globe_with_meridians:] RECONNECT"
+        data.title = "[<:online:" + str(ids.emojiIDs.online_EmojiID) + ">] RECONNECT"
         data.description = "Verbindung wurde wiederhergestellt `@" + modules.bottiHelper._getTimestamp() + "`"
         data.color = 0x0000FF
         await modules.bottiHelper._setNormalStatus(botti, botData)
