@@ -16,12 +16,12 @@ async def on_member_join(member):
         roles.append(guild.get_role(role_id))
     await member.edit(roles = roles, reason = "Mitglieder beitritt.")
     
-    channel = guild.get_channel(ids.channelIDs.allgemein_ChannelID)
+    channel = guild.get_channel(ids.channelIDs.nutzer_updates_ChannelID)
     
     data = discord.Embed(
         title = member.name + "#" + str(member.discriminator),
         color = 0x00FF00,
-        description = "ist dem Server beigetreten!"
+        description = "<@!" + str(member.id) + "> ist dem Server beigetreten!"
     )
     data.add_field(name = "Server beigetreten am", value = modules.bottiHelper._toGermanTimestamp(member.joined_at), inline = False)
     data.add_field(name = "Account erstellt am", value = modules.bottiHelper._toGermanTimestamp(member.created_at), inline = False)
@@ -37,7 +37,7 @@ async def on_member_join(member):
 async def on_member_remove(member):
     guild = botti.get_guild(ids.serverIDs.ETIT_KIT_ServerID)
     
-    channel = guild.get_channel(ids.channelIDs.allgemein_ChannelID)
+    channel = guild.get_channel(ids.channelIDs.nutzer_updates_ChannelID)
     
     data = discord.Embed(
         title = member.name + "#" + str(member.discriminator),
@@ -67,11 +67,11 @@ async def on_raw_reaction_add(payload):
         updatedStatus = ""
         if payload.emoji.name == "✅":
             updatedStatus = "angenommen"
-        elif payload.emoji.name == "➖":
+        elif payload.emoji.name == "💤":
              updatedStatus = "on hold"
         elif payload.emoji.name == "❌":
              updatedStatus = "abgelehnt"
-        await channel_botTestLobby_ChannelID.send(":bookmark_tabs: Statusänderung für Vorschlag von {0} ({1}) <@!{1}> `@{2}`\n`{3}`\nwurde auf {4} **{5}** gesetzt!".format(vorschlagMessage.split(" ")[0], vorschlagMessage.split(" ")[1][1:-1], vorschlagMessage.split("| ")[1], vorschlagMessage.split("'")[1], payload.emoji.name, updatedStatus)) 
+        await channel_botTestLobby_ChannelID.send(":bookmark_tabs: Statusänderung für Vorschlag von **{0}** ({1}) <@!{1}> `@{2}`\n`{3}`\nwurde auf {4} **{5}** gesetzt!".format(vorschlagMessage.split("**")[1], vorschlagMessage.split("(")[1][:18], vorschlagMessage.split("| ")[1], vorschlagMessage.split("'")[1], payload.emoji.name, updatedStatus)) 
 
     # ROLLEN
     if payload.message_id == ids.messageIDs.roleSelect_MessageID:
@@ -146,12 +146,19 @@ async def on_raw_reaction_add(payload):
                 
             await helpfulMessage.add_reaction("✅")
         pass
-        
+"""        
 @botti.event
 async def on_member_update(before, after):
     guild = botti.get_guild(ids.serverIDs.ETIT_KIT_ServerID)
     
     channel = guild.get_channel(ids.channelIDs.devInternal1_ChannelID)
+    
+    onlineIconDict = {
+        discord.Status.online: "<:online:" + str(ids.emojiIDs.online_EmojiID) + ">",
+        discord.Status.offline: "<:offline:" + str(ids.emojiIDs.offline_EmojiID) + ">",
+        discord.Status.idle: "<:idle:" + str(ids.emojiIDs.idle_EmojiID) + ">",
+        discord.Status.dnd: "<:dnd:" + str(ids.emojiIDs.dnd_EmojiID) + ">"
+    }
     
     data = discord.Embed(
         title = after.name + "#" + str(after.discriminator),
@@ -159,7 +166,7 @@ async def on_member_update(before, after):
         description = "<@" + str(after.id) + "> wurde aktualisiert!"
     )
     
-    data.add_field(name = "Status", value = str(before.status) + " -> " + str(after.status), inline = False)
+    data.add_field(name = "Status", value = "{} {} -> {} {}".format(str(before.status), str(onlineIconDict[before.status]), str(after.status), str(onlineIconDict[after.status])), inline = False)
     data.add_field(name = "Aktivität", value = str(before.activity) + " -> " + str(after.activity), inline = False)
 
     data.set_author(name = "🔃 Mitglieder-Aktualisierung")
@@ -180,3 +187,4 @@ async def on_member_update(before, after):
             data.set_thumbnail(url = botti.user.avatar_url)
             data.set_author(name = "📡 Offline-Detektor")
             await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.botTestLobby_ChannelID).send(content = "<@192701441188560900>", embed = data)
+"""

@@ -29,13 +29,13 @@ async def balance(botti, message, botData):
             await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Da du noch kein Konto hast, wurde für dich eben eins angelegt. Dein Kontostand beträgt nun **5 000** :cookie:!")
             return
         else:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Dein Kontostand beträgt **{}** :cookie:!".format(modules.bottiHelper._spaceIntToString(int(balance))))
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Dein Kontostand beträgt **{}** :cookie:!".format(modules.bottiHelper._spaceIntToString(balance)))
     else:
         if balance == -1:
             await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Nutzer {} hat kein Konto!".format(user.mention))
             return
         else:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Der Kontostand von {} beträgt **{}** :cookie:!".format(modules.bottiHelper._spaceIntToString(int(balance))))
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Der Kontostand von {} beträgt **{}** :cookie:!".format(modules.bottiHelper._spaceIntToString(balance)))
 
 async def betflip(botti, message, botData):
     """ 

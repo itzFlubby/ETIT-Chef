@@ -482,7 +482,7 @@ async def vorschlag(botti, message, botData):
         sentMessage = await botti.get_user(ids.userIDs.itzFlubby_ID).dm_channel.send("**{0}#{1}** ({2}) hat im Privat-Chat folgendes geschrieben: _'{3}'_. | {4}".format(message.author.name, message.author.discriminator, message.author.id, str(message.content[9:]), modules.bottiHelper._getTimestamp()))
     
     await sentMessage.add_reaction("✅")
-    await sentMessage.add_reaction("➖")
+    await sentMessage.add_reaction("💤")
     await sentMessage.add_reaction("❌")
     await modules.bottiHelper._sendMessagePingAuthor(message, ":bookmark_tabs: Deine Nachricht wurde erfolgreich zugestellt!")
 

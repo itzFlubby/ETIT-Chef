@@ -244,7 +244,7 @@ async def restart(botti, message, botData):
     !restart\r!restart -n
     """
     params = modules.bottiHelper._getParametersFromMessage(message.content, 11)
-    await modules.bottiHelper._sendMessagePingAuthor(message, ":infinity: **[RESTART]** _@{}_".format(modules.bottiHelper._getTimestamp()))
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":infinity: **[RESTART]**  `@{}`".format(modules.bottiHelper._getTimestamp()))
     print("[ INFO ] Der Bot wurde von **{0}#{1}** neugestartet!".format(message.author.name, message.author.discriminator))
     print("---")
     if "n" not in params:
@@ -291,7 +291,7 @@ async def shutdown(botti, message, botData):
     Dieser Befehl fährt den Bot herunter.
     !shutdown
     """
-    await modules.bottiHelper._sendMessagePingAuthor(message, ":arrow_heading_down: **[SHUTDOWN]** _@{}_".format(modules.bottiHelper._getTimestamp()))
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":arrow_heading_down: **[SHUTDOWN]** `@{}`".format(modules.bottiHelper._getTimestamp()))
     await save(botti, message, botData)
     await botti.logout()
     await botti.close()
