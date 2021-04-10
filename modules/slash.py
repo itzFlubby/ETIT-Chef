@@ -4,6 +4,7 @@ import modules.info
 import modules.lerngruppe
 import modules.mensa
 import modules.utils
+import traceback
 
 from __main__ import botti, slash
 
@@ -144,7 +145,7 @@ async def _templerngruppe(ctx: SlashContext, option = "", user = None):
 @slash.slash(name="test", description="Überprüft, ob einfach alles funzt...")
 async def _test(ctx: SlashContext):
     modules.bottiHelper._logSlashCommand(ctx, botData)
-    msg = await ctx.send(content = ":globe_with_meridians: Der Bot ist online und läuft ordnungsgemäß!", hidden = True) 
+    await ctx.send(content = ":globe_with_meridians: Der Bot ist online und läuft ordnungsgemäß!", hidden = True) 
 
 @slash.slash(name="userinfo", description="Zeigt Informationen über einen Benutzer an!", options = [ manage_commands.create_option(
     name = "benutzer",
@@ -169,7 +170,7 @@ async def _vorschlag(ctx: SlashContext, nachricht):
         await botti.get_user(ids.userIDs.itzFlubby_ID).create_dm()
     sentMessage = await botti.get_user(ids.userIDs.itzFlubby_ID).dm_channel.send("**{0}#{1}** ({2}) hat per SlashCommand folgendes vorgeschlagen: _'{3}'_. | {4}".format(ctx.author.name, ctx.author.discriminator, ctx.author.id, nachricht, modules.bottiHelper._getTimestamp()))
     await sentMessage.add_reaction("✅")
-    await sentMessage.add_reaction("➖")
+    await sentMessage.add_reaction("💤")
     await sentMessage.add_reaction("❌")
 
     await ctx.send(content = ":bookmark_tabs: Deine Nachricht wurde erfolgreich zugestellt!", hidden = True) 

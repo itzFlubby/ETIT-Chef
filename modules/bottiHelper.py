@@ -92,6 +92,8 @@ def _logCommand(message, botData):
         return 0
 
 def _logSlashCommand(ctx, botData):
+    ctx.defer()
+
     botData.lastCommands =  botData.lastCommands[-1:] + botData.lastCommands[:-1]
     botData.lastCommands[0] = ctx
         
