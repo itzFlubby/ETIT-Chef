@@ -6,6 +6,8 @@ import os
 import platform
 import psutil
 
+from mcstatus import MinecraftServer
+
 async def botinfo(botti, message, botData):
     """ 
     Für alle ausführbar
@@ -74,6 +76,30 @@ async def channelinfo(botti, message, botData):
     
     await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
 
+async def minecraft(botti, message, botData):
+    """ 
+    Für alle ausführbar
+    Dieser Befehl zeigt die Minecraft-Server-Info an.
+    !minecraft
+    """    
+    server = MinecraftServer.lookup(botData.minecraftServerName)
+    
+    status = server.status()
+    query = server.query()
+    
+    data = discord.Embed(
+        title = "<:minecraft:" + str(ids.emojiIDs.minecraft_EmojiID) + "> Server-Status",
+        color = 0x00ff00,
+        description = botData.minecraftServerName
+    )
+    data.add_field(name = "Latenz", value = str(status.latency) + "ms", inline = False)
+    data.add_field(name = "Spieler", value = "**{0} / 8**\n```\n{1}```".format(status.players.online, ",\n".join(query.players.names)), inline = False)
+
+    data.set_thumbnail(url = botti.user.avatar_url)
+    data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
+    
+    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    
 async def permissions(botti, message, botData):
     """ 
     Für alle ausführbar
