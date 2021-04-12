@@ -82,21 +82,25 @@ async def minecraft(botti, message, botData):
     Dieser Befehl zeigt die Minecraft-Server-Info an.
     !minecraft
     """    
-    server = MinecraftServer.lookup(botData.minecraftServerName)
-    
-    status = server.status()
-    query = server.query()
-    
     data = discord.Embed(
         title = "<:minecraft:" + str(ids.emojiIDs.minecraft_EmojiID) + "> Server-Status",
         color = 0x00ff00,
         description = botData.minecraftServerName
     )
-    data.add_field(name = "Latenz", value = str(status.latency) + "ms", inline = False)
-    data.add_field(name = "Spieler", value = "**{0} / 8**\n```\n{1}```".format(status.players.online, ",\n".join(query.players.names)), inline = False)
-
     data.set_thumbnail(url = botti.user.avatar_url)
     data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
+    
+    try:
+        server = MinecraftServer.lookup(botData.minecraftServerName)
+        
+        status = server.status()
+        query = server.query()
+        
+        data.add_field(name = "Latenz", value = str(status.latency) + "ms", inline = False)
+        data.add_field(name = "Spieler", value = "**{0} / 8**\n```\n{1}```".format(status.players.online, ",\n".join(query.players.names)), inline = False)
+    except:
+        data.color = 0xff0000
+        data.add_field(name = "Offline", value = "Der Server ist nicht erreichbar.")
     
     await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
     
