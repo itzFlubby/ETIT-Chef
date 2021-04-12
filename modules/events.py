@@ -76,17 +76,17 @@ async def on_raw_reaction_add(payload):
     # ROLLEN
     if payload.message_id == ids.messageIDs.roleSelect_MessageID:
         if payload.emoji.name == "⚡":
-            userRoles = modules.roles._changeRole(payload.member.roles, [                                ids.roleIds.MIT_Ersti_RoleID, ids.roleIds.Info_RoleID, ids.roleIds.Paedagogik_RoleID, ids.roleIds.NWT_RoleID, ids.roleIds.Gast_RoleID ], guild.get_role(ids.roleIds.ETIT_Ersti_RoleID), guild)
+            userRoles = modules.roles._changeRole(payload.member.roles, [                                ids.roleIDs.MIT_Ersti_RoleID, ids.roleIDs.Info_RoleID, ids.roleIDs.Paedagogik_RoleID, ids.roleIDs.NWT_RoleID, ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.ETIT_Ersti_RoleID), guild)
         elif payload.emoji.name == "⚙️":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIds.ETIT_Ersti_RoleID,                               ids.roleIds.Info_RoleID, ids.roleIds.Paedagogik_RoleID, ids.roleIds.NWT_RoleID, ids.roleIds.Gast_RoleID ], guild.get_role(ids.roleIds.MIT_Ersti_RoleID), guild)
+            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID,                               ids.roleIDs.Info_RoleID, ids.roleIDs.Paedagogik_RoleID, ids.roleIDs.NWT_RoleID, ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.MIT_Ersti_RoleID), guild)
         elif payload.emoji.name == "💻":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIds.ETIT_Ersti_RoleID, ids.roleIds.MIT_Ersti_RoleID,                          ids.roleIds.Paedagogik_RoleID, ids.roleIds.NWT_RoleID, ids.roleIds.Gast_RoleID ], guild.get_role(ids.roleIds.Info_RoleID), guild)
+            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID, ids.roleIDs.MIT_Ersti_RoleID,                          ids.roleIDs.Paedagogik_RoleID, ids.roleIDs.NWT_RoleID, ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.Info_RoleID), guild)
         elif payload.emoji.name == "👦":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIds.ETIT_Ersti_RoleID, ids.roleIds.MIT_Ersti_RoleID, ids.roleIds.Info_RoleID,                                ids.roleIds.NWT_RoleID, ids.roleIds.Gast_RoleID ], guild.get_role(ids.roleIds.Paedagogik_RoleID), guild)
+            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID, ids.roleIDs.MIT_Ersti_RoleID, ids.roleIDs.Info_RoleID,                                ids.roleIDs.NWT_RoleID, ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.Paedagogik_RoleID), guild)
         elif payload.emoji.name == "👨‍🏫":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIds.ETIT_Ersti_RoleID, ids.roleIds.MIT_Ersti_RoleID, ids.roleIds.Info_RoleID, ids.roleIds.Paedagogik_RoleID,                         ids.roleIds.Gast_RoleID ], guild.get_role(ids.roleIds.NWT_RoleID), guild)
+            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID, ids.roleIDs.MIT_Ersti_RoleID, ids.roleIDs.Info_RoleID, ids.roleIDs.Paedagogik_RoleID,                         ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.NWT_RoleID), guild)
         elif payload.emoji.name == "👤":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIds.ETIT_Ersti_RoleID, ids.roleIds.MIT_Ersti_RoleID, ids.roleIds.Info_RoleID, ids.roleIds.Paedagogik_RoleID, ids.roleIds.NWT_RoleID                          ], guild.get_role(ids.roleIds.Gast_RoleID), guild)
+            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID, ids.roleIDs.MIT_Ersti_RoleID, ids.roleIDs.Info_RoleID, ids.roleIDs.Paedagogik_RoleID, ids.roleIDs.NWT_RoleID                          ], guild.get_role(ids.roleIDs.Gast_RoleID), guild)
         else:
             return
         await payload.member.edit(roles = userRoles, reason = "Requested by user.")

@@ -35,8 +35,8 @@ async def etit(botti, message, botData):
         return
     userRoles = _changeRole(userRoles, [ ids.roleIDs.MIT_Ersti_RoleID, ids.roleIDs.Paedagogik_RoleID, ids.roleIDs.Info_RoleID ], addRole, message.guild)
     
-    await message.author.edit(roles = userRoles, reason="Requested by user.")
-    await modules.bottiHelper._sendMessagePingAuthor(message, ":white_check_mark: Dir wurde die ETIT-Ersti-Rolle verliehen!")   
+    await message.author.edit(roles = userRoles, reason = "Requested by user.")
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":white_check_mark: Dir wurde die Rolle <@&{}> verliehen!".format(str(ids.roleIDs.ETIT_Ersti_RoleID)))   
 
 async def matlab(botti, message, botData):
     """
@@ -48,7 +48,7 @@ async def matlab(botti, message, botData):
         await message.author.add_roles(message.guild.get_role(ids.roleIDs.Matlab_RoleID), reason = "Requested by user.")
     except:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Du hast diese Rolle bereits!")
-    await modules.bottiHelper._sendMessagePingAuthor(message, ":white_check_mark: Dir wurde die Matlab-C++ Rolle verliehen!")
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":white_check_mark: Dir wurde die Rolle <@&{}> verliehen!".format(str(ids.roleIDs.Matlab_RoleID)))   
 
 async def mit(botti, message, botData):
     """
@@ -62,5 +62,6 @@ async def mit(botti, message, botData):
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Du besitzt diese Rolle bereits!")
         return
     userRoles = _changeRole(userRoles, [ ids.roleIDs.ETIT_Ersti_RoleID, ids.roleIDs.Paedagogik_RoleID, ids.roleIDs.Info_RoleID ], addRole, message.guild)
-    await message.author.edit(roles = userRoles, reason="Requested by user.")
-    await modules.bottiHelper._sendMessagePingAuthor(message, ":white_check_mark: Dir wurde die MIT-Ersti-Rolle verliehen!")
+    await message.author.edit(roles = userRoles, reason = "Requested by user.")
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":white_check_mark: Dir wurde die Rolle <@&{}> verliehen!".format(str(ids.roleIDs.MIT_Ersti_RoleID)))   
+
