@@ -100,23 +100,9 @@ async def estimateprunes(botti, message, botData):
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!estimateprunes"))
         return        
         
-    # estimate_pruned_members() ist für meine Zwecke ungeeignet, da keine Option für roles vorhanden
-    url = "https://discord.com/api/v8/guilds/" + str(message.guild.id) + "/prune"
-
-    headers = {
-        "Authorization": "Bot " + botData.botToken
-    }
-
-    roles = [str(role.id) for role in message.guild.roles]
-
-    json = {
-        "days": str(nDays),
-        "include_roles": ', '.join(roles)
-    }
+    estimated_prunes = await message.guild.estimate_pruned_members(days = nDays, roles = message.guild.roles)
     
-    response = requests.get(url = url, headers = headers, params = json)
-    
-    await modules.bottiHelper._sendMessagePingAuthor(message, ":stopwatch: {} Mitglieder sind seit {} Tagen inaktiv.".format(response.json()['pruned'], nDays))
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":stopwatch: **{}** Mitglieder sind seit **{}** Tagen inaktiv.".format(estimated_prunes, nDays))
 
 async def eval(botti, message, botData):    
     """
