@@ -140,7 +140,7 @@ async def on_message(message):
         # GAMBLING
         elif command in botData.gambleCommandList:
             if (message.channel.id != ids.channelIDs.spielhalle_ChannelID) and (command not in [ "!balance", "!rank", "!ranking", "!transfer" ]):
-                await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Dieser Befehl darf nur in <#" + str(ids.channelIDs.spielhalle_ChannelID) + "> verwendet werden!")
+                await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Dieser Befehl darf nur in <#{}> verwendet werden!".format(str(ids.channelIDs.spielhalle_ChannelID)))
                 return
             await getattr(modules.gamble, commandName)(botti, message, botData) 
         # INFO
