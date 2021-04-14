@@ -97,7 +97,8 @@ async def minecraft(botti, message, botData):
         query = server.query()
         
         data.add_field(name = "Latenz", value = str(status.latency) + "ms", inline = False)
-        data.add_field(name = "Spieler", value = "**{0} / 8**\n```\n{1}```".format(status.players.online, ",\n".join(query.players.names)), inline = False)
+        data.add_field(name = "Version", value = "{0} {1}\n[Modded] Direwolf20 v2.5.0".format(query.software.brand, query.software.version))
+        data.add_field(name = "Spieler", value = "**{0} / {1}**".format(status.players.online, status.players.max) + ("\n```\n{0}```".format(",\n".join(query.players.names)) if status.players.online != 0 else ""), inline = False)
     except:
         data.color = 0xff0000
         data.add_field(name = "Offline", value = "Der Server ist nicht erreichbar.")
