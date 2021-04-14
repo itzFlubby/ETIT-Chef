@@ -510,10 +510,12 @@ async def wochenplan(botti, message, botData):
     mit = False
     
     for role in message.author.roles:
-        if "ETIT Ersti" in role.name:
+        if ids.roleIDs.ETIT_Ersti_RoleID == role.id:
             etit = True
-        if "MIT Ersti" in role.name:
+            break
+        if ids.roleIDs.MIT_Ersti_RoleID == role.id:
             mit = True
+            break
     
     if (etit and parameter == "") or parameter.lower() == "etit":
         type = "ETIT"
