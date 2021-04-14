@@ -31,7 +31,7 @@ def _createDummyMessage(author, channel, content):
     return msg  
        
 async def _errorMessage(botti, message, botData, error):
-    await _sendMessage(message, "```css\n[FAIL]: {}```".format(error))
+    await _sendMessage(message, "```css\n[FAIL]: {0}```:fly: Bug automatisch an <@!{1}> gemeldet!".format(error, ids.userIDs.itzFlubby_ID))
     raise BotError("")
 
 def _formatCommandLog(message):
