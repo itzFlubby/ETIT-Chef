@@ -62,7 +62,7 @@ async def on_ready():
     
     if botData.firstBoot == True:
         if botData.maintenanceMode is True:
-            data.title = "[<:online:" + str(ids.emojiIDs.online_EmojiID) + ">] Wartungsarbeiten-Modus"
+            data.title = "[<:dnd:" + str(ids.emojiIDs.dnd_EmojiID) + ">] Wartungsarbeiten-Modus"
             data.description = "Verbindung etabliert `@" + modules.bottiHelper._getTimestamp() + "`"
             data.color = 0xFF0000
             await botti.change_presence(activity = discord.Game(name = "⚒ Wartungsarbeiten ⚒"), status = discord.Status.dnd)
