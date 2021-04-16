@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import discord
 import linecache
@@ -396,3 +397,15 @@ async def unban(botti, message, botData):
     
     await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Nutzer **{0}** ist nicht gebannt.".format(username))
   
+async def updatecalendar(botti, message, botData):
+    """
+    Reserviert für Moderator oder höher
+    Dieser Befehl aktualisiert den Kalender.
+    !updatecalendar
+    """
+    await modules.bottiHelper._sendMessage(message, ":calendar: Aktualisiere Kalender... Dies dauert ein paar Sekunden...\n")
+    request = requests.get(botData.calendarURL)
+    with open(botData.modulesDirectory + "/data/calendar/cal.ical", "w+") as f:
+        f.write(request.text.replace("\r", ""))
+    await asyncio.sleep(5)
+        
