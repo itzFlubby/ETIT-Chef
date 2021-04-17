@@ -393,6 +393,9 @@ def _compareDate(first, second):
         
     return 0
 
+def _appendItem(itemList, day, start, end, summary):
+    itemList[day].append("`" + start.strftime("%H:%M") + " - " + end.strftime("%H:%M` ") + summary + "\n")
+
 async def wochenplan(botti, message, botData):
     """ 
     Für alle ausführbar
@@ -442,8 +445,8 @@ async def wochenplan(botti, message, botData):
                 
                 if "INTERVAL" in component.decoded("rrule"):
                     if (abs(startOfWeek.isocalendar()[1] - dtstart.isocalendar()[1]) % component.decoded("rrule")["INTERVAL"][0]) is 0:
-                        weekdayItems[dtstart.weekday()].append("`" + dtstart.strftime("%H:%M") + " - " + dtend.strftime("%H:%M` ") + summary + "\n")
-                    continue
+                        _appendItem(weekdayItems, dtstart.weekday(), dtstart, dtend, summary)
+                        continue
                     
                 
                 if "BYDAY" in component.decoded("rrule"):
@@ -468,32 +471,28 @@ async def wochenplan(botti, message, botData):
 
                             if appendDate:
                                 if (datetimeDay - dtend).days >= -1:
-                                    weekdayItems[indexDay].append("`" + dtstart.strftime("%H:%M") + " - " + dtend.strftime("%H:%M` ") + summary + "\n")
-                        continue
+                                    _appendItem(weekdayItems, indexDay, dtstart, dtend, summary)
+                            continue
                         
                 if "exdate" in component:
+                    returnToMainloop = False
                     if hasattr(component.decoded("exdate"), "dts"):
-                        returnToMainloop = False
                         for vDDDType in component.decoded("exdate").dts:
                             if (vDDDType.dt - startOfWeek).days < 5:
                                 returnToMainloop = True
                                 break
-                        if returnToMainloop:
-                            continue
                     else:   
-                        returnToMainloop = False
                         for exdate in component.decoded("exdate"):
                             for vDDDType in exdate.dts:
                                 if (vDDDType.dt - startOfWeek).days < 5:
                                     returnToMainloop = True
                                     break
-                        if returnToMainloop:
-                            continue
                     
-                    weekdayItems[dtstart.weekday()].append("`" + dtstart.strftime("%H:%M") + " - " + dtend.strftime("%H:%M` ") + summary + "\n")
+                    if not returnToMainloop:
+                        _appendItem(weekdayItems, dtstart.weekday(), dtstart, dtend, summary)
                     continue
                     
-                weekdayItems[dtstart.weekday()].append("`" + dtstart.strftime("%H:%M") + " - " + dtend.strftime("%H:%M` ") + summary + "\n")
+                _appendItem(weekdayItems, dtstart.weekday(), dtstart, dtend, summary)
                 continue    
                 
                         
@@ -503,8 +502,7 @@ async def wochenplan(botti, message, botData):
             if _compareDate(dtstart, startOfWeek) is not 0:
                 continue
             else:
-                weekdayItems[dtstart.weekday()].append("`" + dtstart.strftime("%H:%M") + " - " + dtend.strftime("%H:%M` ") + summary + "\n")
-    
+                _appendItem(weekdayItems, dtstart.weekday(), dtstart, dtend, summary)
     
     data = discord.Embed(
         title = "",
@@ -515,12 +513,12 @@ async def wochenplan(botti, message, botData):
     items = ""
     weekdayNames = [ "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag" ]
     for i in range(5):
-        weekdayItems[i] = sorted(weekdayItems[i], key=lambda x: int(x[1:3]))
+        weekdayItems[i] = sorted(weekdayItems[i], key = lambda x: int(x[1:3]))
         dayString = ""
         for entry in weekdayItems[i]:
             dayString += entry
                 
-        data.add_field(name = weekdayNames[i], value = dayString if dayString is not "" else "-", inline = False)
+        data.add_field(name = weekdayNames[i] + (startOfWeek + datetime.timedelta(days = i)).strftime(" `(%d.%m.%Y)`"), value = dayString if dayString is not "" else "-", inline = False)
     
     data.set_author(name = "🗓️ Wochenplan für ETIT")
     data.set_thumbnail(url = botti.user.avatar_url)
