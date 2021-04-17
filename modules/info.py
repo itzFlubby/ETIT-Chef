@@ -415,7 +415,7 @@ async def wochenplan(botti, message, botData):
             return         
     
     content = ""
-    with open(botData.modulesDirectory + "/data/calendar/cal.ical", "r") as f:
+    with open(botData.modulesDirectory + "data/calendar/cal.ical", "r") as f:
         content += f.read()
         
     calendar = Calendar.from_ical(content)

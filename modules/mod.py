@@ -392,9 +392,9 @@ async def updatecalendar(botti, message, botData):
     Dieser Befehl aktualisiert den Kalender.
     !updatecalendar
     """
-    await modules.bottiHelper._sendMessage(message, ":calendar: Aktualisiere Kalender... Dies dauert ein paar Sekunden...\n")
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Aktualisiere Kalender... Dies dauert ein paar Sekunden...\n")
     request = requests.get(botData.calendarURL)
-    with open(botData.modulesDirectory + "/data/calendar/cal.ical", "w+") as f:
+    with open(botData.modulesDirectory + "data/calendar/cal.ical", "w+") as f:
         f.write(request.text.replace("\r", ""))
     await asyncio.sleep(5)
         

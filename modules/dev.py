@@ -157,12 +157,12 @@ async def maintenance(botti, message, botData):
     if botData.maintenanceMode is True:
         botData.maintenanceMode = False
         await modules.bottiHelper._sendMessage(message, ":tools: Die Wartungsarbeiten sind **abgeschlossen**!")
-        await modules.bottiHelper._setNormalStatus(botti, botData.configFile)
+        await modules.bottiHelper._setNormalStatus(botti, botData)
         modules.bottiHelper._maintenanceChange(botData.configFile)
     else:
         botData.maintenanceMode = True
         await modules.bottiHelper._sendMessage(message, ":tools: Die Wartungsarbeiten haben **begonnen**!")
-        await botti.change_presence(activity = discord.Game(name = "⚒ Wartungsarbeiten ⚒"), status = discord.Status.idle)
+        await botti.change_presence(activity = discord.Game(name = "⚒ Wartungsarbeiten ⚒"), status = discord.Status.dnd)
         modules.bottiHelper._maintenanceChange(botData.configFile)
 
 async def mdtext(botti, message, botData):
