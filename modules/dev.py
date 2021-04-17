@@ -328,5 +328,16 @@ async def traceback(botti, message, botData):
             j =+ 1
     else:
         await modules.bottiHelper._sendMessage(message, "{}".format(botData.lastError))
+        
+async def tts(botti, message, botData):
+    """
+    Reserviert für Moderator oder höher
+    Dieser Befehl liest eine Nachricht vor.
+    !tts {NACHRICHT}
+    {NACHRICHT} String
+    !tts Ich bin cool
+    """
+    await modules.bottiHelper._sendTTS(message, message.content[5:])
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":robot: Der TTS-Befehl wurde ausgeführt.")
     
     
