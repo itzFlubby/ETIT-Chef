@@ -64,14 +64,8 @@ async def on_raw_reaction_add(payload):
             await botti.get_user(ids.userIDs.itzFlubby_ID).create_dm()
         vorschlagMessage = (await botti.get_user(ids.userIDs.itzFlubby_ID).dm_channel.fetch_message(payload.message_id)).content
         channel_botTestLobby_ChannelID = guild.get_channel(ids.channelIDs.botTestLobby_ChannelID)
-        updatedStatus = ""
-        if payload.emoji.name == "✅":
-            updatedStatus = "angenommen"
-        elif payload.emoji.name == "💤":
-             updatedStatus = "on hold"
-        elif payload.emoji.name == "❌":
-             updatedStatus = "abgelehnt"
-        await channel_botTestLobby_ChannelID.send(":bookmark_tabs: Statusänderung für Vorschlag von **{0}** ({1}) <@!{1}> `@{2}`\n`{3}`\nwurde auf {4} **{5}** gesetzt!".format(vorschlagMessage.split("**")[1], vorschlagMessage.split("(")[1][:18], vorschlagMessage.split("| ")[1], vorschlagMessage.split("'")[1], payload.emoji.name, updatedStatus)) 
+        emojiToStatusname = { "✅": "angenommen", "💤": "on hold", "❌": "abgelehnt" }
+        await channel_botTestLobby_ChannelID.send(":bookmark_tabs: Statusänderung für Vorschlag von **{0}** ({1}) <@!{1}> `@{2}`\n`{3}`\nwurde auf {4} **{5}** gesetzt!".format(vorschlagMessage.split("**")[1], vorschlagMessage.split("(")[1][:18], vorschlagMessage.split("| ")[1], vorschlagMessage.split("'")[1], payload.emoji.name, emojiToStatusname[payload.emoji.name])) 
 
     # ROLLEN
     if payload.message_id == ids.messageIDs.roleSelect_MessageID:
@@ -92,60 +86,41 @@ async def on_raw_reaction_add(payload):
         await payload.member.edit(roles = userRoles, reason = "Requested by user.")
         
     if payload.message_id == ids.messageIDs.removeRoleSelect_MessageID:
-        if payload.emoji.name == "💬":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Zitate_RoleID ], -1, guild)
-        elif payload.emoji.name == "🎼":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Musik_RoleID ], -1, guild)          
-        elif payload.emoji.name == "👾":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Memes_RoleID ], -1, guild)       
-        elif payload.emoji.name == "🎮":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Gaming_RoleID ], -1, guild)       
-        elif payload.emoji.name == "😺":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Katzen_RoleID ], -1, guild)       
-        elif payload.emoji.name == "💻":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.tech_talk_RoleID ], -1, guild)       
-        elif payload.emoji.name == "🎰":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Spielhalle_RoleID ], -1, guild)       
-        elif payload.emoji.name == "🐖":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Vorlesungsspam_RoleID ], -1, guild)       
-        elif payload.emoji.name == "❌":     
+        emojiToRole = { "💬": ids.roleIDs.Zitate_RoleID, 
+                        "🎼": ids.roleIDs.Musik_RoleID, 
+                        "👾": ids.roleIDs.Memes_RoleID,
+                        "🎮": ids.roleIDs.Gaming_RoleID,
+                        "😺": ids.roleIDs.Katzen_RoleID,
+                        "💻": ids.roleIDs.tech_talk_RoleID,
+                        "🎰": ids.roleIDs.Spielhalle_RoleID,
+                        "🐖": ids.roleIDs.Vorlesungsspam_RoleID }     
+        if payload.emoji.name == "❌":     
             userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Zitate_RoleID, ids.roleIDs.Musik_RoleID, ids.roleIDs.Memes_RoleID, ids.roleIDs.Gaming_RoleID, ids.roleIDs.Katzen_RoleID, ids.roleIDs.tech_talk_RoleID, ids.roleIDs.Spielhalle_RoleID, ids.roleIDs.Vorlesungsspam_RoleID, ids.roleIDs.Freizeit_RoleID ], -1, guild)          
         else:
-            return
+            userRoles = modules.roles._changeRole(payload.member.roles, [ emojiToRole[payload.emoji.name] ], -1, guild)
         await payload.member.edit(roles = userRoles, reason = "Requested by user.")  
         
     if payload.message_id == ids.messageIDs.matlabSelect_MessageID:
-        try:
-            await payload.member.add_roles(guild.get_role(ids.roleIDs.Matlab_RoleID), reason = "Requested by user.")
-        except:
-            pass
+        await payload.member.add_roles(guild.get_role(ids.roleIDs.Matlab_RoleID), reason = "Requested by user.")
+
    
     # DANKE               
     if payload.emoji.id == ids.emojiIDs.danke_EmojiID:
         channel = payload.member.guild.get_channel(payload.channel_id)
-        helpfulMessage = await channel.fetch_message(payload.message_id)
-        if payload.user_id == helpfulMessage.author.id:
-            await helpfulMessage.add_reaction("❌")
+        message = await channel.fetch_message(payload.message_id)
+        if payload.user_id == message.author.id:
+            await message.add_reaction("❌")
             return
-        
-        reactions = helpfulMessage.reactions
         wasAcknowledged = False
-        for reaction in reactions:
-            try:
-                if reaction.me == True:
-                    wasAcknowledged = True
-            except:
-                pass
-                
+        for reaction in message.reactions:
+            if reaction.me == True:
+                wasAcknowledged = True
+                break
         if wasAcknowledged == False:
-            if modules.gamble._getBalance(botData, helpfulMessage.author.id) == -1:
-                modules.gamble._createAccount(botData, helpfulMessage.author.id)
-                
-            if helpfulMessage.author.id != ids.userIDs.itzFlubby_ID:
-                modules.gamble._setBalance(botData, helpfulMessage.author.id, 1500)
-                
-            await helpfulMessage.add_reaction("✅")
-        pass
+            if modules.gamble._getBalance(botData, message.author.id) == -1:
+                modules.gamble._createAccount(botData, message.author.id)
+            modules.gamble._addBalance(botData, message.author.id, 1500)
+            await message.add_reaction("✅")
 """        
 @botti.event
 async def on_member_update(before, after):

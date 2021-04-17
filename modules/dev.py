@@ -121,7 +121,7 @@ async def give(botti, message, botData):
         if (userCookies + value) < 0:
             value = -userCookies
         
-        returnVal = modules.gamble._setBalance(botData, user.id, value)
+        returnVal = modules.gamble._addBalance(botData, user.id, value)
         if returnVal == 1:
             await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: Cookies konnten an **{}#{}** __nicht__ vergeben werden!".format(user.name, user.discriminator)) 
             return
