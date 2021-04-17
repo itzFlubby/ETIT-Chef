@@ -388,7 +388,7 @@ def _compareDate(first, second):
     if first.month < second.month or first.day < second.day :
         return 1
 
-    if first.month > second.month or first.day > second.day + 5:
+    if first.month > second.month or first.day > (second.day + 7):
         return 2
         
     return 0
@@ -429,7 +429,7 @@ async def wochenplan(botti, message, botData):
             dtend = component.decoded("dtend")
             
             if "rrule" in component:
-                if (dtstart - startOfWeek).days > 5:
+                if (dtstart - startOfWeek).days > 7:
                     continue
                 
                 if "UNTIL" in component.decoded("rrule"):
@@ -478,13 +478,13 @@ async def wochenplan(botti, message, botData):
                     returnToMainloop = False
                     if hasattr(component.decoded("exdate"), "dts"):
                         for vDDDType in component.decoded("exdate").dts:
-                            if (vDDDType.dt - startOfWeek).days < 5:
+                            if (vDDDType.dt - startOfWeek).days < 7:
                                 returnToMainloop = True
                                 break
                     else:   
                         for exdate in component.decoded("exdate"):
                             for vDDDType in exdate.dts:
-                                if (vDDDType.dt - startOfWeek).days < 5:
+                                if (vDDDType.dt - startOfWeek).days < 7:
                                     returnToMainloop = True
                                     break
                     
@@ -511,8 +511,8 @@ async def wochenplan(botti, message, botData):
     )
     
     items = ""
-    weekdayNames = [ "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag" ]
-    for i in range(5):
+    weekdayNames = [ "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" ]
+    for i in range(7):
         weekdayItems[i] = sorted(weekdayItems[i], key = lambda x: int(x[1:3]))
         dayString = ""
         for entry in weekdayItems[i]:
