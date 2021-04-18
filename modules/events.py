@@ -55,6 +55,18 @@ async def on_member_remove(member):
     await channel.send(embed = data)
 
 @botti.event
+async def on_raw_reaction_remove(payload):
+    guild = botti.get_guild(ids.serverIDs.ETIT_KIT_ServerID)
+    
+    if payload.channel_id in [ ids.channelIDs.auswahl_BSC_ETIT_ChannelID, ids.channelIDs.auswahl_BSC_MIT_ChannelID, ids.channelIDs.auswahl_MSC_ETIT_ChannelID ]:
+        if payload.emoji.name == "approve":
+            member = guild.get_member(payload.user_id)
+            channel = guild.get_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+            if len(message.role_mentions) != 0:
+                await member.remove_roles(message.role_mentions[0], reason = "Requested by user.")    
+
+@botti.event
 async def on_raw_reaction_add(payload): 
     guild = botti.get_guild(ids.serverIDs.ETIT_KIT_ServerID)
     
@@ -66,25 +78,8 @@ async def on_raw_reaction_add(payload):
         channel_botTestLobby_ChannelID = guild.get_channel(ids.channelIDs.botTestLobby_ChannelID)
         emojiToStatusname = { "✅": "angenommen", "💤": "on hold", "❌": "abgelehnt" }
         await channel_botTestLobby_ChannelID.send(":bookmark_tabs: Statusänderung für Vorschlag von **{0}** ({1}) <@!{1}> `@{2}`\n`{3}`\nwurde auf {4} **{5}** gesetzt!".format(vorschlagMessage.split("**")[1], vorschlagMessage.split("(")[1][:18], vorschlagMessage.split("| ")[1], vorschlagMessage.split("'")[1], payload.emoji.name, emojiToStatusname[payload.emoji.name])) 
-
-    # ROLLEN
-    if payload.message_id == ids.messageIDs.roleSelect_MessageID:
-        if payload.emoji.name == "⚡":
-            userRoles = modules.roles._changeRole(payload.member.roles, [                                ids.roleIDs.MIT_Ersti_RoleID, ids.roleIDs.Info_RoleID, ids.roleIDs.Paedagogik_RoleID, ids.roleIDs.NWT_RoleID, ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.ETIT_Ersti_RoleID), guild)
-        elif payload.emoji.name == "⚙️":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID,                               ids.roleIDs.Info_RoleID, ids.roleIDs.Paedagogik_RoleID, ids.roleIDs.NWT_RoleID, ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.MIT_Ersti_RoleID), guild)
-        elif payload.emoji.name == "💻":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID, ids.roleIDs.MIT_Ersti_RoleID,                          ids.roleIDs.Paedagogik_RoleID, ids.roleIDs.NWT_RoleID, ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.Info_RoleID), guild)
-        elif payload.emoji.name == "👦":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID, ids.roleIDs.MIT_Ersti_RoleID, ids.roleIDs.Info_RoleID,                                ids.roleIDs.NWT_RoleID, ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.Paedagogik_RoleID), guild)
-        elif payload.emoji.name == "👨‍🏫":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID, ids.roleIDs.MIT_Ersti_RoleID, ids.roleIDs.Info_RoleID, ids.roleIDs.Paedagogik_RoleID,                         ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.NWT_RoleID), guild)
-        elif payload.emoji.name == "👤":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID, ids.roleIDs.MIT_Ersti_RoleID, ids.roleIDs.Info_RoleID, ids.roleIDs.Paedagogik_RoleID, ids.roleIDs.NWT_RoleID                          ], guild.get_role(ids.roleIDs.Gast_RoleID), guild)
-        else:
-            return
-        await payload.member.edit(roles = userRoles, reason = "Requested by user.")
-        
+    
+    # Personalisierung
     if payload.message_id == ids.messageIDs.removeRoleSelect_MessageID:
         emojiToRole = { "💬": ids.roleIDs.Zitate_RoleID, 
                         "🎼": ids.roleIDs.Musik_RoleID, 
@@ -102,7 +97,19 @@ async def on_raw_reaction_add(payload):
         
     if payload.message_id == ids.messageIDs.matlabSelect_MessageID:
         await payload.member.add_roles(guild.get_role(ids.roleIDs.Matlab_RoleID), reason = "Requested by user.")
-
+        
+    # Modulauswahl
+    if payload.channel_id in [ ids.channelIDs.auswahl_BSC_ETIT_ChannelID, ids.channelIDs.auswahl_BSC_MIT_ChannelID, ids.channelIDs.auswahl_MSC_ETIT_ChannelID ]:
+        if payload.emoji.name == "approve":
+            channel = guild.get_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+            if len(message.role_mentions) == 0:
+                channel_dev_internal_ChannelID = guild.get_channel(ids.channelIDs.devInternal_ChannelID)
+                await channel_dev_internal_ChannelID.send("👤 {} hat in <#{}> **{}** ausgewählt <@!{}>".format(payload.member.mention, payload.channel_id, message.content, ids.userIDs.David_ID))
+                return
+            role = message.role_mentions[0]
+            if role not in payload.member.roles:
+                await payload.member.add_roles(role, reason = "Requested by user.")
    
     # DANKE               
     if payload.emoji.id == ids.emojiIDs.danke_EmojiID:
@@ -123,7 +130,7 @@ async def on_raw_reaction_add(payload):
 async def on_member_update(before, after):
     guild = botti.get_guild(ids.serverIDs.ETIT_KIT_ServerID)
     
-    channel = guild.get_channel(ids.channelIDs.devInternal1_ChannelID)
+    channel = guild.get_channel(ids.channelIDs.devInternal_ChannelID)
     
     onlineIconDict = {
         discord.Status.online: "<:online:" + str(ids.emojiIDs.online_EmojiID) + ">",
