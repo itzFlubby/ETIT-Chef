@@ -388,7 +388,7 @@ def _compareDate(first, second):
     if first.month < second.month or first.day < second.day :
         return 1
 
-    if first.month > second.month or first.day > (second.day + 7):
+    if first.month > second.month or first.day > (second.day + 6):
         return 2
         
     return 0

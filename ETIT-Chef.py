@@ -120,7 +120,7 @@ async def on_message(message):
             return       
                 
         command = message.content.lower().split(" ")[0]
-        commandName = message.content.lower().split(" ")[0].split("!")[1]
+        commandName = command[1:]
         
         # AUDIO
         if command in botData.audioCommandList:
@@ -168,7 +168,7 @@ async def on_message(message):
         # UTILS
         elif command in botData.utilsCommandList:
             await getattr(modules.utils, commandName)(botti, message, botData)                
-        elif command == "!cancel":
+        elif command == botData.botPrefix + "cancel":
             pass
         else:
             await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Befehl **'{0}'** existiert nicht!".format(message.content))
