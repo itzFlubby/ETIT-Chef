@@ -77,7 +77,7 @@ async def commandlist(botti, message, botData):
     data.add_field(name = "Slash-Commands", value = botData.slashCommandList, inline = False)
     
     data.set_thumbnail(url = botti.user.avatar_url)
-    data.set_author(name = botti.user.name + "#" + str(botti.user.discriminator), icon_url="https://cdn.discordapp.com/app-assets/" + str(botti.user.id) + "/" + str(ids.assetIDs.profilePicture_AssetID) + ".png")
+    data.set_author(name = botti.user.name + "#" + str(botti.user.discriminator), icon_url="https://cdn.discordapp.com/app-assets/" + str(botti.user.id) + "/" + str(ids.assetIDs.PROFILE_PICTURE) + ".png")
     data.set_footer(text = "Insgesamt sind das " + str(botData.totalCommands) + " Befehle!")
     
     await modules.bottiHelper._sendEmbed(message, message.author.mention, data)

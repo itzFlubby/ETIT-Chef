@@ -87,7 +87,7 @@ def _createAccount(botData, id):
     botData.balanceKeeper.append([id, 5000])
 
 async def _cyclicBotDetection(botti, botData, runInLoop):
-    channel = botti.get_guild(ids.guildIDs.ETIT_KIT_ServerID).get_channel(ids.channelIDs.spielhalle_ChannelID)
+    channel = botti.get_guild(ids.guildIDs.ETIT_KIT).get_channel(ids.channelIDs.SPIELHALLE)
     run = True
     
     while(run):
@@ -305,7 +305,7 @@ async def norisknofun(botti, message, botData):
             randomint = randint(0, 100)
               
             if randomint == 3:
-                await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: <@&" + str(ids.roleIDs.Spielhalle_RoleID) + "> UNGLAUBLICHER GEWINN!!! Damit hast du **{}** :cookie: gewonnen!".format(modules.bottiHelper._spaceIntToString(int(userBalance* 100))))
+                await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: <@&" + str(ids.roleIDs.SPIELHALLE) + "> UNGLAUBLICHER GEWINN!!! Damit hast du **{}** :cookie: gewonnen!".format(modules.bottiHelper._spaceIntToString(int(userBalance* 100))))
                 _addBalance(botData, message.author.id, userBalance * 100) 
             else:
                 await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: Damit hast du **{}** :cookie: verloren!".format(modules.bottiHelper._spaceIntToString(userBalance)))
@@ -497,7 +497,7 @@ async def transfer(botti, message, botData):
             await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Du kannst dir nicht selbst Cookies überweisen!")
             return                
             
-        if userToTransferTo.id == ids.userIDs.itzFlubby_ID:
+        if userToTransferTo.id == ids.userIDs.ITZFLUBBY:
             await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Diesem Nutzer kannst du keine Cookies überweisen!")
             return             
     
@@ -564,7 +564,7 @@ async def wheel(botti, message, botData):
     
     if randomint in range(1, 4):
         winSelect = ":blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :arrow_up: :blue_square: :blue_square: :blue_square: :blue_square:\n"
-        winMessage = "**UNFASSBARER GEWINN**!!! Glückwunsch :partying_face: :crown:! **{}** :cookie: :cookie: <@&{}>".format(modules.bottiHelper._spaceIntToString(winAmounts[7]), str(ids.channelIDs.Spielhalle_RoleID)) 
+        winMessage = "**UNFASSBARER GEWINN**!!! Glückwunsch :partying_face: :crown:! **{}** :cookie: :cookie: <@&{}>".format(modules.bottiHelper._spaceIntToString(winAmounts[7]), str(ids.channelIDs.SPIELHALLE)) 
         _addBalance(botData, message.author.id, winAmounts[7] - costToPlay)
     elif randomint in range(4, 14):
         winSelect = ":blue_square: :arrow_up: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square:\n"

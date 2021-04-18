@@ -46,7 +46,7 @@ async def on_ready():
         botData.slashCommandList = list(slash.commands)
 
     data = discord.Embed(
-        title = "[<:online:" + str(ids.emojiIDs.online_EmojiID) + ">] Online",
+        title = "[<:online:" + str(ids.emojiIDs.ONLINE) + ">] Online",
         description = "[:shield:] Guard ist aktiv",
         color = 0x00FF00
     )
@@ -58,11 +58,11 @@ async def on_ready():
     data.add_field(name = "Python Build", value = str(platform.python_build()).replace("'", "").replace("(", "").replace(")", ""))
     data.set_footer(text = "[ID]: {}\nInsgesamt {} Befehle • {} Slash-Befehle!\nGestartet {}".format(str(botti.user.id), str(botData.totalCommands), str(botData.totalSlashCommands), modules.bottiHelper._toSTRFTimestamp(botData.startTimestamp)))
     data.set_thumbnail(url = botti.user.avatar_url)
-    data.set_author(name = botti.user.name + "#" + botti.user.discriminator, icon_url="https://cdn.discordapp.com/app-assets/" + str(botti.user.id) + "/" + str(ids.assetIDs.profilePicture_AssetID) + ".png")
+    data.set_author(name = botti.user.name + "#" + botti.user.discriminator, icon_url="https://cdn.discordapp.com/app-assets/" + str(botti.user.id) + "/" + str(ids.assetIDs.PROFILE_PICTURE) + ".png")
     
     if botData.firstBoot == True:
         if botData.maintenanceMode is True:
-            data.title = "[<:dnd:" + str(ids.emojiIDs.dnd_EmojiID) + ">] Wartungsarbeiten-Modus"
+            data.title = "[<:dnd:" + str(ids.emojiIDs.DND) + ">] Wartungsarbeiten-Modus"
             data.description = "Verbindung etabliert `@" + modules.bottiHelper._getTimestamp() + "`"
             data.color = 0xFF0000
             await botti.change_presence(activity = discord.Game(name = "⚒ Wartungsarbeiten ⚒"), status = discord.Status.dnd)
@@ -80,12 +80,12 @@ async def on_ready():
         
         botData.firstBoot = False
     else:
-        data.title = "[<:online:" + str(ids.emojiIDs.online_EmojiID) + ">] RECONNECT"
+        data.title = "[<:online:" + str(ids.emojiIDs.ONLINE) + ">] RECONNECT"
         data.description = "Verbindung wurde wiederhergestellt `@" + modules.bottiHelper._getTimestamp() + "`"
         data.color = 0x0000FF
         await modules.bottiHelper._setNormalStatus(botti, botData)
         
-    await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.botTestLobby_ChannelID).send(embed = data)
+    await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(embed = data)
 
 @botti.event
 async def on_message(message):
@@ -139,8 +139,8 @@ async def on_message(message):
                 await getattr(modules.banlist, commandName)(botti, message, botData)
         # GAMBLING
         elif command in botData.gambleCommandList:
-            if (message.channel.id != ids.channelIDs.spielhalle_ChannelID) and (command not in [ "!balance", "!rank", "!ranking", "!transfer" ]):
-                await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Dieser Befehl darf nur in <#{}> verwendet werden!".format(str(ids.channelIDs.spielhalle_ChannelID)))
+            if (message.channel.id != ids.channelIDs.SPIELHALLE) and (command not in [ "!balance", "!rank", "!ranking", "!transfer" ]):
+                await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Dieser Befehl darf nur in <#{}> verwendet werden!".format(str(ids.channelIDs.SPIELHALLE)))
                 return
             await getattr(modules.gamble, commandName)(botti, message, botData) 
         # INFO
@@ -191,17 +191,17 @@ async def on_error(error, *args, **kwargs):
     botData.lastError = ":warning: Error in `{}()` • Traceback _(Timestamp: {})_\n```py\n{}```".format(error, modules.bottiHelper._getTimestamp(), fullError)
     
     if len(botData.lastError) > 1900:
-        await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.botTestLobby_ChannelID).send(content = "{}".format(botData.lastError.split("\n")[0]))
+        await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(content = "{}".format(botData.lastError.split("\n")[0]))
         longError = botData.lastError[(len(botData.lastError.split("\n")[0])):]
         j = 0
         markdownAppend = ""
         for i in range(0, len(botData.lastError), 1900):
             if j > 0:
                 markdownAppend = "```py\n"
-            await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.botTestLobby_ChannelID).send(content = "{}{}```".format(markdownAppend, longError[(1900*j):(1900*(j+1))]))
+            await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(content = "{}{}```".format(markdownAppend, longError[(1900*j):(1900*(j+1))]))
             j =+ 1
     else:    
         pass
-        await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.botTestLobby_ChannelID).send(content = botData.lastError)
+        await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(content = botData.lastError)
 
 botti.run(botData.botToken)

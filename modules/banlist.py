@@ -17,7 +17,7 @@ async def botban(botti, message, botData):
     try:
         user = message.mentions[0]
         
-        if user.id == ids.userIDs.itzFlubby_ID:
+        if user.id == ids.userIDs.ITZFLUBBY:
             return
             
         botData.botBanList.append([user.id, 1])

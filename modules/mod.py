@@ -24,7 +24,7 @@ async def ban(botti, message, botData):
         return  
     user = message.mentions[0]
     await message.guild.ban(user, reason = "Banned by User-Request.", delete_message_days = 0)
-    channel = discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.allgemein_ChannelID)
+    channel = discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.ALLGEMEIN)
     await channel.trigger_typing()
     await channel.send(":judge: Der Nutzer **{0}#{1}** wurde von {2} gebannt. Der Bann-Hammer hat gesprochen.".format(user.name, user.discriminator, message.author.mention))
     await modules.bottiHelper._sendMessagePingAuthor(message, ":judge: Der Nutzer **{0}#{1}** wurde gebannt.".format(user.name, user.discriminator))
@@ -67,14 +67,14 @@ async def debugger(botti, message, botData):
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!debugger"))      
         return  
       
-    debuggerRole = message.guild.get_role(ids.roleIDs.debugger_RoleID)
+    debuggerRole = message.guild.get_role(ids.roleIDs.DEBUGGER)
     userRoles = user.roles
     if debuggerRole in userRoles:
         if option == "add":
             await modules.bottiHelper._sendMessagePingAuthor(message, ":fly: {} ist bereits ein Debugger!".format(user.mention))
             return
         else:
-            newUserRoles = modules.roles._changeRole(userRoles, [ ids.roleIDs.debugger_RoleID ], -1, message.guild)
+            newUserRoles = modules.roles._changeRole(userRoles, [ ids.roleIDs.DEBUGGER ], -1, message.guild)
             await user.edit(roles = newUserRoles, reason = "Set by {}#{}.".format(message.author.name, str(message.author.discriminator)))
             await modules.bottiHelper._sendMessagePingAuthor(message, ":fly: {} ist jetzt kein Debugger mehr!".format(user.mention))
     else:
@@ -379,7 +379,7 @@ async def unban(botti, message, botData):
             
             await message.guild.unban(banned_user_entry.user)
             
-            channel = discord.utils.get(botti.get_all_channels(), id = ids.channelID.allgemein_ChannelID)
+            channel = discord.utils.get(botti.get_all_channels(), id = ids.channelID.ALLGEMEIN)
             await channel.send(":judge: Der Nutzer **{0}#{1}** wurde von {2} entbannt.".format(banned_user_entry.user.name, banned_user_entry.user.discriminator, message.author.mention))
             await modules.bottiHelper._sendMessagePingAuthor(message, ":judge: Der Nutzer **{0}** wurde entbannt.".format(banned_user_entry.user))
             return 

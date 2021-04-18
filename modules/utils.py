@@ -297,9 +297,9 @@ async def kekse(botti, message, botData):
     !kekse
     """
     botMessage = await modules.bottiHelper._sendMessage(message, "**Ich mag** :cookie::cookie::cookie: **OMNOMNOM**")
-    await botMessage.add_reaction(":Nein:" + str(ids.emojiIDs.nein_EmojiID))
-    await botMessage.add_reaction(":Doch:" + str(ids.emojiIDs.doch_EmojiID))
-    await botMessage.add_reaction(":Oh:" + str(ids.emojiIDs.oh_EmojiID))
+    await botMessage.add_reaction(":Nein:" + str(ids.emojiIDs.NEIN))
+    await botMessage.add_reaction(":Doch:" + str(ids.emojiIDs.DOCH))
+    await botMessage.add_reaction(":Oh:" + str(ids.emojiIDs.OH))
     await botMessage.add_reaction("🍪")
 
 async def klausuren(botti, message, botData):
@@ -475,11 +475,11 @@ async def vorschlag(botti, message, botData):
     !vorschlag Dies ist ein Test
     """
     if message.guild is not None:
-        if botti.get_user(ids.userIDs.itzFlubby_ID).dm_channel is None:
-            await botti.get_user(ids.userIDs.itzFlubby_ID).create_dm()
-        sentMessage = await botti.get_user(ids.userIDs.itzFlubby_ID).dm_channel.send("**{0}#{1}** ({2}) hat auf **{3} ({4}) / {5} ({6})** folgendes geschrieben: _'{7}'_. | {8}".format(message.author.name, message.author.discriminator, message.author.id, message.guild.name, message.guild.id, message.channel.name, message.channel.id, str(message.content[9:]), modules.bottiHelper._getTimestamp()))
+        if botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel is None:
+            await botti.get_user(ids.userIDs.ITZFLUBBY).create_dm()
+        sentMessage = await botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel.send("**{0}#{1}** ({2}) hat auf **{3} ({4}) / {5} ({6})** folgendes geschrieben: _'{7}'_. | {8}".format(message.author.name, message.author.discriminator, message.author.id, message.guild.name, message.guild.id, message.channel.name, message.channel.id, str(message.content[9:]), modules.bottiHelper._getTimestamp()))
     else:
-        sentMessage = await botti.get_user(ids.userIDs.itzFlubby_ID).dm_channel.send("**{0}#{1}** ({2}) hat im Privat-Chat folgendes geschrieben: _'{3}'_. | {4}".format(message.author.name, message.author.discriminator, message.author.id, str(message.content[9:]), modules.bottiHelper._getTimestamp()))
+        sentMessage = await botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel.send("**{0}#{1}** ({2}) hat im Privat-Chat folgendes geschrieben: _'{3}'_. | {4}".format(message.author.name, message.author.discriminator, message.author.id, str(message.content[9:]), modules.bottiHelper._getTimestamp()))
     
     await sentMessage.add_reaction("✅")
     await sentMessage.add_reaction("💤")

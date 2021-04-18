@@ -10,11 +10,11 @@ class BotError(Exception):
 async def _checkCommandIgnoreList(message):
     commandIgnoreList = [ "!pepo", "!getfrogbot", "!pepohelp", "!aboutpepo", "!froghelp" ]    
     if message.content.split(" ")[0] in commandIgnoreList:
-        await _sendMessage(message, "<:pepe_retarded:" + str(ids.emojiIDs.pepeRetarded_EmojiID) + "> Pepo-Befehl mit Präfix `!` erkannt. Ignoriere...")
+        await _sendMessage(message, "<:pepe_retarded:" + str(ids.emojiIDs.PEPERETARDED) + "> Pepo-Befehl mit Präfix `!` erkannt. Ignoriere...")
         return False   
         
 async def _checkPingTrigger(message, botti):
-    if message.mention_everyone == False and botti.user.mentioned_in(message) == True and message.author.id not in [ ids.userIDs.itzFlubby_ID, ids.userIDs.Christoph_ID ]:
+    if message.mention_everyone == False and botti.user.mentioned_in(message) == True and message.author.id not in [ ids.userIDs.ITZFLUBBY, ids.userIDs.CHRISTOPH ]:
         try:
             await message.reply(":100: Ich wurde erwähnt und da bin ich. Mit `!help` zeige ich dir eine Hilfe an!")
         except:
@@ -31,7 +31,7 @@ def _createDummyMessage(author, channel, content):
     return msg  
        
 async def _errorMessage(botti, message, botData, error):
-    await _sendMessage(message, "```css\n[FAIL]: {0}```:fly: Bug automatisch an <@!{1}> gemeldet!".format(error, ids.userIDs.itzFlubby_ID))
+    await _sendMessage(message, "```css\n[FAIL]: {0}```:fly: Bug automatisch an <@!{1}> gemeldet!".format(error, ids.userIDs.ITZFLUBBY))
     raise BotError("")
 
 def _formatCommandLog(message):

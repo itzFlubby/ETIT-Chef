@@ -2,11 +2,11 @@ import modules.banlist
 import modules.bottiHelper
 import modules.data.ids as ids
 
-devIDs = [ ids.userIDs.itzFlubby_ID, ids.userIDs.WUB_ID ]
+devIDs = [ ids.userIDs.ITZFLUBBY, ids.userIDs.WUB ]
 
-allowedIDs = [ ids.userIDs.itzFlubby_ID, ids.userIDs.WUB_ID ]
+allowedIDs = [ ids.userIDs.ITZFLUBBY, ids.userIDs.WUB ]
 
-trustetIDs = [ ids.userIDs.Christoph_ID, ids.userIDs.Titra_ID, ids.userIDs.Leo_ID ]
+trustetIDs = [ ids.userIDs.CHRISTOPH, ids.userIDs.TITRA, ids.userIDs.LEO ]
 
 allowed_roles = [ "Admin", "Dev", "Fachschaft ETEC", "Tutoren" ]
 
