@@ -47,7 +47,7 @@ async def betflip(botti, message, botData):
     """
     try:
         betValue = message.content.split(" ")[1]
-        if betValue.isdigit() != True and betValue != "allin":
+        if (not betValue.isdigit()) and betValue != "allin":
             raise IndexError()
             
             
@@ -216,7 +216,7 @@ async def guess(botti, message, botData):
         guessValue = message.content.split(" ")[1]
     
         betValue = message.content.split(" ")[2]
-        if betValue.isdigit() != True and betValue != "allin" or guessValue.isdigit() != True:
+        if ((not betValue.isdigit()) and (betValue not "allin")) or (not guessValue.isdigit()):
             raise IndexError()
             
         guessValue = int(guessValue)
@@ -426,9 +426,8 @@ async def slots(botti, message, botData):
     """
     try:
         betValue = message.content.split(" ")[1]
-        if betValue.isdigit() != True and betValue != "allin":
+        if (not betValue.isdigit()) and (betValue is not "allin"):
             raise IndexError()
-            
             
         if betValue == "allin":    
             betValue = _getBalance(botData, message.author.id)
@@ -502,7 +501,7 @@ async def transfer(botti, message, botData):
             return             
     
         transferValue = message.content.split(" ")[2]
-        if transferValue.isdigit() != True:
+        if not transferValue.isdigit():
             raise IndexError()
             
         transferValue = int(transferValue)

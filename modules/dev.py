@@ -107,12 +107,12 @@ async def give(botti, message, botData):
         
         
         if value[0] == "-":
-            if value[1:].isdigit() != True:
+            if not value[1:].isdigit():
                 raise IndexError()
             else:
                 value = -1 * int(value[1:])
         else:
-            if value.isdigit() != True:
+            if not value.isdigit():
                 raise IndexError()
             else:
                 value = int(value)

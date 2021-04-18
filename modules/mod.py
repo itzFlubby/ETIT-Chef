@@ -284,7 +284,7 @@ async def purgemax(botti, message, botData):
     Dieser Befehl löscht alle Befehle in einem Kanal. Dieser Befehl muss bestätigt werden.
     !purgemax
     """
-    if botData.purgemaxConfirm != True:
+    if not botData.purgemaxConfirm:
         botData.purgemaxConfirm = True
         await modules.bottiHelper._sendMessagePingAuthor(message, ":exclamation: Purgemax eingeleitet! Zum Bestätigen `{prefix}purgemax` erneut eingeben. Zum Abbrechen `{prefix}cancel`. **Bist du dir sicher, was du tust?**".format(prefix = botData.botPrefix))
         return
