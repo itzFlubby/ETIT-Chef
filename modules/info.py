@@ -139,7 +139,7 @@ async def permissions(botti, message, botData):
         total_string = total_string + cuttedStrings[i] + "\n"
 
     total_string = total_string.replace(", True", " {emoji} (True)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.APPROVE)))
-    total_string = total_string.replace(", False", " {deny} (False)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.DENY)))
+    total_string = total_string.replace(", False", " {emoji} (False)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.DENY)))
     total_string = total_string.replace("'", "`")
     if isUser:
         await modules.bottiHelper._sendMessage(message, ":shield: Dies sind die Berechtigungen für **{0}** _in {1}_ {2}:\n{3}".format(user.mention, message.channel.name, message.author.mention, total_string))
