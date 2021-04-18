@@ -190,17 +190,11 @@ async def on_error(error, *args, **kwargs):
     botData.lastError = ":warning: Error in `{}()` • Traceback _(Timestamp: {})_\n```py\n{}```".format(error, modules.bottiHelper._getTimestamp(), fullError)
     
     if len(botData.lastError) > 1900:
-        await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(content = "{}".format(botData.lastError.split("\n")[0]))
-        longError = botData.lastError[(len(botData.lastError.split("\n")[0])):]
         j = 0
-        markdownAppend = ""
         for i in range(0, len(botData.lastError), 1900):
-            if j > 0:
-                markdownAppend = "```py\n"
-            await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(content = "{}{}```".format(markdownAppend, longError[(1900*j):(1900*(j+1))]))
+            await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(content = "```py\n{}```".format(botData.lastError[(1900*j):(1900*(j+1))]))
             j =+ 1
     else:    
-        pass
         await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(content = botData.lastError)
 
 botti.run(botData.botToken)

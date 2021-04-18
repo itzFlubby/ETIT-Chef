@@ -314,14 +314,9 @@ async def traceback(botti, message, botData):
         await modules.bottiHelper._sendMessagePingAuthor(message, ":warning: Bisher ist noch kein Fehler aufgetreten!")
         return
     if len(botData.lastError) > 1900:
-        await modules.bottiHelper._sendMessage(message, "{}".format(botData.lastError.split("\n")[0]))
-        longError = botData.lastError[(len(botData.lastError.split("\n")[0])):]
         j = 0
-        markdownAppend = ""
         for i in range(0, len(botData.lastError), 1900):
-            if j > 0:
-                markdownAppend = "```py\n"
-            await modules.bottiHelper._sendMessage(message, "{}{}```".format(markdownAppend, longError[(1900*j):(1900*(j+1))]))
+            await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(content = "```py\n{}```".format(botData.lastError[(1900*j):(1900*(j+1))]))
             j =+ 1
     else:
         await modules.bottiHelper._sendMessage(message, "{}".format(botData.lastError))

@@ -131,23 +131,20 @@ async def permissions(botti, message, botData):
     perm_list = str(perm_list).split("[(")[1]
     perm_list = perm_list.split(")]")[0]
     total_string = ""
-    cut_var = 0
-    try:
-        while True:
-            string_cutted = perm_list.split("), (")[cut_var]
-            if isUser and (string_cutted in [ "'priority_speaker', False", "'stream', False", "'connect', False", "'speak', False", "'mute_members', False", "'deafen_members', False", "'move_members', False", "'use_voice_activation', False" ]):
-                cut_var += 1
-                continue
-            total_string = total_string + string_cutted + "\n"
-            cut_var += 1
-    except IndexError:
-        total_string = total_string.replace(", True", " {emoji} (True)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.APPROVE)))
-        total_string = total_string.replace(", False", " {deny} (False)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.DENY)))
-        total_string = total_string.replace("'", "`")
-        if isUser:
-            await modules.bottiHelper._sendMessage(message, ":shield: Dies sind die Berechtigungen für **{0}** _in {1}_ {2}:\n{3}".format(user.mention, message.channel.name, message.author.mention, total_string))
-        else:    
-            await modules.bottiHelper._sendMessage(message, ":shield: Dies sind die globalen Berechtigungen für **{0}** _wenn nicht anderweitig gesetzt_:\n{1}".format(role.mention, total_string))
+
+    cuttedStrings = perm_list.split("), (")
+    for i in range(len(cuttedStrings)):
+        if isUser and (cuttedStrings[i] in [ "'priority_speaker', False", "'stream', False", "'connect', False", "'speak', False", "'mute_members', False", "'deafen_members', False", "'move_members', False", "'use_voice_activation', False" ]):
+            continue
+        total_string = total_string + cuttedStrings[i] + "\n"
+
+    total_string = total_string.replace(", True", " {emoji} (True)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.APPROVE)))
+    total_string = total_string.replace(", False", " {deny} (False)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.DENY)))
+    total_string = total_string.replace("'", "`")
+    if isUser:
+        await modules.bottiHelper._sendMessage(message, ":shield: Dies sind die Berechtigungen für **{0}** _in {1}_ {2}:\n{3}".format(user.mention, message.channel.name, message.author.mention, total_string))
+    else:    
+        await modules.bottiHelper._sendMessage(message, ":shield: Dies sind die globalen Berechtigungen für **{0}** _wenn nicht anderweitig gesetzt_:\n{1}".format(role.mention, total_string))
 
 async def ping(botti, message, botData):
     """ 
