@@ -122,25 +122,31 @@ async def on_raw_reaction_add(payload):
                                 ids.channelIDs.AUSWAHL_MIT_MSC: ids.roleIDs.MIT_MSC
                             }
             
-            for setupRole in ids.roleIDs.setupRoles:
-                if setupRole in [x.id for x in payload.member.roles]:
-                    await payload.member.remove_roles(guild.get_role(setupRole), reason = "User set course.")
-                    roles = payload.member.roles
-                    for role_id in ids.roleIDs.newMemberJoinRoles:
-                        if role_id not in [x.id for x in payload.member.roles]:
-                            roles.append(guild.get_role(role_id))
+            userRoles = payload.member.roles
+            userRoleIDs = [role.id for role in userRoles]
+            setupRoleIDs = [roleID for roleID in ids.roleIDs.setupRoles if roleID in userRoleIDs]
+            setupRoleID = 0
+            if len(setupRoleIDs) > 0:
+                setupRoleID = setupRoleIDs[0] # Take first element, because this list WILL only have one element. EVER.
+                setupRole = guild.get_role(setupRoleID)
+                
+                userRoles.remove(setupRole)
                     
-                    if setupRole in [ ids.roleIDs.KIT_BSC_Einrichtung, ids.roleIDs.KIT_MSC_Einrichtung ]:
-                        setupRoleToNormalRole = {   ids.roleIDs.KIT_BSC_Einrichtung: ids.roleIDs.KIT_BSC,
-                                                    ids.roleIDs.KIT_MSC_Einrichtung: ids.roleIDs.KIT_MSC
-                                                }   
-                        roles.append(guild.get_role(setupRoleToNormalRole[setupRole]))
-                    else:
-                        if channelToRole[payload.channel_id] not in [x.id for x in payload.member.roles]:
-                            roles.append(guild.get_role(channelToRole[payload.channel_id]))
+                for roleID in ids.roleIDs.newMemberJoinRoles:
+                    if roleID not in userRoleIDs:
+                        userRoles.append(guild.get_role(roleID))
                     
-                    await payload.member.edit(roles = roles, reason = "User set course.")
-                    break
+            if setupRoleID in [ ids.roleIDs.KIT_BSC_Einrichtung, ids.roleIDs.KIT_MSC_Einrichtung ]:
+                setupRoleToNormalRole = {   ids.roleIDs.KIT_BSC_Einrichtung: ids.roleIDs.KIT_BSC,
+                                            ids.roleIDs.KIT_MSC_Einrichtung: ids.roleIDs.KIT_MSC
+                                        }   
+                userRoles.append(guild.get_role(setupRoleToNormalRole[setupRoleID]))
+            else:
+                if channelToRole[payload.channel_id] not in userRoleIDs:
+                    userRoles.append(guild.get_role(channelToRole[payload.channel_id]))
+            
+            await payload.member.edit(roles = userRoles, reason = "User set course.")
+
               
             if len(message.role_mentions) == 0:
                 channel_sdadisdigen = guild.get_channel(ids.channelIDs.SDADISDIGEN)
