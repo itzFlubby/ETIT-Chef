@@ -29,7 +29,7 @@ async def viewpoll(botti, message, botData):
     try:
         pollname = message.content.split(" ")[1].lower()
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!viewpoll"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "viewpoll"))      
         return
     try:
         workbook = xlrd.open_workbook(botData.modulesDirectory + "/data/polls/" + pollname + ".xls")
@@ -64,7 +64,7 @@ async def vote(botti, message, botData):
         pollname = message.content[6:].split(" ")[0].lower()
         polloption = message.content.split(" ")[2].lower()
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!vote"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "vote"))      
         return
     try:
         workbook = xlrd.open_workbook(botData.modulesDirectory + "/data/polls/" + pollname + ".xls")

@@ -8,20 +8,21 @@ class BotError(Exception):
     pass
 
 async def _checkCommandIgnoreList(message):
-    commandIgnoreList = [ "!pepo", "!getfrogbot", "!pepohelp", "!aboutpepo", "!froghelp" ]    
-    if message.content.split(" ")[0] in commandIgnoreList:
+    commandIgnoreList = [ "pepo", "getfrogbot", "pepohelp", "aboutpepo", "froghelp" ]    
+    if message.content.split(" ")[0][1:] in commandIgnoreList:
         await _sendMessage(message, "<:pepe_retarded:" + str(ids.emojiIDs.PEPERETARDED) + "> Pepo-Befehl mit Präfix `!` erkannt. Ignoriere...")
         return False   
         
-async def _checkPingTrigger(message, botti):
+async def _checkPingTrigger(botti, botData, message):
     if message.mention_everyone == False and botti.user.mentioned_in(message) == True and message.author.id not in [ ids.userIDs.ITZFLUBBY, ids.userIDs.CHRISTOPH ]:
+        helpString = ":100: Ich wurde erwähnt und da bin ich. Mit `{prefix}help` zeige ich dir eine Hilfe an!".format(prefix = botData.prefix)
         try:
-            await message.reply(":100: Ich wurde erwähnt und da bin ich. Mit `!help` zeige ich dir eine Hilfe an!")
+            await message.reply(helpString)
         except:
-            await _sendMessagePingAuthor(message, ":100: Ich wurde erwähnt und da bin ich. Mit `!help` zeige ich dir eine Hilfe an!")
+            await _sendMessagePingAuthor(message, helpString)
         
 async def _checkPurgemaxConfirm(message, botData):
-    if (botData.purgemaxConfirm == True) and (message.content != "!purgemax"):
+    if (botData.purgemaxConfirm == True) and (message.content != "{prefix}purgemax".format(prefix = botData.prefix)):
         await _sendMessagePingAuthor(message, ":exclamation: Purgemax abgebrochen.")
         botData.purgemaxConfirm = False
         
@@ -68,8 +69,8 @@ def _toUTCTimestamp(datetimeObject):
 def _toGermanTimestamp(datetimeObject):
     return datetimeObject.strftime("%d.%m.%Y um %H:%M:%S")
 
-def _invalidParams(string):
-    return ":x: Ungültige Parameter! Verwende `!command " + string + "` für weitere Hilfe!"
+def _invalidParams(botData, subcommand):
+    return ":x: Ungültige Parameter! Verwende `{prefix}command {prefix}{subcommand}` für weitere Hilfe!".format(prefix = botData.botPrefix, subcommand = subcommand)
 
 def _loadSettings(botData):
     with open(botData.configFile, "r") as conf:

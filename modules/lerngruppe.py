@@ -25,7 +25,7 @@ async def lerngruppe(botti, message, botData):
             
             await modules.bottiHelper._sendMessagePingAuthor(message, ":books: Du bist der **Lerngruppe {0}** beigetreten!".format(message.content[12:]))
             return
-    await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!lerngruppe"))  
+    await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "lerngruppe"))  
  
 async def listlerngruppen(botti, message, botData):
     """
@@ -90,7 +90,7 @@ async def templerngruppe(botti, message, botData):
         elif subcommand == "null":
             pass
         else:
-            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!templerngruppe"))      
+            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "templerngruppe"))      
             return 
     except:
         pass

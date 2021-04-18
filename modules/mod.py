@@ -20,7 +20,7 @@ async def ban(botti, message, botData):
     !ban @ETIT-Chef
     """
     if len(message.mentions) == 0:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!ban"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "ban"))      
         return  
     user = message.mentions[0]
     await message.guild.ban(user, reason = "Banned by User-Request.", delete_message_days = 0)
@@ -38,7 +38,7 @@ async def deafen(botti, message, botData):
     !deafen @ETIT-Chef
     """
     if len(message.mentions) == 0: 
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!deafen"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "deafen"))      
         return  
     user = message.mentions[0]
     
@@ -64,7 +64,7 @@ async def debugger(botti, message, botData):
         if option not in [ "add", "remove" ]:
             raise IndexError("Wrong Parameters.")
     except:    
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!debugger"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "debugger"))      
         return  
       
     debuggerRole = message.guild.get_role(ids.roleIDs.DEBUGGER)
@@ -98,7 +98,7 @@ async def estimateprunes(botti, message, botData):
         if nDays > 30 or nDays < 1:
             raise IndexError()
     except:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!estimateprunes"))
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "estimateprunes"))
         return        
         
     estimated_prunes = await message.guild.estimate_pruned_members(days = nDays, roles = message.guild.roles)
@@ -116,13 +116,12 @@ async def eval(botti, message, botData):
     try:
         pollname = message.content.split(" ")[1]
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!eval"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "eval"))      
         return  
     try:
         workbook = xlrd.open_workbook(botData.modulesDirectory + "/data/polls/" + pollname + ".xls")
     except FileNotFoundError:
-        
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Diese Umfrage existiert nicht! Verwende `!polls`, um die aktuellen Abstimmungen anzuzeigen.")
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Diese Umfrage existiert nicht! Verwende `{prefix}polls`, um die aktuellen Abstimmungen anzuzeigen.".format(prefix = botData.botPrefix))
         return
     sheet = workbook.sheet_by_index(0)
     
@@ -149,7 +148,7 @@ async def kick(botti, message, botData):
     !kick @ETIT-Chef
     """
     if len(message.mentions) == 0:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!kick"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "kick"))      
         return  
     user = message.mentions[0]
     await message.guild.kick(user, reason="Requestes by Admin.")
@@ -183,7 +182,7 @@ async def mute(botti, message, botData):
     !mute @ETIT-Chef
     """
     if len(message.mentions) == 0:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!mute"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "mute"))      
         return  
     user = message.mentions[0]
     
@@ -238,7 +237,7 @@ async def poll(botti, message, botData):
         pollname = message.content.split(" ")[1].lower()
         polloptions = message.content.split(" ")[2].lower().split(";")
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!poll"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "poll"))      
         return  
 
     wb = xlwt.Workbook()
@@ -265,7 +264,7 @@ async def purge(botti, message, botData):
     """
     try:
         if not str(message.content.split(" ")[1]).isdigit():
-            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!purge")) 
+            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "purge")) 
             return
         if not 0 <= int(message.content.split(" ")[1]) <= 100:
             await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Du musst eine Zahl zwischen einschließlich **0 und 100** wählen.")
@@ -277,7 +276,7 @@ async def purge(botti, message, botData):
         if "q" not in parameters:
             await modules.bottiHelper._sendMessagePingAuthor(message, ":recycle: Es wurden **{0}** Nachrichten gelöscht.".format(len(deleted)))
     except:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!purge"))   
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "purge"))   
 
 async def purgemax(botti, message, botData):
     """
@@ -287,7 +286,7 @@ async def purgemax(botti, message, botData):
     """
     if botData.purgemaxConfirm != True:
         botData.purgemaxConfirm = True
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":exclamation: Purgemax eingeleitet! Zum Bestätigen `!purgemax` erneut eingeben. Zum Abbrechen `!cancel`. **Bist du dir sicher, was du tust?**")
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":exclamation: Purgemax eingeleitet! Zum Bestätigen `{prefix}purgemax` erneut eingeben. Zum Abbrechen `{prefix}cancel`. **Bist du dir sicher, was du tust?**".format(prefix = botData.botPrefix))
         return
         
     await modules.bottiHelper._sendMessage(message, ":exclamation: **!Purgemax!**")
@@ -324,7 +323,7 @@ async def shoutout(botti, message, botData):
         else:    
             messageToSend = message.content[10:]
     except:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!shoutout"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "shoutout"))      
         return
     await channelToSend.trigger_typing()
     await channelToSend.send(":loudspeaker: {} @everyone\n~ Shoutout von {}".format(messageToSend, message.author.mention))

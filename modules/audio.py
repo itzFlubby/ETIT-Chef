@@ -144,7 +144,7 @@ async def play(botti, botData, message):
                 
                 await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!play"))
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "play"))
     except FileNotFoundError:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Es ist ein Fehler aufgetreten! Achte darauf, dass die URL richtig ist, und nur die Video-ID darin enhalten ist (also z.B. kein `&t=`)")
 
@@ -152,7 +152,7 @@ async def queue(botti, botData, message):
     try:
         option = message.content.split(" ")[1]
     except:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!queue"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "queue"))      
         return
         
     global musicQueue
@@ -189,7 +189,7 @@ async def queue(botti, botData, message):
                 await modules.bottiHelper._sendMessagePingAuthor(message, ":minidisc: Ungültiger Warteschlangen-Index!")
                 return
         except:
-            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!queue"))      
+            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "queue"))      
             return    
         del musicQueue[removeIndex - 1]
         await modules.bottiHelper._sendMessagePingAuthor(message, ":minidisc: Video mit ID `{}` wurde aus der Warteschlange entfernt!".format(musicQueue[removeIndex - 1].split("?v=")[1]))
@@ -206,7 +206,7 @@ async def queue(botti, botData, message):
         await play(botti, botData, dummyMessage)
         pass
     else:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!queue"))
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "queue"))
 
 async def reconnect(botti, botData, message):
     """
@@ -282,4 +282,4 @@ async def volume(botti, botData, message):
             volumeLevel = volumeFile.readline().rstrip()
         await modules.bottiHelper._sendMessagePingAuthor(message, ":loud_sound: Lautsärke bei **{0}**!".format(volumeLevel))
     except ValueError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!volume"))
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "volume"))

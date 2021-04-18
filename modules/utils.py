@@ -54,7 +54,7 @@ async def command(botti, message, botData):
         if commandName[0] != "!":    
             commandName = "!" + commandName
     except:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!command"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "command"))      
         return
         
     infoText = ""
@@ -108,7 +108,7 @@ async def convert(botti, message, botData):
         posInContent = 11 + len(convertFrom) + len(convertTo)
         textToConvert = message.content[posInContent:]
     except:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!convert"))
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "convert"))
         return     
        
     convertableFrom = [ "text", "bin", "hex" ]
@@ -135,7 +135,7 @@ async def convert(botti, message, botData):
             break
             
     if convertID == -1:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!convert"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "convert"))      
         return        
     
     for i in range(len(convertableTo)):
@@ -150,7 +150,7 @@ async def convert(botti, message, botData):
             break    
 
     if convertID not in convertIDs:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!convert"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "convert"))      
         return      
 
     try:

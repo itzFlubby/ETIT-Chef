@@ -71,7 +71,7 @@ async def betflip(botti, message, botData):
             await modules.bottiHelper._sendMessagePingAuthor(message, ":coin: Die Münze ist auf **Zahl** gelandet! Du hast **{}** :cookie: gewonnen!".format(modules.bottiHelper._spaceIntToString(betValue)))
             _addBalance(botData, message.author.id, betValue)
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!betflip"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "betflip"))      
         return        
 
 def _checkBalance(botData, userID, value):
@@ -261,7 +261,7 @@ async def guess(botti, message, botData):
         await modules.bottiHelper._sendMessagePingAuthor(message, ":game_die: Zufallszahl ist **{}**. Abstand von deinem Tipp ist **{}**! Damit hast du **{}** gewonnen!".format(randomint, difference, winMessage))    
 
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!guess"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "guess"))      
         return  
 
 def _loadBalancesToKeeper(botti, botData):
@@ -478,7 +478,7 @@ async def slots(botti, message, botData):
             return           
 
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!slots"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "slots"))      
         return    
 
 async def transfer(botti, message, botData):
@@ -522,7 +522,7 @@ async def transfer(botti, message, botData):
         await modules.bottiHelper._sendMessagePingAuthor(message, ":money_with_wings: Du hast erfolgreich **{}** :cookie: an {} transferiert!".format(transferValue, userToTransferTo.mention))
         
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!transfer"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "transfer"))      
         return  
 
 async def wheel(botti, message, botData):

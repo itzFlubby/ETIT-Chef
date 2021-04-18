@@ -127,7 +127,7 @@ async def give(botti, message, botData):
             return
         await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: **{}** Cookies an {} vergeben!".format(str(value), user.mention)) 
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!give"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "give"))      
         return   
 
 async def lastcommands(botti, message, botData):
@@ -198,7 +198,7 @@ async def mdtext(botti, message, botData):
 
         await modules.bottiHelper._sendEmbedPingAuthor(message, "", data)
     except:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!mdtext"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "mdtext"))      
         return   
 
 async def modulelist(botti, message, botData):
@@ -212,7 +212,7 @@ async def modulelist(botti, message, botData):
     try:
         wantedModule = message.content.split(" ")[1].lower()
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!modulelist"))
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "modulelist"))
         return
         
     data = discord.Embed(
@@ -233,7 +233,7 @@ async def modulelist(botti, message, botData):
             await modules.bottiHelper._sendEmbedPingAuthor(message, "", data)
             return
     
-    await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!modulelist"))
+    await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "modulelist"))
 
 async def restart(botti, message, botData):
     """ 
@@ -280,7 +280,7 @@ async def say(botti, message, botData):
         else:    
             messageToSend = message.content[5:]
     except:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!say"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "say"))      
         return
     await channelToSend.trigger_typing()
     await channelToSend.send(messageToSend)  

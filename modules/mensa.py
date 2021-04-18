@@ -65,7 +65,7 @@ async def mensa(botti, message, botData):
         requestedWeekday = currentWeekday + 1   
 
     if requestedWeekday > 4:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!mensa"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "mensa"))      
         return
     
     if requestedWeekday != - 1:

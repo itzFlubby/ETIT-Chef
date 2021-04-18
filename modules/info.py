@@ -169,7 +169,7 @@ async def roleinfo(botti, message, botData):
     try:
         role = message.role_mentions[0]
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!roleinfo"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "roleinfo"))      
         return
     data = discord.Embed(
         title = "",
@@ -411,7 +411,7 @@ async def wochenplan(botti, message, botData):
             items = date.split(".")
             now = datetime.datetime(int(items[2]), int(items[1]), int(items[0]), 0, 0, 0, tzinfo = datetime.timezone.utc)
         except:
-            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!wochenplan"))      
+            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "wochenplan"))      
             return         
     
     content = ""
