@@ -126,7 +126,7 @@ async def on_raw_reaction_add(payload):
             userRoleIDs = [role.id for role in userRoles]
             setupRoleIDs = [roleID for roleID in ids.roleIDs.setupRoles if roleID in userRoleIDs]
             setupRoleID = 0
-            if len(setupRoleIDs) > 0:
+            if bool(setupRoleIDs): # If user has a setup role
                 setupRoleID = setupRoleIDs[0] # Take first element, because this list WILL only have one element. EVER.
                 setupRole = guild.get_role(setupRoleID)
                 

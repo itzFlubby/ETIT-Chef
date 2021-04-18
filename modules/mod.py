@@ -44,10 +44,10 @@ async def deafen(botti, message, botData):
     
     if user.voice.deaf is False:
         await user.edit(deafen = True)
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":headphones: Der Nutzer {0} wurde **taub** geschaltet.".format(user.name.mention))
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":headphones: Der Nutzer {0} wurde **taub** geschaltet.".format(user.mention))
     else:
         await user.edit(deafen = False)
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":headphones: Der Nutzer {0} wurde **frei** geschaltet.".format(user.name.mention))        
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":headphones: Der Nutzer {0} wurde **frei** geschaltet.".format(user.mention))        
 
 async def debugger(botti, message, botData):
     """
@@ -187,11 +187,11 @@ async def mute(botti, message, botData):
     user = message.mentions[0]
     
     if user.voice.mute is False:
-        await user.edit(mute=True)
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":microphone2: Der Nutzer **{0}#{1}** wurde **stumm** geschaltet.".format(user.name, user.discriminator))
+        await user.edit(mute = True)
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":microphone2: Der Nutzer {0} wurde **stumm** geschaltet.".format(user.mention))
     else:
-        await user.edit(mute=False)
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":microphone2: Der Nutzer **{0}#{1}** wurde **frei** geschaltet.".format(user.name, user.discriminator))
+        await user.edit(mute = False)
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":microphone2: Der Nutzer {0} wurde **frei** geschaltet.".format(user.mention))
 
 async def nick(botti, message, botData):
     """
