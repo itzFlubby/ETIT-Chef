@@ -153,7 +153,7 @@ async def on_message(message):
             await getattr(modules.mensa, command)(botti, message, botData)
         # MOD
         elif command in botData.modCommandList:
-            if await modules.guard._checkPerms(botti, message, [ "Admin", "Dev", "Fachschaft ETEC", "Tutoren", "Bot-Commander" ] ):
+            if await modules.guard._checkPerms(botti, message, [ "Admin", "Dev", "Fachschaft ETEC", "Moderator", "Tutoren", "Bot-Commander" ] ):
                 await getattr(modules.mod, command)(botti, message, botData)
         # POLLS
         elif command in botData.pollsCommandList:

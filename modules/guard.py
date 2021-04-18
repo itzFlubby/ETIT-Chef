@@ -24,14 +24,14 @@ async def _checkPerms(botti, message, allowed, enableTrustet = False):
     if enableTrustet:
         if message.author.id in trustetIDs:
             return True
-    if message.author.id in allowedIDs or message.author.top_role.name in allowed:
+    if message.author.id in allowedIDs or any(role.name in allowed for role in message.author.roles):
         return True
     else:
         await modules.bottiHelper._sendMessagePingAuthor(message, "[:shield:] `Guard`: **Fehlende Berechtigung!**")
         return False
         
 def _checkPermsQuiet(botti, message, allowed):
-    if message.author.id in allowedIDs or message.author.top_role.name in allowed:
+    if message.author.id in allowedIDs or any(role.name in allowed for role in message.author.roles):
         return True
     else:
         return False
