@@ -143,8 +143,8 @@ async def on_raw_reaction_add(payload):
                     break
               
             if len(message.role_mentions) == 0:
-                channel_dev_internal_ChannelID = guild.get_channel(ids.channelIDs.DEV_INTERNAL)
-                await channel_dev_internal_ChannelID.send("👤 {} hat in <#{}> **{}** ausgewählt <@!{}>".format(payload.member.mention, payload.channel_id, message.content, ids.userIDs.DAVID))
+                channel_sdadisdigen = guild.get_channel(ids.channelIDs.SDADISDIGEN)
+                await channel_sdadisdigen.send("👤 {} hat in <#{}> **{}** ausgewählt <@!{}>".format(payload.member.mention, payload.channel_id, message.content, ids.userIDs.DAVID))
                 return
               
             role = message.role_mentions[0]
