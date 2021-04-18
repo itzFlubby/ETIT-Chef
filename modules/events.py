@@ -111,16 +111,13 @@ async def on_raw_reaction_add(payload):
         if payload.user_id == message.author.id:
             await message.add_reaction("❌")
             return
-        wasAcknowledged = False
         for reaction in message.reactions:
             if reaction.me == True:
-                wasAcknowledged = True
-                break
-        if wasAcknowledged == False:
-            if modules.gamble._getBalance(botData, message.author.id) == -1:
-                modules.gamble._createAccount(botData, message.author.id)
-            modules.gamble._addBalance(botData, message.author.id, 1500)
-            await message.add_reaction("✅")
+                return
+        if modules.gamble._getBalance(botData, message.author.id) == -1:
+            modules.gamble._createAccount(botData, message.author.id)
+        modules.gamble._addBalance(botData, message.author.id, 1500)
+        await message.add_reaction("✅")
 """        
 @botti.event
 async def on_member_update(before, after):
