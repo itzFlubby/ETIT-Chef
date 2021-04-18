@@ -47,7 +47,7 @@ async def betflip(botti, message, botData):
     """
     try:
         betValue = message.content.split(" ")[1]
-        if (not betValue.isdigit()) and betValue != "allin":
+        if (not betValue.isdigit()) and (betValue is not "allin"):
             raise IndexError()
             
             
@@ -216,7 +216,7 @@ async def guess(botti, message, botData):
         guessValue = message.content.split(" ")[1]
     
         betValue = message.content.split(" ")[2]
-        if ((not betValue.isdigit()) and (betValue not "allin")) or (not guessValue.isdigit()):
+        if ((not betValue.isdigit()) and (betValue is not "allin")) or (not guessValue.isdigit()):
             raise IndexError()
             
         guessValue = int(guessValue)
