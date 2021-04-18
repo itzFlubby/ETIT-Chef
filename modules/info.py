@@ -133,10 +133,18 @@ async def permissions(botti, message, botData):
     total_string = ""
 
     cuttedStrings = perm_list.split("), (")
+    ignoredPermissions = [  "'priority_speaker', False", 
+                            "'stream', False", 
+                            "'connect', False", 
+                            "'speak', False", 
+                            "'mute_members', False", 
+                            "'deafen_members', False", 
+                            "'move_members', False", 
+                            "'use_voice_activation', False" 
+                        ]
     for i in range(len(cuttedStrings)):
-        if isUser and (cuttedStrings[i] in [ "'priority_speaker', False", "'stream', False", "'connect', False", "'speak', False", "'mute_members', False", "'deafen_members', False", "'move_members', False", "'use_voice_activation', False" ]):
-            continue
-        total_string = total_string + cuttedStrings[i] + "\n"
+        if not isUser or not (cuttedStrings[i] in ignoredPermissions):
+            total_string = total_string + cuttedStrings[i] + "\n"
 
     total_string = total_string.replace(", True", " {emoji} (True)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.APPROVE)))
     total_string = total_string.replace(", False", " {emoji} (False)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.DENY)))
