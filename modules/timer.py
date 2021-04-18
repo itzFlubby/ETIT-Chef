@@ -25,19 +25,19 @@ async def timer(botti, message, botData):
     minutes = 0
     hours = 0
     if timeformat == 0:
-        if timestring.isdigit() is False:
+        if not timestring.isdigit():
             await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "timer"))      
             return
         seconds = int(timestring)
     elif timeformat == 1:
         minutesSeconds = timestring.split(":")
-        if minutesSeconds[0].isdigit() is False or minutesSeconds[1].isdigit() is False:
+        if (not minutesSeconds[0].isdigit()) or (not minutesSeconds[1].isdigit()):
             await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "timer"))      
             return
         seconds = int(minutesSeconds[0]) * 60 + int(minutesSeconds[1])
     elif timeformat == 2:
         hoursMinutesSeconds = timestring.split(":")
-        if hoursMinutesSeconds[0].isdigit() is False or hoursMinutesSeconds[1].isdigit() is False or hoursMinutesSeconds[2].isdigit() is False:
+        if (not hoursMinutesSeconds[0].isdigit()) or (not hoursMinutesSeconds[1].isdigit()) or (not hoursMinutesSeconds[2].isdigit()):
             await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "timer"))      
             return
         seconds = int(hoursMinutesSeconds[0]) * 3600 + int(hoursMinutesSeconds[1]) * 60 + int(hoursMinutesSeconds[2])

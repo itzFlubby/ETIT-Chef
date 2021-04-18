@@ -154,7 +154,7 @@ async def maintenance(botti, message, botData):
     Dieser Befehl ändert den Maintenance-Mode.
     !maintenance
     """
-    if botData.maintenanceMode is True:
+    if botData.maintenanceMode:
         botData.maintenanceMode = False
         await modules.bottiHelper._sendMessage(message, ":tools: Die Wartungsarbeiten sind **abgeschlossen**!")
         await modules.bottiHelper._setNormalStatus(botti, botData)

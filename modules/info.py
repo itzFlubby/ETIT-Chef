@@ -128,7 +128,6 @@ async def permissions(botti, message, botData):
 
         perm_list = list(user.permissions_in(message.channel))
     
-    
     perm_list = str(perm_list).split("[(")[1]
     perm_list = perm_list.split(")]")[0]
     total_string = ""

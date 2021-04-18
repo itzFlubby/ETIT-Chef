@@ -60,8 +60,8 @@ async def on_ready():
     data.set_thumbnail(url = botti.user.avatar_url)
     data.set_author(name = botti.user.name + "#" + botti.user.discriminator, icon_url="https://cdn.discordapp.com/app-assets/" + str(botti.user.id) + "/" + str(ids.assetIDs.PROFILE_PICTURE) + ".png")
     
-    if botData.firstBoot == True:
-        if botData.maintenanceMode is True:
+    if botData.firstBoot:
+        if botData.maintenanceMode:
             data.title = "[{emoji}] Wartungsarbeiten-Modus".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.ONLINE))
             data.description = "Verbindung etabliert `@" + modules.bottiHelper._getTimestamp() + "`"
             data.color = 0xFF0000
@@ -96,26 +96,26 @@ async def on_message(message):
             
         await modules.bottiHelper._checkPingTrigger(botti, botData, message)
         
-        if message.content.startswith(botData.botPrefix) is False:
+        if not message.content.startswith(botData.botPrefix):
             return
             
         if modules.bottiHelper._logCommand(message, botData) == -1:
             await modules.bottiHelper._sendMessage(message, ":x: Funktionen in DM-Chats nicht verfügbar.")
             return
         
-        if await modules.guard._checkBanlist(message, botData) == False:
+        if not await modules.guard._checkBanlist(message, botData):
             return
         
         await modules.guard._floodDetection(message, botti, botData)           
         
-        if await modules.bottiHelper._checkCommandIgnoreList(message) == False:
+        if not await modules.bottiHelper._checkCommandIgnoreList(message):
             return
         
         await modules.bottiHelper._checkPurgemaxConfirm(message, botData)
             
         await message.delete()    
         
-        if message.author.id not in modules.guard.devIDs and botData.maintenanceMode is True:
+        if (message.author.id not in modules.guard.devIDs) and botData.maintenanceMode:
             await modules.bottiHelper._sendMessagePingAuthor(message, ":tools: Der Bot befindet sich in Wartungsarbeiten. Bitte versuche es später erneut.")
             return       
                 

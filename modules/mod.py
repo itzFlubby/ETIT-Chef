@@ -186,7 +186,7 @@ async def mute(botti, message, botData):
         return  
     user = message.mentions[0]
     
-    if user.voice.mute is False:
+    if not user.voice.mute:
         await user.edit(mute = True)
         await modules.bottiHelper._sendMessagePingAuthor(message, ":microphone2: Der Nutzer {0} wurde **stumm** geschaltet.".format(user.mention))
     else:
@@ -294,7 +294,7 @@ async def purgemax(botti, message, botData):
     sleep(3)
     delete_int = 0
     run_loop = True
-    while run_loop is True:
+    while run_loop:
         try:
             deleted = await message.channel.purge(limit = 100)
             if len(deleted) == 0:

@@ -34,7 +34,6 @@ async def connect(botti, botData, message):
         await modules.bottiHelper._sendMessagePingAuthor(message, ":loud_sound: Zu **'{0}'** verbunden!".format(voiceClient.channel.name))
         return True
     except Exception:
-        
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Du befindest dich in keinem Sprach-Kanal!")
         return False
 
@@ -81,7 +80,7 @@ async def play(botti, botData, message):
     voiceClients = botti.voice_clients
     if not voiceClients:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Bot befindet sich in keinem Sprach-Kanal. Versuche zu dir zu verbinden...")
-        if await connect(botti, botData, message) is not True:
+        if not await connect(botti, botData, message):
             return
         voiceClients = botti.voice_clients
     for x in range(len(voiceClients)):

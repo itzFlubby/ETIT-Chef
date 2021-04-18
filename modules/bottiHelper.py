@@ -14,7 +14,7 @@ async def _checkCommandIgnoreList(message):
         return False   
         
 async def _checkPingTrigger(botti, botData, message):
-    if message.mention_everyone == False and botti.user.mentioned_in(message) == True and message.author.id not in [ ids.userIDs.ITZFLUBBY, ids.userIDs.CHRISTOPH ]:
+    if (not message.mention_everyone) and botti.user.mentioned_in(message) and (message.author.id not in [ ids.userIDs.ITZFLUBBY, ids.userIDs.CHRISTOPH ]):
         helpString = ":100: Ich wurde erwähnt und da bin ich. Mit `{prefix}help` zeige ich dir eine Hilfe an!".format(prefix = botData.botPrefix)
         try:
             await message.reply(helpString)
@@ -22,7 +22,7 @@ async def _checkPingTrigger(botti, botData, message):
             await _sendMessagePingAuthor(message, helpString)
         
 async def _checkPurgemaxConfirm(message, botData):
-    if (botData.purgemaxConfirm == True) and (message.content != "{prefix}purgemax".format(prefix = botData.botPrefix)):
+    if (botData.purgemaxConfirm) and (message.content != "{prefix}purgemax".format(prefix = botData.botPrefix)):
         await _sendMessagePingAuthor(message, ":exclamation: Purgemax abgebrochen.")
         botData.purgemaxConfirm = False
         
@@ -36,7 +36,6 @@ def _constructEmojiString(emoji):
 
 def _constructEmojiStringNoBracket(emoji):
     return "{isAnimated}:{emojiName}:{emojiID}".format(isAnimated = ("a" if emoji["animated"] else ""), emojiName = emoji["name"], emojiID = emoji["id"])
-
  
 async def _errorMessage(botti, message, botData, error):
     await _sendMessage(message, "```css\n[FAIL]: {0}```:fly: Bug automatisch an <@!{1}> gemeldet!".format(error, ids.userIDs.ITZFLUBBY))

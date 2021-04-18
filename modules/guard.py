@@ -16,9 +16,8 @@ async def _checkBanlist(message, botData):
             if botData.botBanList[i][1] < 10:
                 await modules.bottiHelper._sendMessagePingAuthor(message, ":customs: Du wurdest von der Nutzung des Bots ausgeschlossen _(BL: {})_!".format(str(botData.botBanList[i][1])))
                 botData.botBanList[i][1] = botData.botBanList[i][1] + 1
-                return False     
-            else:
-                return False
+            return False    
+    return True
 
 async def _checkPerms(botti, message, allowed, enableTrustet = False):
     if enableTrustet:
@@ -41,7 +40,7 @@ async def _floodDetection(message, botti, botData):
         lastAuthorID = botData.lastCommands[0].author.id
         sameAuthor = True
         for entry in botData.lastCommands:
-            if entry.author.id != lastAuthorID:
+            if entry.author.id is not lastAuthorID:
                 sameAuthor = False
                 break
                 
