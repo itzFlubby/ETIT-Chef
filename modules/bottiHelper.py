@@ -15,14 +15,14 @@ async def _checkCommandIgnoreList(message):
         
 async def _checkPingTrigger(botti, botData, message):
     if message.mention_everyone == False and botti.user.mentioned_in(message) == True and message.author.id not in [ ids.userIDs.ITZFLUBBY, ids.userIDs.CHRISTOPH ]:
-        helpString = ":100: Ich wurde erwähnt und da bin ich. Mit `{prefix}help` zeige ich dir eine Hilfe an!".format(prefix = botData.prefix)
+        helpString = ":100: Ich wurde erwähnt und da bin ich. Mit `{prefix}help` zeige ich dir eine Hilfe an!".format(prefix = botData.botPrefix)
         try:
             await message.reply(helpString)
         except:
             await _sendMessagePingAuthor(message, helpString)
         
 async def _checkPurgemaxConfirm(message, botData):
-    if (botData.purgemaxConfirm == True) and (message.content != "{prefix}purgemax".format(prefix = botData.prefix)):
+    if (botData.purgemaxConfirm == True) and (message.content != "{prefix}purgemax".format(prefix = botData.botPrefix)):
         await _sendMessagePingAuthor(message, ":exclamation: Purgemax abgebrochen.")
         botData.purgemaxConfirm = False
         
