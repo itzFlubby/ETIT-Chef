@@ -10,7 +10,7 @@ class BotError(Exception):
 async def _checkCommandIgnoreList(message):
     commandIgnoreList = [ "pepo", "getfrogbot", "pepohelp", "aboutpepo", "froghelp" ]    
     if message.content.split(" ")[0][1:] in commandIgnoreList:
-        await _sendMessage(message, "<:pepe_retarded:" + str(ids.emojiIDs.PEPERETARDED) + "> Pepo-Befehl mit Präfix `!` erkannt. Ignoriere...")
+        await _sendMessage(message, "{emoji} Pepo-Befehl mit Präfix `!` erkannt. Ignoriere...".format(emoji = _constructEmojiString(ids.emojiIDs.PEPERETARDED)))
         return False   
         
 async def _checkPingTrigger(botti, botData, message):
@@ -30,7 +30,14 @@ def _createDummyMessage(author, channel, content):
     msg = discord.Message(state = 0, channel = channel, data = { "id": 0, "webhook_id": 0, "attachments": [], "embeds": {}, "application": 0, "activity": 0, "edited_timestamp": 0, "type": 0, "pinned": 0, "mention_everyone": 0, "tts": 0, "content": content, "nonce": 0 })
     msg.author = author
     return msg  
-       
+ 
+def _constructEmojiString(emoji):
+    return "<{emojiNoBracket}>".format(emojiNoBracket = _constructEmojiStringNoBracket(emoji))
+
+def _constructEmojiStringNoBracket(emoji):
+    return "{isAnimated}:{emojiName}:{emojiID}".format(isAnimated = ("a" if emoji["animated"] else ""), emojiName = emoji["name"], emojiID = emoji["id"])
+
+ 
 async def _errorMessage(botti, message, botData, error):
     await _sendMessage(message, "```css\n[FAIL]: {0}```:fly: Bug automatisch an <@!{1}> gemeldet!".format(error, ids.userIDs.ITZFLUBBY))
     raise BotError("")

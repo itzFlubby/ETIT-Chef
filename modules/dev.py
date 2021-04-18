@@ -223,9 +223,6 @@ async def modulelist(botti, message, botData):
     data.set_thumbnail(url = botti.user.avatar_url)
     data.set_author(name = botti.user.name + "#" + str(botti.user.discriminator), icon_url="https://cdn.discordapp.com/app-assets/770272473735233587/773291276354322443.png")
     
-    
-
-    
     for i in range(botData.totalModules - 1):
         if wantedModule == botData.moduleNames[i]:
             data.add_field(name = botData.moduleNames[i].capitalize(), value = botData.fullCommandList[i])

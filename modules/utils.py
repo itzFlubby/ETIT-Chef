@@ -297,9 +297,9 @@ async def kekse(botti, message, botData):
     !kekse
     """
     botMessage = await modules.bottiHelper._sendMessage(message, "**Ich mag** :cookie::cookie::cookie: **OMNOMNOM**")
-    await botMessage.add_reaction(":Nein:" + str(ids.emojiIDs.NEIN))
-    await botMessage.add_reaction(":Doch:" + str(ids.emojiIDs.DOCH))
-    await botMessage.add_reaction(":Oh:" + str(ids.emojiIDs.OH))
+    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.NEIN))
+    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.DOCH))
+    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.OH))
     await botMessage.add_reaction("🍪")
 
 async def klausuren(botti, message, botData):
@@ -410,7 +410,7 @@ async def thisisfine(botti, message, botData):
     except:
         pass
     
-    numberOfDays = (datetime.datetime(2021, 3, 26, 9, 0, 0) - datetime.datetime.now()).days
+    numberOfDays = (datetime.datetime(2021, 8, 9, 0, 0, 0) - datetime.datetime.now()).days
     
     if not isGIFResquested:
         file = botData.modulesDirectory + "/data/images/temp/thisisfine_{}.jpg".format(str(numberOfDays))
@@ -421,7 +421,7 @@ async def thisisfine(botti, message, botData):
     
     titleFont = ImageFont.truetype(botData.modulesDirectory + "/data/images/fonts/impact.ttf", 35) 
 
-    imageString = "* ExPhyA in {} Tagen *".format(numberOfDays)  
+    imageString = "* KAI in {} Tagen *".format(numberOfDays)  
     shadowcolor = "black"    
     fontColor = (255, 255, 255)    
     cacheString = ""

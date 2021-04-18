@@ -120,7 +120,7 @@ async def play(botti, botData, message):
                 jsonData = json.load(jsonInfo)
                 
                 data = discord.Embed(
-                    title = "<:youtube:" + str(ids.emojiIDs.YOUTUBE) + "> Youtube-Video",
+                    title = "{emoji} Youtube-Video".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.YOUTUBE)),
                     color = 0xff0000,
                     description = ""
                 )
