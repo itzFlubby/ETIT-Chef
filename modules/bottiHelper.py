@@ -12,6 +12,7 @@ async def _checkCommandIgnoreList(message):
     if message.content.split(" ")[0][1:] in commandIgnoreList:
         await _sendMessage(message, "{emoji} Pepo-Befehl mit Präfix `!` erkannt. Ignoriere...".format(emoji = _constructEmojiString(ids.emojiIDs.PEPERETARDED)))
         return False   
+    return True
         
 async def _checkPingTrigger(botti, botData, message):
     if (not message.mention_everyone) and botti.user.mentioned_in(message) and (message.author.id not in [ ids.userIDs.ITZFLUBBY, ids.userIDs.CHRISTOPH ]):

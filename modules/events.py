@@ -95,10 +95,10 @@ async def on_raw_reaction_add(payload):
       
     # Studiengangauswahl
     if payload.channel_id == ids.channelIDs.AUSWAHL_STUDIENGANG:
-        emojiIDs = {    ids.emojiIDs.ETIT: 0, 
-                        ids.emojiIDs.MIT: 1, 
-                        ids.emojiIDs.KIT: 2, 
-                        ids.emojiIDs.GAST: 3 }
+        emojiIDs = {    ids.emojiIDs.ETIT["id"]: 0, 
+                        ids.emojiIDs.MIT["id"]: 1, 
+                        ids.emojiIDs.KIT["id"]: 2, 
+                        ids.emojiIDs.GAST["id"]: 3 }
         if payload.message_id == ids.messageIDs.AUSWAHL_BSC:
             roleSetupIDs = [ ids.roleIDs.ETIT_BSC_Einrichtung, ids.roleIDs.MIT_BSC_Einrichtung, ids.roleIDs.KIT_BSC_Einrichtung, ids.roleIDs.GAST ]
         elif payload.message_id == ids.messageIDs.AUSWAHL_MSC:
@@ -158,7 +158,7 @@ async def on_raw_reaction_add(payload):
                 await payload.member.add_roles(role, reason = "Requested by user.")
    
     # DANKE               
-    if payload.emoji.id == ids.emojiIDs.DANKE:
+    if payload.emoji.id == ids.emojiIDs.DANKE["id"]:
         channel = payload.member.guild.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         if payload.user_id == message.author.id:
