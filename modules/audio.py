@@ -19,7 +19,7 @@ async def _checkForVoiceClient(botti, message, string):
             voiceClient = voiceClients[x]
             return voiceClient
 
-async def connect(botti, botData, message):
+async def connect(botti, message, botData):
     """
     Reserviert für Entwickler
     Dieser Befehl verbindet den Bot mit einen Sprach-Kanal.
@@ -28,7 +28,7 @@ async def connect(botti, botData, message):
     try:
         voiceClients = botti.voice_clients
         if voiceClients:
-            await disconnect(botti, botData, message)
+            await disconnect(botti, message, botData)
         voiceClient = await message.author.voice.channel.connect(timeout=10, reconnect=True)
         
         await modules.bottiHelper._sendMessagePingAuthor(message, ":loud_sound: Zu **'{0}'** verbunden!".format(voiceClient.channel.name))
@@ -37,7 +37,7 @@ async def connect(botti, botData, message):
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Du befindest dich in keinem Sprach-Kanal!")
         return False
 
-async def disconnect(botti, botData, message):
+async def disconnect(botti, message, botData):
     """
     Reserviert für Entwickler
     Dieser Befehl trennt den Bot vom Sprach-Kanal.
@@ -50,7 +50,7 @@ async def disconnect(botti, botData, message):
     
     await modules.bottiHelper._sendMessagePingAuthor(message, ":loud_sound: Verbindung zu **'{0}'** getrennt!".format(voiceClient.channel.name))
 
-async def pause(botti, botData, message):
+async def pause(botti, message, botData):
     """
     Reserviert für Entwickler
     Dieser Befehl pausiert die Audioausgabe des Bots.
@@ -68,7 +68,7 @@ async def pause(botti, botData, message):
 def _downloadVideoJSON(botData, url):
     return os.system("youtube-dl --quiet --no-playlist --write-info-json --skip-download --output \"{0}/temp/%(id)s\" {1}".format(botData.modulesDirectory, url))    
 
-async def play(botti, botData, message):
+async def play(botti, message, botData):
     """
     Reserviert für Entwickler
     Dieser Befehl spielt ein Youtube-Video ab.
@@ -80,7 +80,7 @@ async def play(botti, botData, message):
     voiceClients = botti.voice_clients
     if not voiceClients:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Bot befindet sich in keinem Sprach-Kanal. Versuche zu dir zu verbinden...")
-        if not await connect(botti, botData, message):
+        if not await connect(botti, message, botData):
             return
         voiceClients = botti.voice_clients
     for x in range(len(voiceClients)):
@@ -147,7 +147,7 @@ async def play(botti, botData, message):
     except FileNotFoundError:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Es ist ein Fehler aufgetreten! Achte darauf, dass die URL richtig ist, und nur die Video-ID darin enhalten ist (also z.B. kein `&t=`)")
 
-async def queue(botti, botData, message):
+async def queue(botti, message, botData):
     try:
         option = message.content.split(" ")[1]
     except:
@@ -207,7 +207,7 @@ async def queue(botti, botData, message):
     else:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "queue"))
 
-async def reconnect(botti, botData, message):
+async def reconnect(botti, message, botData):
     """
     Reserviert für Entwickler
     Dieser Befehl verbindet erneut zum Sprach-Kanal.
@@ -221,7 +221,7 @@ async def reconnect(botti, botData, message):
     
     await modules.bottiHelper._sendMessagePingAuthor(message, ":loud_sound: Erneut zu **'{0}'** verbunden!".format(voiceClient.channel.name))
 
-async def resume(botti, botData, message):
+async def resume(botti, message, botData):
     """
     Reserviert für Entwickler
     Dieser Befehl führt die Audio-Wiedergabe fort.
@@ -238,7 +238,7 @@ async def resume(botti, botData, message):
         await modules.bottiHelper._sendMessagePingAuthor(message, ":arrow_forward: Playback fortgeführt!")
         voiceClient.resume()
 
-async def stop(botti, botData, message):
+async def stop(botti, message, botData):
     """
     Reserviert für Entwickler
     Dieser Befehl stoppt die Audio-Wiedergabe.
@@ -255,7 +255,7 @@ async def stop(botti, botData, message):
         await modules.bottiHelper._sendMessagePingAuthor(message, ":stop_button: Playback beendet!")
         voiceClient.stop()
 
-async def volume(botti, botData, message):
+async def volume(botti, message, botData):
     """
     Reserviert für Entwickler
     Dieser Befehl ändert die Lautstärke des Bots.

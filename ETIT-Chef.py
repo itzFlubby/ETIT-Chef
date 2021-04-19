@@ -16,6 +16,7 @@ import modules.data.ids     as ids
 import modules.audio        #as audio
 import modules.banlist      #as banlist
 import modules.bottiHelper  #as bottiHelper
+import modules.calendar     #as calendar
 import modules.dev          #as dev
 import modules.gamble       #as gamble
 import modules.guard        #as guard
@@ -24,7 +25,6 @@ import modules.lerngruppe   #as lerngruppe
 import modules.mensa        #as mensa
 import modules.mod          #as mod
 import modules.polls        #as polls
-import modules.roles        #as roles
 import modules.timer        #as timer
 import modules.utils        #as utils
 
@@ -37,6 +37,8 @@ botti = discord.Client(intents = bottiIntents, guild_subscriptions = True)
 slash = SlashCommand(botti, sync_commands = False)
 import modules.slash  # MUSS unter der Deklaration und Initialisierung von den Objekten slash und botti stehen
 import modules.events # MUSS unter der Deklaration und Initialisierung vom Objekten botti stehen
+             
+from modules.data.commandModule import commandModule             
              
 @botti.event
 async def on_ready():
@@ -121,59 +123,21 @@ async def on_message(message):
                 
         command = message.content.lower().split(" ")[0][1:]
         
-        # AUDIO
-        if command in botData.audioCommandList:
-            if await modules.guard._checkPerms(botti, message, [ ], True ):
-                await getattr(modules.audio, command)(botti, botData, message)
-        # DEV
-        elif command in botData.devCommandList:
-            if await modules.guard._checkPerms(botti, message, [ ], True ):
-                if (message.author.id in modules.guard.trustetIDs) and (command not in [ "balancekeeper", "lastcommands", "commandlist", "mdtext" ]):
-                    await modules.bottiHelper._sendMessagePingAuthor(message, "[:shield:] `Guard`: **Fehlende Berechtigung!**")
+        for module in botData.allCommandModules:
+            if command in module.commandNameList:
+                # BEGIN SPECIAL CASES #
+                if (command in [ "balance", "rank", "ranking", "transfer" ]) and (message.channel.id is not ids.channelIDs.SPIELHALLE):
+                    await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Dieser Befehl darf nur in <#{channelID}> verwendet werden!".format(channelID = ids.channelIDs.SPIELHALLE))
                     return
-                await getattr(modules.dev, command)(botti, message, botData)
-        # BANLIST
-        elif command in botData.banlistCommandList:
-            if await modules.guard._checkPerms(botti, message, [ ] ):
-                await getattr(modules.banlist, command)(botti, message, botData)
-        # GAMBLING
-        elif command in botData.gambleCommandList:
-            if (message.channel.id != ids.channelIDs.SPIELHALLE) and (command not in [ "balance", "rank", "ranking", "transfer" ]):
-                await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Dieser Befehl darf nur in <#{}> verwendet werden!".format(str(ids.channelIDs.SPIELHALLE)))
+                # END SPECIAL CASES #
+                if 0 not in module.allowedRoles:
+                    if not await modules.guard._checkPerms(botti, message, module.allowedRoles, module.enableTrustet ):
+                        return
+                await getattr(module.module, command)(botti, message, botData)
+                botData.befehlsCounter =+ 1
                 return
-            await getattr(modules.gamble, command)(botti, message, botData) 
-        # INFO
-        elif command in botData.infoCommandList:
-            await getattr(modules.info, command)(botti, message, botData)
-        # LERNGRUPPE
-        elif command in botData.lerngruppeCommandList:
-            await getattr(modules.lerngruppe, command)(botti, message, botData)
-        # MENSA
-        elif command in botData.mensaCommandList:
-            await getattr(modules.mensa, command)(botti, message, botData)
-        # MOD
-        elif command in botData.modCommandList:
-            if await modules.guard._checkPerms(botti, message, [ "Admin", "Dev", "Fachschaft ETEC", "Moderator", "Tutoren", "Bot-Commander" ] ):
-                await getattr(modules.mod, command)(botti, message, botData)
-        # POLLS
-        elif command in botData.pollsCommandList:
-            await getattr(modules.polls, command)(botti, message, botData)       
-        # ROLES
-        elif command in botData.rolesCommandList:
-            await getattr(modules.roles, command)(botti, message, botData)       
-        # TIMER
-        elif command in botData.timerCommandList:
-            await getattr(modules.timer, command)(botti, message, botData)       
-        # UTILS
-        elif command in botData.utilsCommandList:
-            await getattr(modules.utils, command)(botti, message, botData)                
-        elif command == botData.botPrefix + "cancel":
-            pass
-        else:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Befehl **'{0}'** existiert nicht!".format(message.content))
-
-        botData.befehlsCounter = botData.befehlsCounter + 1
-
+                
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Befehl **'{0}'** existiert nicht!".format(message.content))        
     except Exception as error:
         botData.lastError = ":warning: Traceback _(Timestamp: {})_  • Verursacht durch {}\n```py\n{}```".format(modules.bottiHelper._getTimestamp(), message.author.mention, traceback.format_exc().replace(os.getcwd()[:-10], ".."))
         await modules.bottiHelper._errorMessage(botti, message, botData, error)

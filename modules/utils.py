@@ -14,7 +14,6 @@ import modules.mensa
 import modules.mod
 import modules.guard
 import modules.polls
-import modules.roles
 import modules.timer
 import modules.utils
 
@@ -50,21 +49,20 @@ async def command(botti, message, botData):
     !command !test\r!command test
     """
     try:
-        commandName = message.content.split(" ")[1]
-        if commandName[0] != "!":    
-            commandName = "!" + commandName
+        subcommand = message.content.split(" ")[1]
+        commandName = subcommand if (subcommand[0] is not botData.botPrefix) else subcommand[1:]
     except:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "command"))      
         return
         
     infoText = ""
     
-    for i in range(0, botData.totalModules):
-        if commandName in botData.fullCommandList[i]:
-            infoText = getattr(botData.fullModuleList[i], commandName[1:]).__doc__
+    for module in botData.allCommandModules:
+        if commandName in module.commandNameList:
+            infoText = getattr(module.module, commandName).__doc__
             break
     
-    if infoText == None or infoText == "":
+    if infoText in [ None, "" ]:
         infoText = "\n\nDieser Befehl existiert nicht, oder es ist keine Hilfe verfügbar!\nAusführung nicht verfügbar.\n"
     
     infoTextLines = infoText.replace("    ", "").split("\n")
@@ -72,7 +70,7 @@ async def command(botti, message, botData):
     del(infoTextLines[-1])
     
     data = discord.Embed(
-        title = commandName,
+        title = botData.botPrefix + commandName,
         color = 0x009AFF,
         description = ""
     )
@@ -204,39 +202,29 @@ async def help(botti, message, botData):
     !help
     """
 
-    commandList = botData.fullCommandList.copy()
-    moduleList = botData.fullModuleList.copy()
-    moduleNames = botData.moduleNames.copy()
+    moduleList = botData.allCommandModules.copy()
     
-    if modules.guard._checkPermsQuiet(botti, message, modules.guard.allowed_roles) == False:
-        commandList.remove(botData.audioCommandList)
-        moduleList.remove(modules.audio)
-        moduleNames.remove("audio")
-        commandList.remove(botData.banlistCommandList)
-        moduleList.remove(modules.banlist)
-        moduleNames.remove("banlist")
-        commandList.remove(botData.devCommandList)
-        moduleList.remove(modules.dev)
-        moduleNames.remove("dev")
-        commandList.remove(botData.modCommandList)
-        moduleList.remove(modules.mod)
-        moduleNames.remove("mod")
+    if not modules.guard._checkPermsQuiet(botti, message, modules.guard.allowed_roles):
+        moduleList.remove(botData.audioCommands)
+        moduleList.remove(botData.banlistCommands)
+        moduleList.remove(botData.devCommands)
+        moduleList.remove(botData.modCommands)
 
     allHelpStrings = []
     helpStr = "```yaml\n"
-    for i in range(len(moduleList)):
-        moduleNameLen = len(moduleNames[i])
+    for module in moduleList:
+        moduleNameLen = len(module.moduleName)
         spacerLen = int((19 - moduleNameLen) / 2)
         moduleHeader = ""    
         moduleHeader += "-"*spacerLen
-        moduleHeader = moduleHeader + " " + moduleNames[i].upper() + " "
+        moduleHeader = moduleHeader + " " + module.moduleName.upper() + " "
         if ((19 - moduleNameLen) % 2) == 0:
             moduleHeader += "-"*(spacerLen - 1)
         else:
             moduleHeader += "-"*spacerLen           
         moduleStr = "--------------------\n" + moduleHeader + "\n--------------------\n"
-        for j in range(len(commandList[i])):
-            infoText = getattr(moduleList[i], commandList[i][j].split("!")[1]).__doc__
+        for command in module.commandNameList:
+            infoText = getattr(module.module, command).__doc__
             if infoText == None:
                 infoText = "<NONE>\n<NONE>\n<NONE>\n<NONE>\n"
             infoTextLines = infoText.replace("    ", "").split("\n")
@@ -340,7 +328,7 @@ async def klausuren(botti, message, botData):
         
     
     klausurString = klausurString  
-    await modules.bottiHelper._sendMessagePingAuthor(message, klausurString)
+    await modules.bottiHelper._sendMessagePingAuthor(message, klausurString + "Jegliche Angaben ohne Gewähr.")
 
 async def random(botti, message, botData):
     """ 
