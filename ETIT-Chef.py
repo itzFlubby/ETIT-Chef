@@ -40,7 +40,7 @@ import modules.events # MUSS unter der Deklaration und Initialisierung vom Objek
              
 @botti.event
 async def on_ready():
-    if botData.firstBoot == True:
+    if botData.firstBoot:
         modules.bottiHelper._loadSettings(botData)
         botData.totalSlashCommands = len(slash.commands)
         botData.slashCommandList = list(slash.commands)

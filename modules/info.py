@@ -144,7 +144,7 @@ async def permissions(botti, message, botData):
                         ]
     for i in range(len(cuttedStrings)):
         if not isUser or not (cuttedStrings[i] in ignoredPermissions):
-            total_string = total_string + cuttedStrings[i] + "\n"
+            total_string += cuttedStrings[i] + "\n"
 
     total_string = total_string.replace(", True", " {emoji} (True)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.APPROVE)))
     total_string = total_string.replace(", False", " {emoji} (False)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.DENY)))
