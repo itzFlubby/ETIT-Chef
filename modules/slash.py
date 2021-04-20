@@ -166,9 +166,9 @@ async def _userinfo(ctx, benutzer):
     required = True )])
 async def _vorschlag(ctx: SlashContext, nachricht):
     modules.bottiHelper._logSlashCommand(ctx, botData)   
-    if botti.get_user(ids.userIDs.itzFlubby_ID).dm_channel is None:
-        await botti.get_user(ids.userIDs.itzFlubby_ID).create_dm()
-    sentMessage = await botti.get_user(ids.userIDs.itzFlubby_ID).dm_channel.send("**{0}#{1}** ({2}) hat per SlashCommand folgendes vorgeschlagen: _'{3}'_. | {4}".format(ctx.author.name, ctx.author.discriminator, ctx.author.id, nachricht, modules.bottiHelper._getTimestamp()))
+    if botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel is None:
+        await botti.get_user(ids.userIDs.ITZFLUBBY).create_dm()
+    sentMessage = await botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel.send("**{0}#{1}** ({2}) hat per SlashCommand folgendes vorgeschlagen: _'{3}'_. | {4}".format(ctx.author.name, ctx.author.discriminator, ctx.author.id, nachricht, modules.bottiHelper._getTimestamp()))
     await sentMessage.add_reaction("✅")
     await sentMessage.add_reaction("💤")
     await sentMessage.add_reaction("❌")

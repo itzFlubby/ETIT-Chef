@@ -7,3 +7,5 @@ xlrd
 xlutils
 xlwt
 youtube-dl
+mcstatus
+icalendar

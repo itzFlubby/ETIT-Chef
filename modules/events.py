@@ -10,13 +10,8 @@ from modules.data.botData import botData
 
 @botti.event
 async def on_member_join(member):
-    roles = []
-    guild = botti.get_guild(ids.serverIDs.ETIT_KIT_ServerID)
-    for role_id in ids.roleIDs.newMemberJoinRoles:
-        roles.append(guild.get_role(role_id))
-    await member.edit(roles = roles, reason = "Mitglieder beitritt.")
-    
-    channel = guild.get_channel(ids.channelIDs.nutzer_updates_ChannelID)
+    guild = botti.get_guild(ids.serverIDs.ETIT_KIT)
+    channel = guild.get_channel(ids.channelIDs.NUTZER_UPDATES)
     
     data = discord.Embed(
         title = member.name + "#" + str(member.discriminator),
@@ -35,9 +30,9 @@ async def on_member_join(member):
     
 @botti.event
 async def on_member_remove(member):
-    guild = botti.get_guild(ids.serverIDs.ETIT_KIT_ServerID)
+    guild = botti.get_guild(ids.serverIDs.ETIT_KIT)
     
-    channel = guild.get_channel(ids.channelIDs.nutzer_updates_ChannelID)
+    channel = guild.get_channel(ids.channelIDs.NUTZER_UPDATES)
     
     data = discord.Embed(
         title = member.name + "#" + str(member.discriminator),
@@ -55,136 +50,122 @@ async def on_member_remove(member):
     await channel.send(embed = data)
 
 @botti.event
+async def on_raw_reaction_remove(payload):
+    guild = botti.get_guild(ids.serverIDs.ETIT_KIT)
+    
+    if payload.channel_id in [ ids.channelIDs.AUSWAHL_ETIT_BSC, ids.channelIDs.AUSWAHL_MIT_BSC, ids.channelIDs.AUSWAHL_ETIT_MSC ]:
+        if payload.emoji.name == "approve":
+            member = guild.get_member(payload.user_id)
+            channel = guild.get_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+            if len(message.role_mentions) != 0:
+                await member.remove_roles(message.role_mentions[0], reason = "Requested by user.")    
+
+@botti.event
 async def on_raw_reaction_add(payload): 
-    guild = botti.get_guild(ids.serverIDs.ETIT_KIT_ServerID)
+    guild = botti.get_guild(ids.serverIDs.ETIT_KIT)
     
     # Vorschlag
-    if payload.channel_id == ids.channelIDs.dm_itzFlubby_ChannelID and payload.user_id == ids.userIDs.itzFlubby_ID:
-        if botti.get_user(ids.userIDs.itzFlubby_ID).dm_channel is None:
-            await botti.get_user(ids.userIDs.itzFlubby_ID).create_dm()
-        vorschlagMessage = (await botti.get_user(ids.userIDs.itzFlubby_ID).dm_channel.fetch_message(payload.message_id)).content
-        channel_botTestLobby_ChannelID = guild.get_channel(ids.channelIDs.botTestLobby_ChannelID)
-        updatedStatus = ""
-        if payload.emoji.name == "✅":
-            updatedStatus = "angenommen"
-        elif payload.emoji.name == "💤":
-             updatedStatus = "on hold"
-        elif payload.emoji.name == "❌":
-             updatedStatus = "abgelehnt"
-        await channel_botTestLobby_ChannelID.send(":bookmark_tabs: Statusänderung für Vorschlag von **{0}** ({1}) <@!{1}> `@{2}`\n`{3}`\nwurde auf {4} **{5}** gesetzt!".format(vorschlagMessage.split("**")[1], vorschlagMessage.split("(")[1][:18], vorschlagMessage.split("| ")[1], vorschlagMessage.split("'")[1], payload.emoji.name, updatedStatus)) 
-
-    # ROLLEN
-    if payload.message_id == ids.messageIDs.roleSelect_MessageID:
-        if payload.emoji.name == "⚡":
-            userRoles = modules.roles._changeRole(payload.member.roles, [                                ids.roleIDs.MIT_Ersti_RoleID, ids.roleIDs.Info_RoleID, ids.roleIDs.Paedagogik_RoleID, ids.roleIDs.NWT_RoleID, ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.ETIT_Ersti_RoleID), guild)
-        elif payload.emoji.name == "⚙️":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID,                               ids.roleIDs.Info_RoleID, ids.roleIDs.Paedagogik_RoleID, ids.roleIDs.NWT_RoleID, ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.MIT_Ersti_RoleID), guild)
-        elif payload.emoji.name == "💻":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID, ids.roleIDs.MIT_Ersti_RoleID,                          ids.roleIDs.Paedagogik_RoleID, ids.roleIDs.NWT_RoleID, ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.Info_RoleID), guild)
-        elif payload.emoji.name == "👦":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID, ids.roleIDs.MIT_Ersti_RoleID, ids.roleIDs.Info_RoleID,                                ids.roleIDs.NWT_RoleID, ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.Paedagogik_RoleID), guild)
-        elif payload.emoji.name == "👨‍🏫":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID, ids.roleIDs.MIT_Ersti_RoleID, ids.roleIDs.Info_RoleID, ids.roleIDs.Paedagogik_RoleID,                         ids.roleIDs.Gast_RoleID ], guild.get_role(ids.roleIDs.NWT_RoleID), guild)
-        elif payload.emoji.name == "👤":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ETIT_Ersti_RoleID, ids.roleIDs.MIT_Ersti_RoleID, ids.roleIDs.Info_RoleID, ids.roleIDs.Paedagogik_RoleID, ids.roleIDs.NWT_RoleID                          ], guild.get_role(ids.roleIDs.Gast_RoleID), guild)
+    if payload.channel_id == ids.channelIDs.DM_ITZFLUBBY and payload.user_id == ids.userIDs.ITZFLUBBY:
+        if botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel is None:
+            await botti.get_user(ids.userIDs.ITZFLUBBY).create_dm()
+        vorschlagMessage = (await botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel.fetch_message(payload.message_id)).content
+        channel_BOT_TEST_LOBBY = guild.get_channel(ids.channelIDs.BOT_TEST_LOBBY)
+        emojiToStatusname = { "✅": "angenommen", "💤": "on hold", "❌": "abgelehnt" }
+        await channel_BOT_TEST_LOBBY.send(":bookmark_tabs: Statusänderung für Vorschlag von **{0}** ({1}) <@!{1}> `@{2}`\n`{3}`\nwurde auf {4} **{5}** gesetzt!".format(vorschlagMessage.split("**")[1], vorschlagMessage.split("(")[1][:18], vorschlagMessage.split("| ")[1], vorschlagMessage.split("'")[1], payload.emoji.name, emojiToStatusname[payload.emoji.name])) 
+    
+    # Personalisierung
+    if payload.message_id == ids.messageIDs.REMOVE_ROLE_SELECT:
+        emojiToRole = { "💬": ids.roleIDs.ZITATE, 
+                        "🎼": ids.roleIDs.MUSIK, 
+                        "👾": ids.roleIDs.MEMES,
+                        "🎮": ids.roleIDs.GAMING,
+                        "😺": ids.roleIDs.KATZEN,
+                        "💻": ids.roleIDs.TECH_TALK,
+                        "🎰": ids.roleIDs.SPIELHALLE,
+                        "🐖": ids.roleIDs.VORLESUNGSSPAM }     
+        if payload.emoji.name == "❌":     
+            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ZITATE, ids.roleIDs.MUSIK, ids.roleIDs.MEMES, ids.roleIDs.GAMING, ids.roleIDs.KATZEN, ids.roleIDs.TECH_TALK, ids.roleIDs.SPIELHALLE, ids.roleIDs.VORLESUNGSSPAM, ids.roleIDs.FREIZEIT ], -1, guild)          
         else:
-            return
-        await payload.member.edit(roles = userRoles, reason = "Requested by user.")
-        
-    if payload.message_id == ids.messageIDs.removeRoleSelect_MessageID:
-        if payload.emoji.name == "💬":
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Zitate_RoleID ], -1, guild)
-        elif payload.emoji.name == "🎼":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Musik_RoleID ], -1, guild)          
-        elif payload.emoji.name == "👾":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Memes_RoleID ], -1, guild)       
-        elif payload.emoji.name == "🎮":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Gaming_RoleID ], -1, guild)       
-        elif payload.emoji.name == "😺":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Katzen_RoleID ], -1, guild)       
-        elif payload.emoji.name == "💻":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.tech_talk_RoleID ], -1, guild)       
-        elif payload.emoji.name == "🎰":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Spielhalle_RoleID ], -1, guild)       
-        elif payload.emoji.name == "🐖":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Vorlesungsspam_RoleID ], -1, guild)       
-        elif payload.emoji.name == "❌":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.Zitate_RoleID, ids.roleIDs.Musik_RoleID, ids.roleIDs.Memes_RoleID, ids.roleIDs.Gaming_RoleID, ids.roleIDs.Katzen_RoleID, ids.roleIDs.tech_talk_RoleID, ids.roleIDs.Spielhalle_RoleID, ids.roleIDs.Vorlesungsspam_RoleID, ids.roleIDs.Freizeit_RoleID ], -1, guild)          
-        else:
-            return
+            userRoles = modules.roles._changeRole(payload.member.roles, [ emojiToRole[payload.emoji.name] ], -1, guild)
         await payload.member.edit(roles = userRoles, reason = "Requested by user.")  
         
-    if payload.message_id == ids.messageIDs.matlabSelect_MessageID:
-        try:
-            await payload.member.add_roles(guild.get_role(ids.roleIDs.Matlab_RoleID), reason = "Requested by user.")
-        except:
-            pass
+    if payload.message_id == ids.messageIDs.MATLAB_SELECT:
+        await payload.member.add_roles(guild.get_role(ids.roleIDs.MATLAB), reason = "Requested by user.")
+      
+    # Studiengangauswahl
+    if payload.channel_id == ids.channelIDs.AUSWAHL_STUDIENGANG:
+        emojiIDs = {    ids.emojiIDs.ETIT["id"]: 0, 
+                        ids.emojiIDs.MIT["id"]: 1, 
+                        ids.emojiIDs.KIT["id"]: 2, 
+                        ids.emojiIDs.GAST["id"]: 3 }
+        if payload.message_id == ids.messageIDs.AUSWAHL_BSC:
+            roleSetupIDs = [ ids.roleIDs.ETIT_BSC_Einrichtung, ids.roleIDs.MIT_BSC_Einrichtung, ids.roleIDs.KIT_BSC_Einrichtung, ids.roleIDs.GAST ]
+        elif payload.message_id == ids.messageIDs.AUSWAHL_MSC:
+            roleSetupIDs = [ ids.roleIDs.ETIT_MSC_Einrichtung, ids.roleIDs.MIT_MSC_Einrichtung, ids.roleIDs.KIT_MSC_Einrichtung, ids.roleIDs.GAST ]
+        else:
+            return
+            
+        setupRole = guild.get_role(roleSetupIDs[emojiIDs[payload.emoji.id]])
+        if setupRole not in payload.member.roles:
+            await payload.member.add_roles(setupRole, reason = "Requested by user.")
+            
+    # Modulauswahl
+    if payload.channel_id in [ ids.channelIDs.AUSWAHL_ETIT_BSC, ids.channelIDs.AUSWAHL_MIT_BSC, ids.channelIDs.AUSWAHL_ETIT_MSC, ids.channelIDs.AUSWAHL_MIT_MSC ]:
+        if payload.emoji.name == "approve":
+            channel = guild.get_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+            
+            channelToRole = {   ids.channelIDs.AUSWAHL_ETIT_BSC: ids.roleIDs.ETIT_BSC, 
+                                ids.channelIDs.AUSWAHL_MIT_BSC: ids.roleIDs.MIT_BSC, 
+                                ids.channelIDs.AUSWAHL_ETIT_MSC: ids.roleIDs.ETIT_MSC,
+                                ids.channelIDs.AUSWAHL_MIT_MSC: ids.roleIDs.MIT_MSC
+                            }
+            
+            userRoles = payload.member.roles
+            userRoleIDs = [role.id for role in userRoles]
+            setupRoleIDs = [roleID for roleID in ids.roleIDs.setupRoles if roleID in userRoleIDs]
+            if bool(setupRoleIDs): # If user has a setup role
+                setupRoleID = setupRoleIDs[0] # Take first element, because this list WILL only have one element. EVER.
+                setupRole = guild.get_role(setupRoleID)
+                
+                userRoles.remove(setupRole)
+                    
+                for roleID in ids.roleIDs.newMemberJoinRoles:
+                    if roleID not in userRoleIDs:
+                        userRoles.append(guild.get_role(roleID))
+                    
+                if setupRoleID in [ ids.roleIDs.KIT_BSC_Einrichtung, ids.roleIDs.KIT_MSC_Einrichtung ]:
+                    setupRoleToNormalRole = {   ids.roleIDs.KIT_BSC_Einrichtung: ids.roleIDs.KIT_BSC,
+                                                ids.roleIDs.KIT_MSC_Einrichtung: ids.roleIDs.KIT_MSC
+                                            }   
+                    userRoles.append(guild.get_role(setupRoleToNormalRole[setupRoleID]))
+                else:
+                    if channelToRole[payload.channel_id] not in userRoleIDs:
+                        userRoles.append(guild.get_role(channelToRole[payload.channel_id]))
+                
+                await payload.member.edit(roles = userRoles, reason = "User set course.")
+
+              
+            if len(message.role_mentions) == 0:
+                channel_sdadisdigen = guild.get_channel(ids.channelIDs.SDADISDIGEN)
+                await channel_sdadisdigen.send("👤 {} hat in <#{}> **{}** ausgewählt <@!{}>".format(payload.member.mention, payload.channel_id, message.content, ids.userIDs.DAVID))
+            else:                  
+                role = message.role_mentions[0]
+                if role not in payload.member.roles:
+                    await payload.member.add_roles(role, reason = "Requested by user.")
    
     # DANKE               
-    if payload.emoji.id == ids.emojiIDs.danke_EmojiID:
+    if payload.emoji.id == ids.emojiIDs.DANKE["id"]:
         channel = payload.member.guild.get_channel(payload.channel_id)
-        helpfulMessage = await channel.fetch_message(payload.message_id)
-        if payload.user_id == helpfulMessage.author.id:
-            await helpfulMessage.add_reaction("❌")
+        message = await channel.fetch_message(payload.message_id)
+        if payload.user_id == message.author.id:
+            await message.add_reaction("❌")
             return
-        
-        reactions = helpfulMessage.reactions
-        wasAcknowledged = False
-        for reaction in reactions:
-            try:
-                if reaction.me == True:
-                    wasAcknowledged = True
-            except:
-                pass
-                
-        if wasAcknowledged == False:
-            if modules.gamble._getBalance(botData, helpfulMessage.author.id) == -1:
-                modules.gamble._createAccount(botData, helpfulMessage.author.id)
-                
-            if helpfulMessage.author.id != ids.userIDs.itzFlubby_ID:
-                modules.gamble._setBalance(botData, helpfulMessage.author.id, 1500)
-                
-            await helpfulMessage.add_reaction("✅")
-        pass
-"""        
-@botti.event
-async def on_member_update(before, after):
-    guild = botti.get_guild(ids.serverIDs.ETIT_KIT_ServerID)
-    
-    channel = guild.get_channel(ids.channelIDs.devInternal1_ChannelID)
-    
-    onlineIconDict = {
-        discord.Status.online: "<:online:" + str(ids.emojiIDs.online_EmojiID) + ">",
-        discord.Status.offline: "<:offline:" + str(ids.emojiIDs.offline_EmojiID) + ">",
-        discord.Status.idle: "<:idle:" + str(ids.emojiIDs.idle_EmojiID) + ">",
-        discord.Status.dnd: "<:dnd:" + str(ids.emojiIDs.dnd_EmojiID) + ">"
-    }
-    
-    data = discord.Embed(
-        title = after.name + "#" + str(after.discriminator),
-        color = 0x0066FF,
-        description = "<@" + str(after.id) + "> wurde aktualisiert!"
-    )
-    
-    data.add_field(name = "Status", value = "{} {} -> {} {}".format(str(before.status), str(onlineIconDict[before.status]), str(after.status), str(onlineIconDict[after.status])), inline = False)
-    data.add_field(name = "Aktivität", value = str(before.activity) + " -> " + str(after.activity), inline = False)
-
-    data.set_author(name = "🔃 Mitglieder-Aktualisierung")
-    data.set_thumbnail(url = after.avatar_url)
-    data.set_footer(text = "Stand: {0}".format(modules.bottiHelper._getTimestamp()))
-    
-    await channel.send(embed = data)
-    
-    if after.id == ids.userIDs.ETIT_Master_ID:
-        if after.status == discord.Status.offline:
-            data = discord.Embed(
-                title = "",
-                description = "",
-                color = 0xFF0000
-            )
-            data.add_field(name = "HEY CHRISTOPH", value = "Da StImMt WaS nIcHt. RePaRiErE dAs!1!!elf!!")
-            data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
-            data.set_thumbnail(url = botti.user.avatar_url)
-            data.set_author(name = "📡 Offline-Detektor")
-            await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.botTestLobby_ChannelID).send(content = "<@192701441188560900>", embed = data)
-"""
+        for reaction in message.reactions:
+            if reaction.me == True:
+                return
+        if modules.gamble._getBalance(botData, message.author.id) == -1:
+            modules.gamble._createAccount(botData, message.author.id)
+        modules.gamble._addBalance(botData, message.author.id, 1500)
+        await message.add_reaction("✅")

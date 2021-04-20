@@ -65,7 +65,7 @@ async def mensa(botti, message, botData):
         requestedWeekday = currentWeekday + 1   
 
     if requestedWeekday > 4:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!mensa"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "mensa"))      
         return
     
     if requestedWeekday != - 1:
@@ -196,10 +196,10 @@ async def mensazusatz(botti, message, botData):
     ":broccoli: `- veganes Gericht`\n"
     ":earth_africa: `- kontrolliert biologischer Anbau mit EU Bio-Siegel / DE-Öko-007 Kontrollstelle`\n"
     ":fish: `- MSC aus zertifizierter Fischerei`\n")
-    await modules.bottiHelper._sendMessage(message, ":fork_knife_plate: Dies sind die Mensa-Zusätze {}:\n{}Eine komplette Liste aller gesetzlich ausweisungspflichtigen Zusatzstoffe und Allergene findest du unter:\n{}".format(message.author.mention, mensaZusatzString, "https://www.sw-ka.de/media/?file=4458_liste_aller_gesetzlich_ausweisungspflichtigen_zusatzstoffe_und_allergene_fuer_website_160218.pdf&download"))
+    await modules.bottiHelper._sendMessage(message, ":fork_knife_plate: Dies sind die Mensa-Zusätze {}:\n{}Eine komplette Liste aller gesetzlich ausweisungspflichtigen Zusatzstoffe und Allergene findest du unter:\n{}".format(message.author.mention, mensaZusatzString, botData.mensaZusatzURL))
 
 async def _updateJson(botData):
-    response = requests.get(url = "https://www.sw-ka.de/json_external/ern004/canteen/", auth = requests.auth.HTTPBasicAuth(botData.mensaUsername, botData.mensaUserpassword))
+    response = requests.get(url = botData.mensaURL, auth = requests.auth.HTTPBasicAuth(botData.mensaUsername, botData.mensaUserpassword))
     
     jsonResponse = response.content
     
@@ -222,5 +222,5 @@ async def _dailyMensa(botti, botData):
         await asyncio.sleep(diff.seconds)
         
         if nextPing.weekday() < 4:
-            msg = modules.bottiHelper._createDummyMessage(botti.get_guild(ids.serverIDs.ETIT_KIT_ServerID).get_member(botti.user.id), discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.mensa_ChannelID), "")
+            msg = modules.bottiHelper._createDummyMessage(botti.get_guild(ids.serverIDs.ETIT_KIT).get_member(botti.user.id), discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.MENSA), "")
             await modules.mensa.mensa(botti, msg, botData)

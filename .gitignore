@@ -126,3 +126,4 @@ modules/data/images/thisisfine.gif
 *.xls
 updateSlashCommand.py
 *.botti
+modules/data/calendar/cal.ical

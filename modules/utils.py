@@ -14,7 +14,6 @@ import modules.mensa
 import modules.mod
 import modules.guard
 import modules.polls
-import modules.roles
 import modules.timer
 import modules.utils
 
@@ -50,21 +49,20 @@ async def command(botti, message, botData):
     !command !test\r!command test
     """
     try:
-        commandName = message.content.split(" ")[1]
-        if commandName[0] != "!":    
-            commandName = "!" + commandName
+        subcommand = message.content.split(" ")[1]
+        commandName = subcommand if (subcommand[0] is not botData.botPrefix) else subcommand[1:]
     except:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!command"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "command"))      
         return
         
     infoText = ""
     
-    for i in range(0, botData.totalModules):
-        if commandName in botData.fullCommandList[i]:
-            infoText = getattr(botData.fullModuleList[i], commandName[1:]).__doc__
+    for module in botData.allCommandModules:
+        if commandName in module.commandNameList:
+            infoText = getattr(module.module, commandName).__doc__
             break
     
-    if infoText == None or infoText == "":
+    if infoText in [ None, "" ]:
         infoText = "\n\nDieser Befehl existiert nicht, oder es ist keine Hilfe verfügbar!\nAusführung nicht verfügbar.\n"
     
     infoTextLines = infoText.replace("    ", "").split("\n")
@@ -72,7 +70,7 @@ async def command(botti, message, botData):
     del(infoTextLines[-1])
     
     data = discord.Embed(
-        title = commandName,
+        title = botData.botPrefix + commandName,
         color = 0x009AFF,
         description = ""
     )
@@ -108,7 +106,7 @@ async def convert(botti, message, botData):
         posInContent = 11 + len(convertFrom) + len(convertTo)
         textToConvert = message.content[posInContent:]
     except:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!convert"))
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "convert"))
         return     
        
     convertableFrom = [ "text", "bin", "hex" ]
@@ -135,7 +133,7 @@ async def convert(botti, message, botData):
             break
             
     if convertID == -1:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!convert"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "convert"))      
         return        
     
     for i in range(len(convertableTo)):
@@ -150,7 +148,7 @@ async def convert(botti, message, botData):
             break    
 
     if convertID not in convertIDs:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!convert"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "convert"))      
         return      
 
     try:
@@ -204,39 +202,29 @@ async def help(botti, message, botData):
     !help
     """
 
-    commandList = botData.fullCommandList.copy()
-    moduleList = botData.fullModuleList.copy()
-    moduleNames = botData.moduleNames.copy()
+    moduleList = botData.allCommandModules.copy()
     
-    if modules.guard._checkPermsQuiet(botti, message, modules.guard.allowed_roles) == False:
-        commandList.remove(botData.audioCommandList)
-        moduleList.remove(modules.audio)
-        moduleNames.remove("audio")
-        commandList.remove(botData.banlistCommandList)
-        moduleList.remove(modules.banlist)
-        moduleNames.remove("banlist")
-        commandList.remove(botData.devCommandList)
-        moduleList.remove(modules.dev)
-        moduleNames.remove("dev")
-        commandList.remove(botData.modCommandList)
-        moduleList.remove(modules.mod)
-        moduleNames.remove("mod")
+    if not modules.guard._checkPermsQuiet(botti, message, modules.guard.allowed_roles):
+        moduleList.remove(botData.audioCommands)
+        moduleList.remove(botData.banlistCommands)
+        moduleList.remove(botData.devCommands)
+        moduleList.remove(botData.modCommands)
 
     allHelpStrings = []
     helpStr = "```yaml\n"
-    for i in range(len(moduleList)):
-        moduleNameLen = len(moduleNames[i])
+    for module in moduleList:
+        moduleNameLen = len(module.moduleName)
         spacerLen = int((19 - moduleNameLen) / 2)
         moduleHeader = ""    
         moduleHeader += "-"*spacerLen
-        moduleHeader = moduleHeader + " " + moduleNames[i].upper() + " "
+        moduleHeader = moduleHeader + " " + module.moduleName.upper() + " "
         if ((19 - moduleNameLen) % 2) == 0:
             moduleHeader += "-"*(spacerLen - 1)
         else:
             moduleHeader += "-"*spacerLen           
         moduleStr = "--------------------\n" + moduleHeader + "\n--------------------\n"
-        for j in range(len(commandList[i])):
-            infoText = getattr(moduleList[i], commandList[i][j].split("!")[1]).__doc__
+        for command in module.commandNameList:
+            infoText = getattr(module.module, command).__doc__
             if infoText == None:
                 infoText = "<NONE>\n<NONE>\n<NONE>\n<NONE>\n"
             infoTextLines = infoText.replace("    ", "").split("\n")
@@ -297,9 +285,9 @@ async def kekse(botti, message, botData):
     !kekse
     """
     botMessage = await modules.bottiHelper._sendMessage(message, "**Ich mag** :cookie::cookie::cookie: **OMNOMNOM**")
-    await botMessage.add_reaction(":Nein:" + str(ids.emojiIDs.nein_EmojiID))
-    await botMessage.add_reaction(":Doch:" + str(ids.emojiIDs.doch_EmojiID))
-    await botMessage.add_reaction(":Oh:" + str(ids.emojiIDs.oh_EmojiID))
+    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.NEIN))
+    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.DOCH))
+    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.OH))
     await botMessage.add_reaction("🍪")
 
 async def klausuren(botti, message, botData):
@@ -340,7 +328,7 @@ async def klausuren(botti, message, botData):
         
     
     klausurString = klausurString  
-    await modules.bottiHelper._sendMessagePingAuthor(message, klausurString)
+    await modules.bottiHelper._sendMessagePingAuthor(message, klausurString + "Jegliche Angaben ohne Gewähr.")
 
 async def random(botti, message, botData):
     """ 
@@ -410,7 +398,7 @@ async def thisisfine(botti, message, botData):
     except:
         pass
     
-    numberOfDays = (datetime.datetime(2021, 3, 26, 9, 0, 0) - datetime.datetime.now()).days
+    numberOfDays = (datetime.datetime(2021, 8, 9, 0, 0, 0) - datetime.datetime.now()).days
     
     if not isGIFResquested:
         file = botData.modulesDirectory + "/data/images/temp/thisisfine_{}.jpg".format(str(numberOfDays))
@@ -421,7 +409,7 @@ async def thisisfine(botti, message, botData):
     
     titleFont = ImageFont.truetype(botData.modulesDirectory + "/data/images/fonts/impact.ttf", 35) 
 
-    imageString = "* ExPhyA in {} Tagen *".format(numberOfDays)  
+    imageString = "* KAI in {} Tagen *".format(numberOfDays)  
     shadowcolor = "black"    
     fontColor = (255, 255, 255)    
     cacheString = ""
@@ -475,63 +463,13 @@ async def vorschlag(botti, message, botData):
     !vorschlag Dies ist ein Test
     """
     if message.guild is not None:
-        if botti.get_user(ids.userIDs.itzFlubby_ID).dm_channel is None:
-            await botti.get_user(ids.userIDs.itzFlubby_ID).create_dm()
-        sentMessage = await botti.get_user(ids.userIDs.itzFlubby_ID).dm_channel.send("**{0}#{1}** ({2}) hat auf **{3} ({4}) / {5} ({6})** folgendes geschrieben: _'{7}'_. | {8}".format(message.author.name, message.author.discriminator, message.author.id, message.guild.name, message.guild.id, message.channel.name, message.channel.id, str(message.content[9:]), modules.bottiHelper._getTimestamp()))
+        if botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel is None:
+            await botti.get_user(ids.userIDs.ITZFLUBBY).create_dm()
+        sentMessage = await botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel.send("**{0}#{1}** ({2}) hat auf **{3} ({4}) / {5} ({6})** folgendes geschrieben: _'{7}'_. | {8}".format(message.author.name, message.author.discriminator, message.author.id, message.guild.name, message.guild.id, message.channel.name, message.channel.id, str(message.content[9:]), modules.bottiHelper._getTimestamp()))
     else:
-        sentMessage = await botti.get_user(ids.userIDs.itzFlubby_ID).dm_channel.send("**{0}#{1}** ({2}) hat im Privat-Chat folgendes geschrieben: _'{3}'_. | {4}".format(message.author.name, message.author.discriminator, message.author.id, str(message.content[9:]), modules.bottiHelper._getTimestamp()))
+        sentMessage = await botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel.send("**{0}#{1}** ({2}) hat im Privat-Chat folgendes geschrieben: _'{3}'_. | {4}".format(message.author.name, message.author.discriminator, message.author.id, str(message.content[9:]), modules.bottiHelper._getTimestamp()))
     
     await sentMessage.add_reaction("✅")
     await sentMessage.add_reaction("💤")
     await sentMessage.add_reaction("❌")
     await modules.bottiHelper._sendMessagePingAuthor(message, ":bookmark_tabs: Deine Nachricht wurde erfolgreich zugestellt!")
-
-async def wochenplan(botti, message, botData):
-    """ 
-    Für alle ausführbar
-    Dieser Befehl zeigt den Wochenplan an.
-    !wochenplan {TYPE}
-    {TYPE} "", "ETIT", "MIT"
-    !wochenplan\r!wochenplan ETIT\r!wochenplan MIT
-    """
-    data = discord.Embed(
-        title = "",
-        color = 0x005dff,
-        description = ""
-    )
-    
-    try:
-        parameter = message.content.split(" ")[1]
-    except:
-        parameter = ""
-        pass
-        
-    etit = False
-    mit = False
-    
-    for role in message.author.roles:
-        if "ETIT Ersti" in role.name:
-            etit = True
-        if "MIT Ersti" in role.name:
-            mit = True
-    
-    if (etit and parameter == "") or parameter.lower() == "etit":
-        type = "ETIT"
-        data.add_field(name = "Montag", value = ":chart_with_upwards_trend: `10:00 - 11:30 HMI`", inline = False)
-        data.add_field(name = "\nDienstag", value = ":chart_with_upwards_trend: `08:00 - 09:30 HMI`\n:electric_plug: `10:00 - 11:30 LEN`", inline = False)
-        data.add_field(name = "\nMittwoch", value = ":boom: `12:00 - 13:30 ExPhy`\n:floppy_disk: `14:00 - 15:30 DT (VL / Ü)`\n:chart_with_upwards_trend: `16:00 - 17:30 HMI`", inline = False)
-        data.add_field(name = "\nDonnerstag", value = ":electric_plug: `10:00 - 11:30 LEN`\n:electric_plug: `12:00 - 13:30 LEN (Ü)`\n:chart_with_upwards_trend: `16:00 - 17:30 HMI (Ü)`", inline = False)
-        data.add_field(name = "\nFreitag", value = ":floppy_disk: `08:00 - 09:30 DT (VL / Ü)`\n:chart_with_upwards_trend: `10:00 - 11:30 HMI (Ü)`\n:boom: `12:00 - 13:30 ExPhy`", inline = False)
-    elif (mit and parameter == "") or parameter.lower() == "mit":
-        type = "MIT"
-        data.add_field(name = "Montag", value = ":chart_with_upwards_trend: `08:00 - 09:30 HMI (Ü)`\n:gear: `14:00 - 15:30 TMI`", inline = False)
-        data.add_field(name = "\nDienstag", value = ":electric_plug: `10:00 - 11:30 LEN`\n:tools: `18:00 - 19:30 MKL GLI`", inline = False)
-        data.add_field(name = "\nMittwoch", value = ":floppy_disk: `14:00 - 15:30 DT (VL / Ü)`", inline = False)
-        data.add_field(name = "\nDonnerstag", value = ":tools: `08:00 - 09:30 MKL GLI`\n:electric_plug: `10:00 - 11:30 LEN`\n:electric_plug: `12:00 - 13:30 LEN (Ü)`", inline = False)
-        data.add_field(name = "\nFreitag", value = ":floppy_disk: `08:00 - 09:30 DT (VL / Ü)`", inline = False)
-        
-    data.set_author(name = "🗓️ Wochenplan für " + type)
-    data.set_thumbnail(url = botti.user.avatar_url)
-    data.set_footer(text = "Vorlesung, wenn nicht anderweitig angegeben.\n{}".format(modules.bottiHelper._getTimestamp()))
-    
-    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)

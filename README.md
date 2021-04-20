@@ -4,5 +4,5 @@
 #### Benötigte Pakete
 Damit der Bot richtig funktioniert, benötigt er ein paar `site-packages`
 ```
-pip install discord-py-slash-commands discord.py Pillow psutil requests xlrd xlutils xlwt youtube-dl
+pip install -r requirements.txt
 ```

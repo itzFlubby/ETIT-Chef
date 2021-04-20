@@ -8,20 +8,22 @@ class BotError(Exception):
     pass
 
 async def _checkCommandIgnoreList(message):
-    commandIgnoreList = [ "!pepo", "!getfrogbot", "!pepohelp", "!aboutpepo", "!froghelp" ]    
-    if message.content.split(" ")[0] in commandIgnoreList:
-        await _sendMessage(message, "<:pepe_retarded:" + str(ids.emojiIDs.pepeRetarded_EmojiID) + "> Pepo-Befehl mit Präfix `!` erkannt. Ignoriere...")
+    commandIgnoreList = [ "pepo", "getfrogbot", "pepohelp", "aboutpepo", "froghelp" ]    
+    if message.content.split(" ")[0][1:] in commandIgnoreList:
+        await _sendMessage(message, "{emoji} Pepo-Befehl mit Präfix `!` erkannt. Ignoriere...".format(emoji = _constructEmojiString(ids.emojiIDs.PEPERETARDED)))
         return False   
+    return True
         
-async def _checkPingTrigger(message, botti):
-    if message.mention_everyone == False and botti.user.mentioned_in(message) == True and message.author.id not in [ ids.userIDs.itzFlubby_ID, ids.userIDs.Christoph_ID ]:
+async def _checkPingTrigger(botti, botData, message):
+    if (not message.mention_everyone) and botti.user.mentioned_in(message) and (message.author.id not in [ ids.userIDs.ITZFLUBBY, ids.userIDs.CHRISTOPH ]):
+        helpString = ":100: Ich wurde erwähnt und da bin ich. Mit `{prefix}help` zeige ich dir eine Hilfe an!".format(prefix = botData.botPrefix)
         try:
-            await message.reply(":100: Ich wurde erwähnt und da bin ich. Mit `!help` zeige ich dir eine Hilfe an!")
+            await message.reply(helpString)
         except:
-            await _sendMessagePingAuthor(message, ":100: Ich wurde erwähnt und da bin ich. Mit `!help` zeige ich dir eine Hilfe an!")
+            await _sendMessagePingAuthor(message, helpString)
         
 async def _checkPurgemaxConfirm(message, botData):
-    if (botData.purgemaxConfirm == True) and (message.content != "!purgemax"):
+    if (botData.purgemaxConfirm) and (message.content != "{prefix}purgemax".format(prefix = botData.botPrefix)):
         await _sendMessagePingAuthor(message, ":exclamation: Purgemax abgebrochen.")
         botData.purgemaxConfirm = False
         
@@ -29,9 +31,15 @@ def _createDummyMessage(author, channel, content):
     msg = discord.Message(state = 0, channel = channel, data = { "id": 0, "webhook_id": 0, "attachments": [], "embeds": {}, "application": 0, "activity": 0, "edited_timestamp": 0, "type": 0, "pinned": 0, "mention_everyone": 0, "tts": 0, "content": content, "nonce": 0 })
     msg.author = author
     return msg  
-       
+ 
+def _constructEmojiString(emoji):
+    return "<{emojiNoBracket}>".format(emojiNoBracket = _constructEmojiStringNoBracket(emoji))
+
+def _constructEmojiStringNoBracket(emoji):
+    return "{isAnimated}:{emojiName}:{emojiID}".format(isAnimated = ("a" if emoji["animated"] else ""), emojiName = emoji["name"], emojiID = emoji["id"])
+ 
 async def _errorMessage(botti, message, botData, error):
-    await _sendMessage(message, "```css\n[FAIL]: {}```".format(error))
+    await _sendMessage(message, "```css\n[FAIL]: {0}```:fly: Bug automatisch an <@!{1}> gemeldet!".format(error, ids.userIDs.ITZFLUBBY))
     raise BotError("")
 
 def _formatCommandLog(message):
@@ -68,8 +76,8 @@ def _toUTCTimestamp(datetimeObject):
 def _toGermanTimestamp(datetimeObject):
     return datetimeObject.strftime("%d.%m.%Y um %H:%M:%S")
 
-def _invalidParams(string):
-    return ":x: Ungültige Parameter! Verwende `!command " + string + "` für weitere Hilfe!"
+def _invalidParams(botData, subcommand):
+    return ":x: Ungültige Parameter! Verwende `{prefix}command {prefix}{subcommand}` für weitere Hilfe!".format(prefix = botData.botPrefix, subcommand = subcommand)
 
 def _loadSettings(botData):
     with open(botData.configFile, "r") as conf:

@@ -17,7 +17,7 @@ async def botban(botti, message, botData):
     try:
         user = message.mentions[0]
         
-        if user.id == ids.userIDs.itzFlubby_ID:
+        if user.id == ids.userIDs.ITZFLUBBY:
             return
             
         botData.botBanList.append([user.id, 1])
@@ -27,7 +27,7 @@ async def botban(botti, message, botData):
                 return
         await modules.bottiHelper._sendMessagePingAuthor(message, ":customs: Der Nutzer {} wurde von der Nutzung des Bots gebannt _(BL: 1)_!".format(user.mention))  
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!botban"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "botban"))      
         return            
 
 async def botunban(botti, message, botData):
@@ -47,7 +47,7 @@ async def botunban(botti, message, botData):
     except ValueError:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dieser Nutzer ist nicht von der Nutzung des Bots gebannt!")             
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!botunban"))     
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "botunban"))     
  
 def _directSave(botData):
     wb = xlwt.Workbook()

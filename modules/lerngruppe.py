@@ -25,7 +25,7 @@ async def lerngruppe(botti, message, botData):
             
             await modules.bottiHelper._sendMessagePingAuthor(message, ":books: Du bist der **Lerngruppe {0}** beigetreten!".format(message.content[12:]))
             return
-    await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!lerngruppe"))  
+    await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "lerngruppe"))  
  
 async def listlerngruppen(botti, message, botData):
     """
@@ -90,7 +90,7 @@ async def templerngruppe(botti, message, botData):
         elif subcommand == "null":
             pass
         else:
-            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!templerngruppe"))      
+            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "templerngruppe"))      
             return 
     except:
         pass
@@ -119,4 +119,4 @@ async def templerngruppe(botti, message, botData):
     await message.guild.create_voice_channel(name = "templerngruppe" + hex(id), category = newCategory)
     await message.author.add_roles(newRole)
     await modules.bottiHelper._sendMessagePingAuthor(message, ":books: Es wurde eine temporäre Lerngruppe _(id : {0})_ erstellt!".format(hex(id)))
-    await message.guild.get_channel(newChannel.id).send(":books: Dies ist eine temporäre Lerngruppe von {0}!\nVerwende `!templerngruppe add @USER`, um Mitglieder hinzuzufügen. Am besten nutzt du den `add`-Befehl in <#" + str(ids.channelIDs.bot_commands_ChannelID) + ">, da dort alle Nutzer gepingt werden können. `(@-Verwendung)`\nLöscht die temporäre Gruppe anschließend mit `!templerngruppe delete` !".format(message.author.mention))
+    await message.guild.get_channel(newChannel.id).send(":books: Dies ist eine temporäre Lerngruppe von {0}!\nVerwende `!templerngruppe add @USER`, um Mitglieder hinzuzufügen. Am besten nutzt du den `add`-Befehl in <#" + str(ids.channelIDs.BOT_COMMANDS) + ">, da dort alle Nutzer gepingt werden können. `(@-Verwendung)`\nLöscht die temporäre Gruppe anschließend mit `!templerngruppe delete` !".format(message.author.mention))

@@ -83,7 +83,7 @@ async def minecraft(botti, message, botData):
     !minecraft
     """    
     data = discord.Embed(
-        title = "<:minecraft:" + str(ids.emojiIDs.minecraft_EmojiID) + "> Server-Status",
+        title = "{emoji} Server-Status".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.MINECRAFT)),
         color = 0x00ff00,
         description = botData.minecraftServerName
     )
@@ -97,7 +97,8 @@ async def minecraft(botti, message, botData):
         query = server.query()
         
         data.add_field(name = "Latenz", value = str(status.latency) + "ms", inline = False)
-        data.add_field(name = "Spieler", value = "**{0} / 8**\n```\n{1}```".format(status.players.online, ",\n".join(query.players.names)), inline = False)
+        data.add_field(name = "Version", value = "{0} {1}\n[Modded] Direwolf20 v2.5.0".format(query.software.brand, query.software.version))
+        data.add_field(name = "Spieler", value = "**{0} / {1}**".format(status.players.online, status.players.max) + ("\n```\n{0}```".format(",\n".join(query.players.names)) if status.players.online != 0 else ""), inline = False)
     except:
         data.color = 0xff0000
         data.add_field(name = "Offline", value = "Der Server ist nicht erreichbar.")
@@ -126,27 +127,31 @@ async def permissions(botti, message, botData):
 
         perm_list = list(user.permissions_in(message.channel))
     
-    
     perm_list = str(perm_list).split("[(")[1]
     perm_list = perm_list.split(")]")[0]
     total_string = ""
-    cut_var = 0
-    try:
-        while True:
-            string_cutted = perm_list.split("), (")[cut_var]
-            if isUser and (string_cutted in [ "'priority_speaker', False", "'stream', False", "'connect', False", "'speak', False", "'mute_members', False", "'deafen_members', False", "'move_members', False", "'use_voice_activation', False" ]):
-                cut_var += 1
-                continue
-            total_string = total_string + string_cutted + "\n"
-            cut_var += 1
-    except IndexError:
-        total_string = total_string.replace(", True", " <:approve:" + str(ids.emojiIDs.approve_EmojiID) + "> (True)")
-        total_string = total_string.replace(", False", " <:deny:" + str(ids.emojiIDs.deny_EmojiID) + "> (False)")
-        total_string = total_string.replace("'", "`")
-        if isUser:
-            await modules.bottiHelper._sendMessage(message, ":shield: Dies sind die Berechtigungen für **{0}** _in {1}_ {2}:\n{3}".format(user.mention, message.channel.name, message.author.mention, total_string))
-        else:    
-            await modules.bottiHelper._sendMessage(message, ":shield: Dies sind die globalen Berechtigungen für **{0}** _wenn nicht anderweitig gesetzt_:\n{1}".format(role.mention, total_string))
+
+    cuttedStrings = perm_list.split("), (")
+    ignoredPermissions = [  "'priority_speaker', False", 
+                            "'stream', False", 
+                            "'connect', False", 
+                            "'speak', False", 
+                            "'mute_members', False", 
+                            "'deafen_members', False", 
+                            "'move_members', False", 
+                            "'use_voice_activation', False" 
+                        ]
+    for i in range(len(cuttedStrings)):
+        if not isUser or not (cuttedStrings[i] in ignoredPermissions):
+            total_string += cuttedStrings[i] + "\n"
+
+    total_string = total_string.replace(", True", " {emoji} (True)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.APPROVE)))
+    total_string = total_string.replace(", False", " {emoji} (False)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.DENY)))
+    total_string = total_string.replace("'", "`")
+    if isUser:
+        await modules.bottiHelper._sendMessage(message, ":shield: Dies sind die Berechtigungen für **{0}** _in {1}_ {2}:\n{3}".format(user.mention, message.channel.name, message.author.mention, total_string))
+    else:    
+        await modules.bottiHelper._sendMessage(message, ":shield: Dies sind die globalen Berechtigungen für **{0}** _wenn nicht anderweitig gesetzt_:\n{1}".format(role.mention, total_string))
 
 async def ping(botti, message, botData):
     """ 
@@ -167,7 +172,7 @@ async def roleinfo(botti, message, botData):
     try:
         role = message.role_mentions[0]
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams("!roleinfo"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "roleinfo"))      
         return
     data = discord.Embed(
         title = "",
@@ -280,9 +285,9 @@ async def test(botti, message, botData):
     !test
     """
     botMessage = await modules.bottiHelper._sendMessagePingAuthor(message, ":globe_with_meridians: Der Bot ist online und läuft ordnungsgemäß!")
-    await botMessage.add_reaction(":Nein:" + str(ids.emojiIDs.nein_EmojiID))
-    await botMessage.add_reaction(":Doch:" + str(ids.emojiIDs.doch_EmojiID))
-    await botMessage.add_reaction(":Oh:" + str(ids.emojiIDs.oh_EmojiID))
+    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.NEIN))
+    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.DOCH))
+    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.OH))
 
 async def uptime(botti, message, botData):
     """ 
