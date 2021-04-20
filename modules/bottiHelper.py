@@ -65,10 +65,10 @@ def _getParametersFromMessage(content, maxLength):
     return parameters
 
 def _getTimestamp():
-    return datetime.datetime.now().strftime("%Y-%m-%dT+%H:%M:%S")
+    return datetime.datetime.now().strftime("%d.%m.%Y um %H:%M:%S")
 
 def _toSTRFTimestamp(datetimeObject):
-    return datetimeObject.strftime("%Y-%m-%dT+%H:%M:%S")
+    return datetimeObject.strftime("%d.%m.%Y um %H:%M:%S")
 
 def _toUTCTimestamp(datetimeObject):
     return "UTC " + _toSTRFTimestamp(datetimeObject)

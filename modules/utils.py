@@ -234,7 +234,7 @@ async def help(botti, message, botData):
                 infoTextLines[2] += " "*(19 - len(infoTextLines[2]))
             moduleStr += infoTextLines[2] + " " + infoTextLines[1] + "\n"
         
-        if len(helpStr) + len(moduleStr) > 1900:
+        if len(helpStr) + len(moduleStr) > botData.maxMessageLength:
             allHelpStrings.append(helpStr)
             helpStr = "```yaml\n"
             

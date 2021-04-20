@@ -35,12 +35,12 @@ async def balancekeeper(botti, message, botData):
         
         userNameAndDiscriminator = "{}#{}".format(user.name, str(user.discriminator))
         
-        if len(userNameAndDiscriminator) > 22:
-            userNameAndDiscriminator = userNameAndDiscriminator[:19] + "..."
+        if len(userNameAndDiscriminator) > 22: # 22 = len("USERNAME#DISCRIMINATOR")
+            userNameAndDiscriminator = userNameAndDiscriminator[:19] + "..." # 19 = len("USERNAME#DISCRIMINATOR") - len("...")
         
         totalString += "{:<23}| {:<18} | {}\n".format(userNameAndDiscriminator, entry[0],  modules.bottiHelper._spaceIntToString(int(entry[1])))
        
-        if len(totalString) > 1900:
+        if len(totalString) > botData.maxMessageLength:
             wasTooLongForSingleMessage = True
             totalStrings.append(totalString + "```")
             totalString = "```ml\n"
@@ -175,8 +175,8 @@ async def mdtext(botti, message, botData):
     !mdtext !"§$%&/()=?\r!mdtext -n !"§$%&/()=?
     """    
     try:
-        parameters = modules.bottiHelper._getParametersFromMessage(message.content, 10)
-        textStart = 8 if len(parameters) == 0 else 11
+        parameters = modules.bottiHelper._getParametersFromMessage(message.content, 10) # 10 = len("!mdtext -q")
+        textStart = 8 if len(parameters) == 0 else 11 # 8 = len("!mdtext ") | 11 = len("!mdtext ") + len("-q ")
         showInline = False if "n" in parameters else True
         
         text = message.content[textStart:] if message.content[textStart:] is not "" else "Beispiel Text! 1234567890 !\"§$%&/()='#*+-/<>{[]}\\" 
@@ -189,7 +189,6 @@ async def mdtext(botti, message, botData):
             color = 0x009aff
         )
         
-
         for markdownType in markdownTypes:
             data.add_field(name = markdownType, value = "```" + markdownType + "\n" + text + "```", inline = showInline)
         
@@ -240,7 +239,7 @@ async def restart(botti, message, botData):
     {PARAMS} -n [Neustart, ohne speichern]
     !restart\r!restart -n
     """
-    params = modules.bottiHelper._getParametersFromMessage(message.content, 11)
+    params = modules.bottiHelper._getParametersFromMessage(message.content, 11) # 11 = len("!restart -q")
     await modules.bottiHelper._sendMessagePingAuthor(message, ":infinity: **[RESTART]**  `@{}`".format(modules.bottiHelper._getTimestamp()))
     print("[ INFO ] Der Bot wurde von **{0}#{1}** neugestartet!".format(message.author.name, message.author.discriminator))
     print("---")
@@ -313,11 +312,11 @@ async def traceback(botti, message, botData):
     if botData.lastError == "":  
         await modules.bottiHelper._sendMessagePingAuthor(message, ":warning: Bisher ist noch kein Fehler aufgetreten!")
         return
-    if len(botData.lastError) > 1900:
-        j = 0
-        for i in range(0, len(botData.lastError), 1900):
-            await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(content = "```py\n{}```".format(botData.lastError[(1900*j):(1900*(j+1))]))
-            j =+ 1
+    if len(botData.lastError) > botData.maxMessageLength:
+        runs = 0
+        for i in range(0, len(botData.lastError), botData.maxMessageLength):
+            await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(content = "```py\n{}```".format(botData.lastError[(botData.maxMessageLength*runs):(botData.maxMessageLength*(runs+1))]))
+            runs =+ 1
     else:
         await modules.bottiHelper._sendMessage(message, "{}".format(botData.lastError))
         

@@ -70,7 +70,6 @@ async def debugger(botti, message, botData):
     if debuggerRole in userRoles:
         if option == "add":
             await modules.bottiHelper._sendMessagePingAuthor(message, ":fly: {} ist bereits ein Debugger!".format(user.mention))
-            return
         else:
             newUserRoles = modules.roles._changeRole(userRoles, [ ids.roleIDs.DEBUGGER ], -1, message.guild)
             await user.edit(roles = newUserRoles, reason = "Set by {}#{}.".format(message.author.name, str(message.author.discriminator)))
@@ -78,7 +77,6 @@ async def debugger(botti, message, botData):
     else:
         if option == "remove":
             await modules.bottiHelper._sendMessagePingAuthor(message, ":fly: {} ist kein Debugger!".format(user.mention))
-            return
         else:
             await user.add_roles(debuggerRole, reason = "Set by {}#{}.".format(message.author.name, str(message.author.discriminator)))
             await modules.bottiHelper._sendMessagePingAuthor(message, ":fly: {} ist jetzt ein Debugger!".format(user.mention))            
@@ -93,13 +91,20 @@ async def estimateprunes(botti, message, botData):
     """
     try:
         nDays = int(message.content.split(" ")[1])
-        if nDays > 30 or nDays < 1:
+        if not (nDays in range(1, 31)): # API only allowes days in range(1, 30)
             raise IndexError()
     except:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "estimateprunes"))
         return        
-        
-    estimated_prunes = await message.guild.estimate_pruned_members(days = nDays, roles = message.guild.roles)
+    
+    roles = [   message.guild.get_role(ids.roleIDs.ETIT_BSC),
+                message.guild.get_role(ids.roleIDs.ETIT_MSC),
+                message.guild.get_role(ids.roleIDs.MIT_BSC),
+                message.guild.get_role(ids.roleIDs.MIT_MSC),
+                message.guild.get_role(ids.roleIDs.KIT_BSC),
+                message.guild.get_role(ids.roleIDs.KIT_MSC)
+            ]
+    estimated_prunes = await message.guild.estimate_pruned_members(days = nDays, roles = roles)
     
     await modules.bottiHelper._sendMessagePingAuthor(message, ":stopwatch: **{}** Mitglieder sind seit **{}** Tagen inaktiv.".format(estimated_prunes, nDays))
 

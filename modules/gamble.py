@@ -151,8 +151,6 @@ async def _cyclicBotDetection(botti, botData, runInLoop):
             
         await channel.send(mentionString)
         
-        
-        
         await asyncio.sleep(26)
         
         startMessage = await channel.fetch_message(startMessage.id)
@@ -285,12 +283,13 @@ async def norisknofun(botti, message, botData):
     !norisknofun\r!norisknofun cancel
     """
     userBalance = _getBalance(botData, message.author.id)
+    costToPlay = 1000
 
     if _checkBalance(botData, message.author.id, userBalance) == -1:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Sieht so aus, als hättest du wohl noch kein Konto. Verwende `!balance`, um eins anzulegen!")
         return 
-    if userBalance < 1000:
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dafür ist dein Kontostand zu niedring. Mindestens **1 000** :cookie: benötigt!")
+    if userBalance < costToPlay:
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dafür ist dein Kontostand zu niedring. Mindestens **{cost}** :cookie: benötigt!".format(cost = modules.bottiHelper._spaceIntToString(costToPlay)))
         return   
                 
     if message.author.id not in botData.noRiskNoFunQueue:
@@ -412,7 +411,7 @@ def _addBalance(botData, userID, value):
 
 async def _saveKeeperToFile(botti, botData):
     while True:
-        await asyncio.sleep(3600 * 3)
+        await asyncio.sleep(3600 * 3) # sleep 3 hours
         _directSave(botti, botData)
         botData.noRiskNoFunQueue.clear()
 

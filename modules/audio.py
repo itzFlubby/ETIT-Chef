@@ -92,8 +92,8 @@ async def play(botti, message, botData):
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Bot hat bereits Musik geladen. Nutze zuerst `!stop`, um ein weiteres Musikstück abspielen zu können!")
         return
         
-    parameters = modules.bottiHelper._getParametersFromMessage(message.content, 15)
-    subcommand = 6 + (len(parameters) * 3) 
+    parameters = modules.bottiHelper._getParametersFromMessage(message.content, 15) # 15 because this is the maximum length the code should look for parameters
+    subcommand = 6 + (len(parameters) * 3) # 6: len("!play ") | 3: len("-q ") or any other parameter
     
     url = message.content[subcommand:]
     

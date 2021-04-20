@@ -22,7 +22,7 @@ async def mensa(botti, message, botData):
     currentDate = int(time.time())
     lastDate = int(list(jsonData["adenauerring"].keys())[-1])
     
-    if (currentDate + (7 * 86400)) > lastDate:
+    if (currentDate + (7 * 86400)) > lastDate: # 7 * 86400 : number of seconds in one week
         await modules.bottiHelper._sendMessage(message, ":fork_knife_plate: Aktualisiere JSON... Dies dauert ein paar Sekunden...\n")
         await _updateJson(botData)
         await asyncio.sleep(5)
@@ -97,7 +97,7 @@ async def mensa(botti, message, botData):
     ]            
     
     for key in jsonData["adenauerring"].keys():
-        if int(key) > currentDate - 86400 + (86400 * requestedDifference):
+        if int(key) > currentDate - 86400 + (86400 * requestedDifference): # 86400 number of seconds in one day
             data = discord.Embed(
                 title = "Mensa " + mensaNames[requestedMensa],
                 color = 0xfad51b,
