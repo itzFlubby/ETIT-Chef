@@ -126,7 +126,7 @@ async def on_message(message):
         for module in botData.allCommandModules:
             if command in module.commandNameList:
                 # BEGIN SPECIAL CASES #
-                if (command in [ "balance", "rank", "ranking", "transfer" ]) and (message.channel.id is not ids.channelIDs.SPIELHALLE):
+                if (module.module is modules.gamble) and (command not in [ "balance", "rank", "ranking", "transfer" ]) and (message.channel.id != ids.channelIDs.SPIELHALLE):
                     await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Dieser Befehl darf nur in <#{channelID}> verwendet werden!".format(channelID = ids.channelIDs.SPIELHALLE))
                     return
                 # END SPECIAL CASES #
