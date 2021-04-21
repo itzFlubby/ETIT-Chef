@@ -26,16 +26,16 @@ async def balance(botti, message, botData):
     if user.id == message.author.id:
         if balance == -1:
             _createAccount(botData, user.id)
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Da du noch kein Konto hast, wurde für dich eben eins angelegt. Dein Kontostand beträgt nun **5 000** :cookie:!")
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Da du noch kein Konto hast, wurde für dich eben eins angelegt. Dein Kontostand beträgt nun **5 000** {currency}!".format(currency = botData.botCurrency["emoji"]))
             return
         else:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Dein Kontostand beträgt **{}** :cookie:!".format(modules.bottiHelper._spaceIntToString(balance)))
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Dein Kontostand beträgt **{balance}** {currency}!".format(balance = modules.bottiHelper._spaceIntToString(balance), currency = botData.botCurrency["emoji"]))
     else:
         if balance == -1:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Nutzer {} hat kein Konto!".format(user.mention))
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Nutzer {userMention} hat kein Konto!".format(userMention = user.mention))
             return
         else:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Der Kontostand von {} beträgt **{}** :cookie:!".format(user.mention, modules.bottiHelper._spaceIntToString(balance)))
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":slot_machine: Der Kontostand von {userMention} beträgt **{balance}** {currency}!".format(userMention = user.mention, balance = modules.bottiHelper._spaceIntToString(balance), currency = botData.botCurrency["emoji"]))
 
 async def betflip(botti, message, botData):
     """ 
@@ -65,10 +65,10 @@ async def betflip(botti, message, botData):
             return 
             
         if randint(1, 100)  > 50:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":coin: Die Münze ist auf **Kopf** gelandet! Du hast **{}** :cookie: verloren!".format(modules.bottiHelper._spaceIntToString(betValue)))
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":coin: Die Münze ist auf **Kopf** gelandet! Du hast **{balance}** {currency} verloren!".format(balance = modules.bottiHelper._spaceIntToString(betValue), currency = botData.botCurrency["emoji"]))
             _addBalance(botData, message.author.id, -betValue)
         else:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":coin: Die Münze ist auf **Zahl** gelandet! Du hast **{}** :cookie: gewonnen!".format(modules.bottiHelper._spaceIntToString(betValue)))
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":coin: Die Münze ist auf **Zahl** gelandet! Du hast **{balance}** {currency} gewonnen!".format(balance = modules.bottiHelper._spaceIntToString(betValue), currency = botData.botCurrency["emoji"]))
             _addBalance(botData, message.author.id, betValue)
     except IndexError:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "betflip"))      
@@ -239,24 +239,19 @@ async def guess(botti, message, botData):
 
         if difference == 0:
             win = int(13 * betValue)
-            winMessage = modules.bottiHelper._spaceIntToString(int(win)) + ":cookie:"
         elif difference < 2: 
-            win = int(6 * betValue)
-            winMessage = modules.bottiHelper._spaceIntToString(int(win)) + ":cookie:"           
+            win = int(6 * betValue)   
         elif difference < 4: 
             win = int(4 * betValue)
-            winMessage = modules.bottiHelper._spaceIntToString(int(win)) + ":cookie:"
         elif difference < 8: 
             win = int(2 * betValue)
-            winMessage = modules.bottiHelper._spaceIntToString(int(win)) + ":cookie:"
         elif difference < 16: 
             win = int(1 * betValue)
-            winMessage = modules.bottiHelper._spaceIntToString(int(win)) + ":cookie:"
         else:
             win = -betValue
-            winMessage = "leider nichts"
+        winMessage = (modules.bottiHelper._spaceIntToString(int(win)) + botData.botCurrency["emoji"]) if (difference in range(0, 16)) else "leider nichts"
         _addBalance(botData, message.author.id, win)   
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":game_die: Zufallszahl ist **{}**. Abstand von deinem Tipp ist **{}**! Damit hast du **{}** gewonnen!".format(randomint, difference, winMessage))    
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":game_die: Zufallszahl ist **{random}**. Abstand von deinem Tipp ist **{difference}**! Damit hast du **{win}** gewonnen!".format(random = randomint, difference = difference, win = winMessage))    
 
     except IndexError:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "guess"))      
@@ -289,25 +284,25 @@ async def norisknofun(botti, message, botData):
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Sieht so aus, als hättest du wohl noch kein Konto. Verwende `!balance`, um eins anzulegen!")
         return 
     if userBalance < costToPlay:
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dafür ist dein Kontostand zu niedring. Mindestens **{cost}** :cookie: benötigt!".format(cost = modules.bottiHelper._spaceIntToString(costToPlay)))
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dafür ist dein Kontostand zu niedring. Mindestens **{cost}** {currency} benötigt!".format(cost = modules.bottiHelper._spaceIntToString(costToPlay), currency = botData.botCurrency["emoji"]))
         return   
                 
     if message.author.id not in botData.noRiskNoFunQueue:
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: Bist du dir sicher, dass du `!norisknofun` ausführen willst?\n:cookie: Wenn du verlierst, dann verlierst du alles!\n:cookie: Zum Ausführen `!norisknofun` erneut eingeben, zum Abbrechen `!norisknofun cancel`!")
+        await modules.bottiHelper._sendMessagePingAuthor(message, "{currency} Bist du dir sicher, dass du `{prefix}norisknofun` ausführen willst?\n{currency} Wenn du verlierst, dann verlierst du alles!\n{currency} Zum Ausführen `!norisknofun` erneut eingeben, zum Abbrechen `{prefix}norisknofun cancel`!".format(currency = botData.botCurrency["emoji"], prefix = botData.botPrefix))
         botData.noRiskNoFunQueue.append(message.author.id)
     else:
         try:
             cancelMessage = message.content.split(" ")[1]
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: `!norisknofun` abgebrochen!")
+            await modules.bottiHelper._sendMessagePingAuthor(message, "{currency} `{prefix}norisknofun` abgebrochen!".format(currency = botData.botCurrency["emoji"], prefix = botData.botPrefix))
             botData.noRiskNoFunQueue.remove(message.author.id)
         except:
             randomint = randint(0, 100)
               
             if randomint == 3:
-                await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: <@&" + str(ids.roleIDs.SPIELHALLE) + "> UNGLAUBLICHER GEWINN!!! Damit hast du **{}** :cookie: gewonnen!".format(modules.bottiHelper._spaceIntToString(int(userBalance* 100))))
+                await modules.bottiHelper._sendMessagePingAuthor(message, "{currency} <@&{channelID}> UNGLAUBLICHER GEWINN!!! Damit hast du **{win}** {currency} gewonnen!".format(currency = botData.botCurrency["emoji"], channelID = ids.roleIDs.SPIELHALLE, win = modules.bottiHelper._spaceIntToString(int(userBalance* 100))))
                 _addBalance(botData, message.author.id, userBalance * 100) 
             else:
-                await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: Damit hast du **{}** :cookie: verloren!".format(modules.bottiHelper._spaceIntToString(userBalance)))
+                await modules.bottiHelper._sendMessagePingAuthor(message, "{currency} Damit hast du **{win}** {currency} verloren!".format(currency = botData.botCurrency["emoji"], win = modules.bottiHelper._spaceIntToString(userBalance)))
                 _addBalance(botData, message.author.id, -userBalance)  
             botData.noRiskNoFunQueue.remove(message.author.id)
 
@@ -335,9 +330,9 @@ async def rank(botti, message, botData):
     
     paramString = "Du befindest"
     if user.id != message.author.id:
-        paramString = "<@" + str(user.id) + "> befindet"
+        paramString = "<@{userID}> befindet".format(userID = user.id)
      
-    await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: " + paramString + " sich im Ranking auf Platz **#" + str(userRank + 1) + "** (von " + str(len(sortedList)) + ") !")
+    await modules.bottiHelper._sendMessagePingAuthor(message, "{currency} {paramString} sich im Ranking auf Platz **#{rank}** (von {totalAccounts}) !".format(currency = botData.botCurrency["emoji"], paramString = paramString, rank = (userRank + 1), totalAccounts = len(sortedList)))
     
 async def ranking(botti, message, botData):
     """ 
@@ -367,9 +362,9 @@ async def ranking(botti, message, botData):
             prefix = "⠀\n"
             suffix = "#" + str(i+1)
             
-        data.add_field(name = "{}{} __{}#{}__ {}".format(prefix, suffix, user.name, user.discriminator, nick), value = modules.bottiHelper._spaceIntToString(int(sortedList[i][1])) + " :cookie:", inline = False)
+        data.add_field(name = "{}{} __{}#{}__ {}".format(prefix, suffix, user.name, user.discriminator, nick), value = "{balance} {currency}".format(balance = modules.bottiHelper._spaceIntToString(int(sortedList[i][1])), currency = botData.botCurrency["emoji"]),inline = False)
     
-    data.set_author(name = "🍪 Cookie-Leaderboard")
+    data.set_author(name = "{currencyEmoji} {currencyNameSingular}-Leaderboard".format(currencyEmoji = botData.botCurrency["emoji"], currencyNameSingular = botData.botCurrency["singular"]))
     data.set_thumbnail(url = botti.user.avatar_url)
     data.set_footer(text = "Stand: {0}".format(modules.bottiHelper._getTimestamp()))
  
@@ -395,12 +390,12 @@ async def rob(botti, message, botData):
     if randint(1, 3) == 1:
         loss = float(randint(50, 100) / 100)
         _addBalance(botData, message.author.id, -int((_getBalance(botData, message.author.id) * loss)))
-        await modules.bottiHelper._sendMessage(message, ":oncoming_police_car: {} hat **{}** {}. Jedoch wurde er **von der Polizei {}** und hat deshalb **{}%** seiner :cookie: verloren!".format(message.author.mention, canRob[randint(0, len(canRob) - 1)], robActivities[randint(0, len(robActivities) - 1)], policeCame[randint(0, len(policeCame) - 1)], int(loss * 100)))
+        await modules.bottiHelper._sendMessage(message, ":oncoming_police_car: {userMention} hat **{robbed}** {robActivity}. Jedoch wurde er **von der Polizei {policeEvent}** und hat deshalb **{loss}%** seiner {currency} verloren!".format(userMention = message.author.mention, robbed = canRob[randint(0, len(canRob) - 1)], robActivity = robActivities[randint(0, len(robActivities) - 1)], policeEvent = policeCame[randint(0, len(policeCame) - 1)], loss = int(loss * 100), currency = botData.botCurrency["emoji"]))
         return 
     
     win = int(((randint(0, 2000) + randint(0, 2000)) / 2))
     _addBalance(botData, message.author.id, win)
-    await modules.bottiHelper._sendMessage(message, ":money_mouth: {} hat **{}** {}. Jedoch **{}** und hat deshalb nur **{}** :cookie: erbeutet!".format(message.author.mention, canRob[randint(0, len(canRob) - 1)], robActivities[randint(0, len(robActivities) - 1)], whileRobbing[randint(0, len(whileRobbing) - 1)], modules.bottiHelper._spaceIntToString(win)))
+    await modules.bottiHelper._sendMessage(message, ":money_mouth: {userMention} hat **{robbed}** {robActivity}. Jedoch **{fail}** und hat deshalb nur **{gain}** {currency} erbeutet!".format(userMention = message.author.mention, robbed = canRob[randint(0, len(canRob) - 1)], robActivity = robActivities[randint(0, len(robActivities) - 1)], fail = whileRobbing[randint(0, len(whileRobbing) - 1)], gain = modules.bottiHelper._spaceIntToString(win), currency = botData.botCurrency["emoji"]))
 
 def _addBalance(botData, userID, value):
     for i in range(len(botData.balanceKeeper)):
@@ -444,10 +439,10 @@ async def slots(botti, message, botData):
         slots = [ ":x:", ":zero:", ":apple:", ":watermelon:", ":palm_tree:", ":small_blue_diamond:", ":rocket:", ":100:" ] 
         randoms = [ randint(0, len(slots) - 1), randint(0, len(slots) - 1), randint(0, len(slots) - 1) ]
 
-        result = "`================`\n:arrow_forward: {} {} {} :arrow_backward:\n`================`\n".format(slots[randoms[0]], slots[randoms[1]], slots[randoms[2]])
+        result = "`================`\n:arrow_forward: {firstSlot} {secondSlot} {thirdSlot} :arrow_backward:\n`================`\n".format(firstSlot = slots[randoms[0]], secondSlot = slots[randoms[1]], thirdSlot = slots[randoms[2]])
         
         if randoms[0] == 0 or randoms[1] == 0 or randoms[2] == 0:
-            await modules.bottiHelper._sendMessagePingAuthor(message, "{}:slot_machine: Leider hast du nichts gewonnen!".format(result))
+            await modules.bottiHelper._sendMessagePingAuthor(message, "{result}:slot_machine: Leider hast du nichts gewonnen!".format(result = result))
             _addBalance(botData, message.author.id, -betValue)
             return
         
@@ -461,17 +456,17 @@ async def slots(botti, message, botData):
                 break     
                 
         if count == 1:
-            await modules.bottiHelper._sendMessagePingAuthor(message, "{}:slot_machine: Leider hast du nichts gewonnen!".format(result))
+            await modules.bottiHelper._sendMessagePingAuthor(message, "{result}:slot_machine: Leider hast du nichts gewonnen!".format(result = result))
             _addBalance(botData, message.author.id, -betValue)
             return
         elif count == 2:
             win = int(index * 0.7 * betValue)
-            await modules.bottiHelper._sendMessagePingAuthor(message, "{}:slot_machine: Kleiner Gewinn! Du hast **{}** :cookie: gewonnen!".format(result, modules.bottiHelper._spaceIntToString(win)))    
+            await modules.bottiHelper._sendMessagePingAuthor(message, "{result}:slot_machine: Kleiner Gewinn! Du hast **{win}** {currency} gewonnen!".format(result = result, win = modules.bottiHelper._spaceIntToString(win), currency = botData.botCurrency["emoji"]))    
             _addBalance(botData, message.author.id, win)
             return
         else:    
             win = int(index * 1.2 * betValue)
-            await modules.bottiHelper._sendMessagePingAuthor(message, "{}:slot_machine: Großer Gewinn! Du hast **{}** :cookie: gewonnen!".format(result, modules.bottiHelper._spaceIntToString(win)))    
+            await modules.bottiHelper._sendMessagePingAuthor(message, "{result}:slot_machine: Großer Gewinn! Du hast **{win}** {currency} gewonnen!".format(result = result, win = modules.bottiHelper._spaceIntToString(win), currency = botData.botCurrency["emoji"]))    
             _addBalance(botData, message.author.id, win)
             return           
 
@@ -517,7 +512,7 @@ async def transfer(botti, message, botData):
             
         _addBalance(botData, message.author.id, -transferValue)
         _addBalance(botData, userToTransferTo.id, transferValue)
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":money_with_wings: Du hast erfolgreich **{}** :cookie: an {} transferiert!".format(transferValue, userToTransferTo.mention))
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":money_with_wings: Du hast erfolgreich **{transferred}** {currency} an {userMention} transferiert!".format(transferred = transferValue, currency = botData.botCurrency["emoji"], userMention = userToTransferTo.mention))
         
     except IndexError:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "transfer"))      
@@ -537,22 +532,22 @@ async def wheel(botti, message, botData):
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Sieht so aus, als hättest du wohl noch kein Konto. Verwende `!balance`, um eins anzulegen!")
         return 
     elif checkBal == 0:
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dafür reicht dein Kontostand nicht aus! Eine Teilnahme kostet **{}** :cookie:".format(modules.bottiHelper._spaceIntToString(costToPlay)))
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dafür reicht dein Kontostand nicht aus! Eine Teilnahme kostet **{cost}** {currency}".format(cost = modules.bottiHelper._spaceIntToString(costToPlay), currency = botData.botCurrency["emoji"]))
         return 
         
 
-    wheelOfFortune = "`=====================================`\n:x: :cookie: :bell: :fleur_de_lis: :banana: :x: :crown: :coin: :cd: :magic_wand: :x:\n`=====================================`\n"
+    wheelOfFortune = "`=====================================`\n:x: {currency} :bell: :fleur_de_lis: :banana: :x: :crown: :coin: :cd: :magic_wand: :x:\n`=====================================`\n".format(currency = botData.botCurrency["emoji"])
     
     possibleWins = (":x: `- Kein Gewinn` (50.00%)\n"
-    ":cd: `-     {}` :cookie: (17.00%)\n"
-    ":banana: `-     {}` :cookie: (12.50%)\n"
-    ":bell: `-     {}` :cookie: (9.30%)\n"
-    ":coin: `-    {}` :cookie: (6.00%)\n"
-    ":magic_wand: `-    {}` :cookie: (3.50%)\n"
-    ":fleur_de_lis: `-    {}` :cookie: (1.57%)\n"
-    ":cookie: `-   {}` :cookie: (0.10%)\n"
-    ":crown: `- {}` :cookie: (0.03%)\n"
-    ).format(*map(modules.bottiHelper._spaceIntToString, winAmounts))
+    ":cd: `-     {}` {currency} (17.00%)\n"
+    ":banana: `-     {}` {currency} (12.50%)\n"
+    ":bell: `-     {}` {currency} (9.30%)\n"
+    ":coin: `-    {}` {currency} (6.00%)\n"
+    ":magic_wand: `-    {}` {currency} (3.50%)\n"
+    ":fleur_de_lis: `-    {}` {currency} (1.57%)\n"
+    ":cookie: `-   {}` {currency} (0.10%)\n"
+    ":crown: `- {}` {currency} (0.03%)\n"
+    ).format(*map(modules.bottiHelper._spaceIntToString, winAmounts), currency = botData.botCurrency["emoji"])
     
     randomint = randint(1, 10000)
     
@@ -562,35 +557,35 @@ async def wheel(botti, message, botData):
     
     if randomint in range(1, 4):
         winSelect = ":blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :arrow_up: :blue_square: :blue_square: :blue_square: :blue_square:\n"
-        winMessage = "**UNFASSBARER GEWINN**!!! Glückwunsch :partying_face: :crown:! **{}** :cookie: :cookie: <@&{}>".format(modules.bottiHelper._spaceIntToString(winAmounts[7]), str(ids.channelIDs.SPIELHALLE)) 
+        winMessage = "**UNFASSBARER GEWINN**!!! Glückwunsch :partying_face: :crown:! **{win}** {currency} {currency} <@&{channelID}>".format(win = modules.bottiHelper._spaceIntToString(winAmounts[7]), channelID = ids.channelIDs.SPIELHALLE, currency = botData.botCurrency["emoji"]) 
         _addBalance(botData, message.author.id, winAmounts[7] - costToPlay)
     elif randomint in range(4, 14):
         winSelect = ":blue_square: :arrow_up: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square:\n"
-        winMessage = "**RIESEN GEWINN**!!! Glückwunsch :partying_face:! **{}** :cookie: :cookie:".format(modules.bottiHelper._spaceIntToString(winAmounts[6]))
+        winMessage = "**RIESEN GEWINN**!!! Glückwunsch :partying_face:! **{win}** {currency} {currency}".format(win = modules.bottiHelper._spaceIntToString(winAmounts[6]), currency = botData.botCurrency["emoji"])
         _addBalance(botData, message.author.id, winAmounts[6] - costToPlay)
     elif randomint in range(14, 171):
         winSelect = ":blue_square: :blue_square: :blue_square: :arrow_up: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square:\n"
-        winMessage = "**GROßER GEWINN**!!! Glückwunsch :partying_face:! **{}** :cookie:".format(modules.bottiHelper._spaceIntToString(winAmounts[5]))
+        winMessage = "**GROßER GEWINN**!!! Glückwunsch :partying_face:! **{win}** {currency}".format(win = modules.bottiHelper._spaceIntToString(winAmounts[5]), currency = botData.botCurrency["emoji"])
         _addBalance(botData, message.author.id, winAmounts[5] - costToPlay)        
     elif randomint in range(171, 521):
         winSelect = ":blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :arrow_up: :blue_square:\n"
-        winMessage = "**Großer Gewinn**!! Glückwunsch :partying_face:! **{}** :cookie:".format(modules.bottiHelper._spaceIntToString(winAmounts[4]))
+        winMessage = "**Großer Gewinn**!! Glückwunsch :partying_face:! **{win}** {currency}".format(win = modules.bottiHelper._spaceIntToString(winAmounts[4]), currency = botData.botCurrency["emoji"])
         _addBalance(botData, message.author.id, winAmounts[4] - costToPlay)        
     elif randomint in range(521, 1121):
         winSelect = ":blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :arrow_up: :blue_square: :blue_square: :blue_square:\n"
-        winMessage = "Großer Gewinn! Glückwunsch! **{}** :cookie:".format(modules.bottiHelper._spaceIntToString(winAmounts[3]))
+        winMessage = "Großer Gewinn! Glückwunsch! **{win}** {currency}".format(win = modules.bottiHelper._spaceIntToString(winAmounts[3]), currency = botData.botCurrency["emoji"])
         _addBalance(botData, message.author.id, winAmounts[3] - costToPlay)  
     elif randomint in range(1121, 2051):
         winSelect = ":blue_square: :blue_square: :arrow_up: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square:\n"
-        winMessage = "Kleiner Gewinn! Glückwunsch!! **{}** :cookie:".format(modules.bottiHelper._spaceIntToString(winAmounts[2]))
+        winMessage = "Kleiner Gewinn! Glückwunsch!! **{win}** {currency}".format(win = modules.bottiHelper._spaceIntToString(winAmounts[2]), currency = botData.botCurrency["emoji"])
         _addBalance(botData, message.author.id, winAmounts[2] - costToPlay)  
     elif randomint in range(2051, 3301):
         winSelect = ":blue_square: :blue_square: :blue_square: :blue_square: :arrow_up: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square:\n"
-        winMessage = "Kleiner Gewinn! Glückwunsch! **{}** :cookie:".format(modules.bottiHelper._spaceIntToString(winAmounts[1]))
+        winMessage = "Kleiner Gewinn! Glückwunsch! **{win}** {currency}".format(win = modules.bottiHelper._spaceIntToString(winAmounts[1]), currency = botData.botCurrency["emoji"])
         _addBalance(botData, message.author.id, winAmounts[1] - costToPlay)
     elif randomint in range(3301, 5001):
         winSelect = ":blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :arrow_up: :blue_square: :blue_square:\n"
-        winMessage = "Mini Gewinn! Glückwunsch! **{}** :cookie:".format(modules.bottiHelper._spaceIntToString(winAmounts[0]))
+        winMessage = "Mini Gewinn! Glückwunsch! **{win}** {currency}".format(win = modules.bottiHelper._spaceIntToString(winAmounts[0]), currency = botData.botCurrency["emoji"])
         _addBalance(botData, message.author.id, winAmounts[0] - costToPlay) 
     else:
         winSelect = ":arrow_up: :blue_square: :blue_square: :blue_square: :blue_square: :arrow_up: :blue_square: :blue_square: :blue_square: :blue_square: :arrow_up:\n"
