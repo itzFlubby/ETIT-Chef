@@ -27,7 +27,7 @@ async def _checkPurgemaxConfirm(message, botData):
         await _sendMessagePingAuthor(message, ":exclamation: Purgemax abgebrochen.")
         botData.purgemaxConfirm = False
         
-def _createDummyMessage(author, channel, content):
+def _createDummyMessage(author, channel, content = ""):
     msg = discord.Message(state = 0, channel = channel, data = { "id": 0, "webhook_id": 0, "attachments": [], "embeds": {}, "application": 0, "activity": 0, "edited_timestamp": 0, "type": 0, "pinned": 0, "mention_everyone": 0, "tts": 0, "content": content, "nonce": 0 })
     msg.author = author
     return msg  
