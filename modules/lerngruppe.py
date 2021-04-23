@@ -15,9 +15,7 @@ async def _addUserToLerngruppe(categoryChannel, message, user, joinString):
                                                 speak = True
                                             )
                                             
-    await categoryChannel.set_permissions(user, overwrite = overwrites)
-    for channel in categoryChannel.channels:
-        await channel.set_permissions(user, overwrite = overwrites)
+    await _overwritePermissionsForUser(categoryChannel, user, overwrites)
         
     await modules.bottiHelper._sendMessage(message, joinString)
     
@@ -45,117 +43,196 @@ def _isLerngruppenChannel(categoryChannel):
         except:
             pass
     return False
+ 
+def _isModUser(categoryChannel, user):
+    userPermissions = categoryChannel.permissions_for(user)
     
+    return userPermissions.manage_channels
+ 
+async def _overwritePermissionsForUser(categoryChannel, user, overwrites):    
+    await categoryChannel.set_permissions(user, overwrite = overwrites)
+    for channel in categoryChannel.channels:
+        await channel.set_permissions(user, overwrite = overwrites)
+        
 async def _removeUserFromLerngruppe(categoryChannel, message, user, leaveString):
-    overwrites = categoryChannel.overwrites
-    for overwrite in overwrites:
-        if isinstance(overwrite, discord.Member):
-            if overwrite.id == user.id:
-                del overwrites[overwrite]
-                await categoryChannel.edit(overwrite = overwrites)
-                for channel in categoryChannel.channels:
-                    await channel.edit(overwrites = overwrites)
-                await modules.bottiHelper._sendMessage(message, leaveString)
-                break
+    await _overwritePermissionsForUser(categoryChannel, user, None)
     
-
-async def lerngruppe(botti, message, botData):
-    """
-    Für alle ausführbar
-    Keine Ahnung.
-    !lerngruppe
-    """
+async def _sendMessageNoLerngruppenChannel(message):
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dieser Befehl kann nur in einer Lerngruppe ausgeführt werden!")
+            
+async def _sendMessageNoPermissions(message):
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Du bist kein Moderator dieser Lerngruppe, darfst diesen Befehl also nicht ausführen!")
+                        
+async def _subcommandAddUser(message, botData):
+    if not (_isLerngruppenChannel(message.channel.category)):    
+        await _sendMessageNoLerngruppenChannel(message)
+        return
     
-    options = [ "create", "delete", "add", "join", "remove", "leave", "makemod" ]
+    if not (_isModUser(message.channel.category, message.author)):
+        await _sendMessageNoPermissions(message)
+        return
     
-    userInput = message.content.split(" ")
-
-    if (not (userInput[1] in options)) or len(userInput) < 2:
+    if len(message.mentions) == 0:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "lerngruppe"))      
         return 
         
-    if userInput[1] == options[0]: # create
-        type = "private"
-        if len(userInput) > 2:
-            if userInput[2] == "public":
-                type = "public" 
+    await _addUserToLerngruppe(message.channel.category, message, message.mentions[0], ":books: {userMention} wurde der Lerngruppe hinzugefügt! {authorMention}".format(userMention = message.mentions[0].mention, authorMention = message.author.mention))
+
+async def _subcommandCreateLerngruppe(message, userInput):
+    types = {
+        "private": "",
+        "public": "[Ö]"
+    }
     
-        types = {
-            "private": "",
-            "public": "[Ö]"
+    type = "private"
+    if len(userInput) > 2:
+        if userInput[2] == "public":
+            type = "public" 
+
+    nextFreeID = _getNextFreeID(message)
+
+    userPermissions = discord.PermissionOverwrite.from_pair(allow = discord.Permissions.all(), deny = discord.Permissions.none())
+    userPermissions.update(manage_permissions = False)
+
+    overwrites = {
+        message.guild.default_role: discord.PermissionOverwrite(read_messages = False),
+        message.author : userPermissions
+    }
+       
+    newCategory = await message.guild.create_category(name = "{type} Lerngruppe-{id}".format(type = types[type], id = nextFreeID), overwrites = overwrites)
+    newChannel = await message.guild.create_text_channel(name = "📚Lerngruppe-{id}".format(id = nextFreeID), category = newCategory)
+    await message.guild.create_voice_channel(name = "📚Lerngruppe-{id}".format(id = nextFreeID), category = newCategory)
+    
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":books: Deine Lerngruppe _(mit der ID: {id})_ wurde erstellt!".format(id = nextFreeID))
+    await newChannel.send(":books: Lerngruppe-{id} {type}\n:books: Eigentümer: {owner}\n:books: Erstellt: {created}".format(id = nextFreeID, type = types[type], owner = message.author.mention, created = modules.bottiHelper._getTimestamp()))
+    
+
+async def _subcommandDelete(message):
+    if not (_isLerngruppenChannel(message.channel.category)):    
+        await _sendMessageNoLerngruppenChannel(message)
+        return
+    
+    if not (_isModUser(message.channel.category, message.author)):
+        await _sendMessageNoPermissions(message)
+        return
+        
+    categoryChannels = message.channel.category.channels
+    for channel in categoryChannels:
+        await channel.delete()
+    await message.channel.category.delete()
+
+      
+async def _subcommandJoin(message, userInput):
+    if (len(userInput) < 3) or (not (userInput[2].isdigit())):
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "lerngruppe"))      
+        return
+
+    id = int(userInput[2])
+    
+    allChannels = await message.guild.fetch_channels()
+    allChannelNames = [channel.name.lower() for channel in allChannels]
+    if "[ö] lerngruppe-{id}".format(id = id) in allChannelNames: # If Lerngruppe is public
+        for channel in allChannels:
+            if "[ö] lerngruppe-{id}".format(id = id) in channel.name.lower():
+                dummyMessage = modules.bottiHelper._createDummyMessage(message.author, channel.text_channels[0])
+                await _addUserToLerngruppe(channel, dummyMessage, message.author, ":books: {userMention} ist der Lerngruppe beigetreten!".format(userMention = message.author.mention))
+                return
+    else:
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Diese Lerngruppe existiert nicht, oder ist privat!")
+ 
+async def _subcommandLeave(message):
+    if not (_isLerngruppenChannel(message.channel.category)):    
+        await _sendMessageNoLerngruppenChannel(message)
+        return
+        
+    await _removeUserFromLerngruppe(message.channel.category, message, message.author, ":books: {authorMention} hat die Lerngruppe verlassen!".format(authorMention = message.author.mention))
+
+async def _subcommandMakemod(message):
+    if not (_isLerngruppenChannel(message.channel.category)):    
+        await _sendMessageNoLerngruppenChannel(message)
+        return
+    
+    if not (_isModUser(message.channel.category, message.author)):
+        await _sendMessageNoPermissions(message)
+        return
+    
+    if len(message.mentions) == 0:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "lerngruppe"))      
+        return 
+    
+    userPermissions = discord.PermissionOverwrite.from_pair(allow = discord.Permissions.all(), deny = discord.Permissions.none())
+    userPermissions.manage_permissions = False
+
+    await _overwritePermissionsForUser(message.channel.category, message.mentions[0], userPermissions)
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":books: {newModMention} ist jetzt Moderator dieser Lerngruppe!".format(newModMention = message.mentions[0].mention))
+    
+ 
+async def _subcommandRemove(message):
+    if not (_isLerngruppenChannel(message.channel.category)):    
+        await _sendMessageNoLerngruppenChannel(message)
+        return
+    
+    if not (_isModUser(message.channel.category, message.author)):
+        await _sendMessageNoPermissions(message)
+        return
+    
+    if len(message.mentions) == 0:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "lerngruppe"))      
+        return 
+        
+    await _removeUserFromLerngruppe(message.channel.category, message, message.mentions[0], ":books: {userMention} wurde aus der Lerngruppe entfernt! {authorMention}".format(userMention = message.mentions[0].mention, authorMention = message.author.mention))
+    
+ 
+async def lerngruppe(botti, message, botData):
+    """
+    Für alle ausführbar
+    Dieser Befehl verwaltet alles was mit Lerngruppen zu tun hat.
+    !lerngruppe {OPTION} {ARGS}
+    {OPTION} "create", "delete", "add", "join", "remove", "leave", "makemod", "setdescription"
+    {ARGS} <leer>, Nutzer-Erwänung, Lerngruppen-ID
+    !lerngruppe create\r!lerngruppe join 0\r!lerngruppe remove @ETIT-Chef
+    """
+    
+    options = [ "create", "delete", "add", "join", "remove", "leave", "makemod", "setdescription" ]
+    
+    userInput = message.content.split(" ")
+
+    if (len(userInput) < 2) or (not (userInput[1] in options)):
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "lerngruppe"))      
+        return 
+
+    functionDict = {
+        options[0]: {
+            "func": _subcommandCreateLerngruppe,
+            "args": [ message, userInput ]
+        },
+        options[1]: {
+            "func": _subcommandDelete,
+            "args": [ message ]
+        },
+        options[2]: {
+            "func": _subcommandAddUser,
+            "args": [ message, botData ]
+        },
+        options[3]: {
+            "func": _subcommandJoin,
+            "args": [ message, userInput ]
+        },
+        options[4]: {
+            "func": _subcommandRemove,
+            "args": [ message ]
+        },
+        options[5]: {
+            "func": _subcommandLeave,
+            "args": [ message ]
+        },
+        options[6]: {
+            "func": _subcommandMakemod,
+            "args": [ message ]
         }
+    }
     
-        nextFreeID = _getNextFreeID(message)
-
-        userPermissions = discord.PermissionOverwrite.from_pair(allow = discord.Permissions.all(), deny = discord.Permissions.none())
-        userPermissions.update(manage_permissions = False)
-
-        overwrites = {
-            message.guild.default_role: discord.PermissionOverwrite(read_messages = False),
-            message.author : userPermissions
-        }           
-
-           
-        newCategory = await message.guild.create_category(name = "{type} Lerngruppe-{id}".format(type = types[type], id = nextFreeID), overwrites = overwrites)
-        newChannel = await message.guild.create_text_channel(name = "📚Lerngruppe-{id}".format(id = nextFreeID), category = newCategory)
-        await message.guild.create_voice_channel(name = "📚Lerngruppe-{id}".format(id = nextFreeID), category = newCategory)
-        
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":books: Deine Lerngruppe _(mit der ID: {id})_ wurde erstellt!".format(id = nextFreeID))
-        await newChannel.send(":books: Lerngruppe-{id} {type}\n:books: Eigentümer: {owner}\n:books: Erstellt: {created}".format(id = nextFreeID, type = types[type], owner = message.author.mention, created = modules.bottiHelper._getTimestamp()))
+    func = functionDict[userInput[1]]["func"]
+    args = functionDict[userInput[1]]["args"]
     
-    elif userInput[1] == options[1]: # delete
-        if _isLerngruppenChannel(message.channel.category):
-            categoryChannels = message.channel.category.channels
-            for channel in categoryChannels:
-                await channel.delete()
-            await message.channel.category.delete()
-        else:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dieser Befehl kann nur in einer Lerngruppe ausgeführt werden!")
-    
-    elif userInput[1] == options[2]: # add
-        if len(message.mentions) == 0:
-            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "lerngruppe"))      
-            return 
-            
-        if not (_isLerngruppenChannel(message.channel.category)):    
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dieser Befehl kann nur in einer Lerngruppe ausgeführt werden!")
-            return
-            
-        await _addUserToLerngruppe(message.channel.category, message, message.mentions[0], ":books: {userMention} wurde der Lerngruppe hinzugefügt! {authorMention}".format(userMention = message.mentions[0].mention, authorMention = message.author.mention))
-    
-    elif userInput[1] == options[3]: # join
-        if (len(userInput) < 3) or (not (userInput[2].isdigit())):
-            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "lerngruppe"))      
-            return
-
-        id = int(userInput[2])
-        
-        allChannels = await message.guild.fetch_channels()
-        allChannelNames = [channel.name.lower() for channel in allChannels]
-        if "[ö] lerngruppe-{id}".format(id = id) in allChannelNames: # If Lerngruppe is public
-            for channel in allChannels:
-                if "[ö] lerngruppe-{id}".format(id = id) in channel.name.lower():
-                    dummyMessage = modules.bottiHelper._createDummyMessage(message.author, channel.text_channels[0])
-                    await _addUserToLerngruppe(channel, dummyMessage, message.author, ":books: {userMention} ist der Lerngruppe beigetreten!".format(userMention = message.author.mention))
-                    return
-        else:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Diese Lerngruppe existiert nicht, oder ist privat!")
-    
-    elif userInput[1] == options[4]: # remove
-        if len(message.mentions) == 0:
-            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "lerngruppe"))      
-            return 
-            
-        if not (_isLerngruppenChannel(message.channel.category)):    
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dieser Befehl kann nur in einer Lerngruppe ausgeführt werden!")
-            return
-            
-        await _removeUserFromLerngruppe(message.channel.category, message, message.mentions[0], ":books: {userMention} wurde aus der Lerngruppe entfernt! {authorMention}".format(userMention = message.mentions[0].mention, authorMention = message.author.mention))
-    
-    elif userInput[1] == options[5]: # leave
-        if not (_isLerngruppenChannel(message.channel.category)):    
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dieser Befehl kann nur in einer Lerngruppe ausgeführt werden!")
-            return
-            
-        await _removeUserFromLerngruppe(message.channel.category, message, message.author, ":books: {authorMention} hat die Lerngruppe verlassen!".format(authorMention = message.author.mention))
-    
+    await func(*args)
