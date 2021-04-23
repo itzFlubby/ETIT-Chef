@@ -93,6 +93,7 @@ async def _subcommandCreateLerngruppe(message, userInput):
 
     userPermissions = discord.PermissionOverwrite.from_pair(allow = discord.Permissions.all(), deny = discord.Permissions.none())
     userPermissions.update(manage_permissions = False)
+    userPermissions.update(manage_channels = False)
 
     overwrites = {
         message.guild.default_role: discord.PermissionOverwrite(read_messages = False),
@@ -162,9 +163,33 @@ async def _subcommandMakemod(message):
     
     userPermissions = discord.PermissionOverwrite.from_pair(allow = discord.Permissions.all(), deny = discord.Permissions.none())
     userPermissions.manage_permissions = False
+    userPermissions.manage_channels = False
 
     await _overwritePermissionsForUser(message.channel.category, message.mentions[0], userPermissions)
     await modules.bottiHelper._sendMessagePingAuthor(message, ":books: {newModMention} ist jetzt Moderator dieser Lerngruppe!".format(newModMention = message.mentions[0].mention))
+ 
+
+async def _subcommandPromote(message, botData):
+    if not (_isLerngruppenChannel(message.channel.category)):    
+        await _sendMessageNoLerngruppenChannel(message)
+        return
+    
+    if not (_isModUser(message.channel.category, message.author)):
+        await _sendMessageNoPermissions(message)
+        return
+    
+    if not ("[ö]" in message.channel.category.name.lower()):
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Deine Lerngruppe ist nicht öffentlich! Du kannst sie deshalb nicht bewerben!")
+        return
+        
+    if message.channel.topic == None:
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Die Lerngruppe benötigt eine Beschreibung, um sie zu bewerben. Nutze `{prefix}lerngruppe setdescription <Beschreibung>` um eine zu setzen!".format(prefix = botData.botPrefix))
+        return
+        
+    channel = message.guild.get_channel(ids.channelIDs.LERNGRUPPE_FINDEN)
+    id = int(message.channel.category.name.split("-")[1])
+    
+    await channel.send(":books: {authorMention} bewirbt **{promotedChannel}**:\n```\n{description}``` Trete mit `{prefix}lerngruppe join {id}` bei!".format(authorMention = message.author.mention, promotedChannel = message.channel.category.name.split(" ")[1], description = message.channel.topic, prefix = botData.botPrefix, id = id))
     
  
 async def _subcommandRemove(message):
@@ -181,7 +206,26 @@ async def _subcommandRemove(message):
         return 
         
     await _removeUserFromLerngruppe(message.channel.category, message, message.mentions[0], ":books: {userMention} wurde aus der Lerngruppe entfernt! {authorMention}".format(userMention = message.mentions[0].mention, authorMention = message.author.mention))
-    
+
+async def _subcommandSetdescription(message, userInput):
+    if not (_isLerngruppenChannel(message.channel.category)):    
+        await _sendMessageNoLerngruppenChannel(message)
+        return    
+     
+    if not (_isModUser(message.channel.category, message.author)):
+        await _sendMessageNoPermissions(message)
+        return
+     
+    if len(userInput) < 3:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "lerngruppe"))      
+        return
+        
+    description = message.content[27:] # 27 = len("!lerngruppe setdescription ")
+ 
+    for textChannel in message.channel.category.text_channels:
+        await textChannel.edit(topic = description)
+        
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":books: Die Beschreibung der Lerngruppe wurde auf **\"{description}\"** gesetzt!".format(description = description))
  
 async def lerngruppe(botti, message, botData):
     """
@@ -189,11 +233,11 @@ async def lerngruppe(botti, message, botData):
     Dieser Befehl verwaltet alles was mit Lerngruppen zu tun hat.
     !lerngruppe {OPTION} {ARGS}
     {OPTION} "create", "delete", "add", "join", "remove", "leave", "makemod", "setdescription"
-    {ARGS} <leer>, Nutzer-Erwänung, Lerngruppen-ID
+    {ARGS} <leer>, Nutzer-Erwänung, Lerngruppen-ID, Beschreibung [String]
     !lerngruppe create\r!lerngruppe join 0\r!lerngruppe remove @ETIT-Chef
     """
     
-    options = [ "create", "delete", "add", "join", "remove", "leave", "makemod", "setdescription" ]
+    options = [ "create", "delete", "add", "join", "remove", "leave", "makemod", "setdescription", "promote" ]
     
     userInput = message.content.split(" ")
 
@@ -229,6 +273,14 @@ async def lerngruppe(botti, message, botData):
         options[6]: {
             "func": _subcommandMakemod,
             "args": [ message ]
+        },
+        options[7]: {
+            "func": _subcommandSetdescription,
+            "args": [ message, userInput ]
+        },
+        options[8]: {
+            "func": _subcommandPromote,
+            "args": [ message, botData ]
         }
     }
     
