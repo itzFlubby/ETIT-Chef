@@ -34,7 +34,7 @@ bottiIntents.reactions = True
 bottiIntents.presences = False
 botti = discord.Client(intents = bottiIntents, guild_subscriptions = True)
 
-slash = SlashCommand(botti, sync_commands = False)
+slash = SlashCommand(botti, sync_commands = True)
 import modules.slash  # MUSS unter der Deklaration und Initialisierung von den Objekten slash und botti stehen
 import modules.events # MUSS unter der Deklaration und Initialisierung vom Objekten botti stehen
              

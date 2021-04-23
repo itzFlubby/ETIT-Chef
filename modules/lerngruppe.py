@@ -56,6 +56,7 @@ async def _overwritePermissionsForUser(categoryChannel, user, overwrites):
         
 async def _removeUserFromLerngruppe(categoryChannel, message, user, leaveString):
     await _overwritePermissionsForUser(categoryChannel, user, None)
+    await modules.bottiHelper._sendMessage(message, leaveString)
     
 async def _sendMessageNoLerngruppenChannel(message):
     await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dieser Befehl kann nur in einer Lerngruppe ausgeführt werden!")
@@ -107,7 +108,6 @@ async def _subcommandCreateLerngruppe(message, userInput):
     await modules.bottiHelper._sendMessagePingAuthor(message, ":books: Deine Lerngruppe _(mit der ID: {id})_ wurde erstellt!".format(id = nextFreeID))
     await newChannel.send(":books: Lerngruppe-{id} {type}\n:books: Eigentümer: {owner}\n:books: Erstellt: {created}".format(id = nextFreeID, type = types[type], owner = message.author.mention, created = modules.bottiHelper._getTimestamp()))
     
-
 async def _subcommandDelete(message):
     if not (_isLerngruppenChannel(message.channel.category)):    
         await _sendMessageNoLerngruppenChannel(message)
@@ -121,8 +121,7 @@ async def _subcommandDelete(message):
     for channel in categoryChannels:
         await channel.delete()
     await message.channel.category.delete()
-
-      
+    
 async def _subcommandJoin(message, userInput, botData):
     if (len(userInput) < 3) or (not (userInput[2].isdigit())):
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "lerngruppe"))      
@@ -168,7 +167,6 @@ async def _subcommandMakemod(message):
     await _overwritePermissionsForUser(message.channel.category, message.mentions[0], userPermissions)
     await modules.bottiHelper._sendMessagePingAuthor(message, ":books: {newModMention} ist jetzt Moderator dieser Lerngruppe!".format(newModMention = message.mentions[0].mention))
  
-
 async def _subcommandPromote(message, botData):
     if not (_isLerngruppenChannel(message.channel.category)):    
         await _sendMessageNoLerngruppenChannel(message)

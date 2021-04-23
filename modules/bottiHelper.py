@@ -27,7 +27,7 @@ async def _checkPurgemaxConfirm(message, botData):
         await _sendMessagePingAuthor(message, ":exclamation: Purgemax abgebrochen.")
         botData.purgemaxConfirm = False
         
-def _createDummyMessage(author, channel, content = ""):
+def _createDummyMessage(author, channel, content = "", mentions = []):
     dataDict = { 
         "id": 0, 
         "webhook_id": 0, 
@@ -41,7 +41,8 @@ def _createDummyMessage(author, channel, content = ""):
         "mention_everyone": 0, 
         "tts": 0, 
         "content": content, 
-        "nonce": 0 
+        "nonce": 0,
+        "mentions": mentions
     }
     msg = discord.Message(state = 0, channel = channel, data = dataDict)
     msg.author = author
@@ -114,9 +115,7 @@ def _logCommand(message, botData):
     else:
         return 0
 
-def _logSlashCommand(ctx, botData):
-    ctx.defer()
-
+async def _logSlashCommand(ctx, botData):
     botData.lastCommands =  botData.lastCommands[-1:] + botData.lastCommands[:-1]
     botData.lastCommands[0] = ctx
         
