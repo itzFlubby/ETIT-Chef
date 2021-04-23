@@ -123,7 +123,7 @@ async def _subcommandDelete(message):
     await message.channel.category.delete()
 
       
-async def _subcommandJoin(message, userInput):
+async def _subcommandJoin(message, userInput, botData):
     if (len(userInput) < 3) or (not (userInput[2].isdigit())):
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "lerngruppe"))      
         return
@@ -189,8 +189,8 @@ async def _subcommandPromote(message, botData):
     channel = message.guild.get_channel(ids.channelIDs.LERNGRUPPE_FINDEN)
     id = int(message.channel.category.name.split("-")[1])
     
-    await channel.send(":books: {authorMention} bewirbt **{promotedChannel}**:\n```\n{description}``` Trete mit `{prefix}lerngruppe join {id}` bei!".format(authorMention = message.author.mention, promotedChannel = message.channel.category.name.split(" ")[1], description = message.channel.topic, prefix = botData.botPrefix, id = id))
-    
+    botMessage = await channel.send(":books: {authorMention} bewirbt **{promotedChannel}**:\n```\n{description}``` Trete mit `{prefix}lerngruppe join {id}`, oder indem du mit {emoji} reagierst, bei!".format(authorMention = message.author.mention, promotedChannel = message.channel.category.name.split(" ")[1], description = message.channel.topic, prefix = botData.botPrefix, id = id, emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.APPROVE)))
+    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.APPROVE))
  
 async def _subcommandRemove(message):
     if not (_isLerngruppenChannel(message.channel.category)):    
@@ -260,7 +260,7 @@ async def lerngruppe(botti, message, botData):
         },
         options[3]: {
             "func": _subcommandJoin,
-            "args": [ message, userInput ]
+            "args": [ message, userInput, botData ]
         },
         options[4]: {
             "func": _subcommandRemove,
