@@ -143,7 +143,7 @@ async def wochenplan(botti, message, botData):
                     continue
                 
                 if "UNTIL" in rrule:
-                    if (rrule["UNTIL"][0] - now).days < 0: # < 0 : if event is in the past
+                    if (rrule["UNTIL"][0] - now).days < 0: # < 0 : If event is in the past
                         continue
                         
                 if "COUNT" in rrule:
@@ -156,7 +156,6 @@ async def wochenplan(botti, message, botData):
                         _appendItem(weekdayItems, dtstart.weekday(), dtstart, dtend, summary)
                     continue
                     
-                
                 if "BYDAY" in rrule:
                     if len(rrule["BYDAY"]) > 1:
                         for i in range(len(rrule["BYDAY"])):
@@ -186,13 +185,13 @@ async def wochenplan(botti, message, botData):
                     returnToMainloop = False
                     if hasattr(component.decoded("exdate"), "dts"):
                         for vDDDType in component.decoded("exdate").dts:
-                            if (vDDDType.dt - startOfWeek).days < 7: # < 7 : if event is in this week (7 days in week)
+                            if (vDDDType.dt - startOfWeek).days < 7: # < 7 : If event is in this week (7 days in week)
                                 returnToMainloop = True
                                 break
                     else:   
                         for exdate in component.decoded("exdate"):
                             for vDDDType in exdate.dts:
-                                if (vDDDType.dt - startOfWeek).days < 7: # < 7 : if event is in this week (7 days in week)
+                                if (vDDDType.dt - startOfWeek).days < 7: # < 7 : If event is in this week (7 days in week)
                                     returnToMainloop = True
                                     break
                     

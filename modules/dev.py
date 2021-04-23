@@ -71,13 +71,13 @@ async def commandlist(botti, message, botData):
         description = ""
     )
     
-    for i in range(botData.totalModules):
-        data.add_field(name = botData.moduleNames[i].capitalize(), value = botData.fullCommandList[i], inline = False)
+    for commandModule in botData.allCommandModules:
+        data.add_field(name = commandModule.moduleName.capitalize(), value = commandModule.commandNameList, inline = False)
         
     data.add_field(name = "Slash-Commands", value = botData.slashCommandList, inline = False)
     
     data.set_thumbnail(url = botti.user.avatar_url)
-    data.set_author(name = botti.user.name + "#" + str(botti.user.discriminator), icon_url="https://cdn.discordapp.com/app-assets/" + str(botti.user.id) + "/" + str(ids.assetIDs.PROFILE_PICTURE) + ".png")
+    data.set_author(name = botti.user.name + "#" + str(botti.user.discriminator), icon_url = "https://cdn.discordapp.com/app-assets/" + str(botti.user.id) + "/" + str(ids.assetIDs.PROFILE_PICTURE) + ".png")
     data.set_footer(text = "Insgesamt sind das " + str(botData.totalCommands) + " Befehle!")
     
     await modules.bottiHelper._sendEmbed(message, message.author.mention, data)
@@ -220,12 +220,12 @@ async def modulelist(botti, message, botData):
         description = ""
     )    
     data.set_thumbnail(url = botti.user.avatar_url)
-    data.set_author(name = botti.user.name + "#" + str(botti.user.discriminator), icon_url="https://cdn.discordapp.com/app-assets/770272473735233587/773291276354322443.png")
+    data.set_author(name = botti.user.name + "#" + str(botti.user.discriminator), icon_url = "https://cdn.discordapp.com/app-assets/" + str(botti.user.id) + "/" + str(ids.assetIDs.PROFILE_PICTURE) + ".png")
     
-    for i in range(botData.totalModules - 1):
-        if wantedModule == botData.moduleNames[i]:
-            data.add_field(name = botData.moduleNames[i].capitalize(), value = botData.fullCommandList[i])
-            data.set_footer(text = "{} hat {} Befehle!".format(botData.moduleNames[i].capitalize(), len(botData.fullCommandList[i])))
+    for commandModule in botData.allCommandModules:
+        if wantedModule == commandModule.moduleName:
+            data.add_field(name = commandModule.moduleName.capitalize(), value = commandModule.commandNameList)
+            data.set_footer(text = "{} hat {} Befehle!".format(commandModule.moduleName.capitalize(), len(commandModule.commandNameList)))
             await modules.bottiHelper._sendEmbedPingAuthor(message, "", data)
             return
     

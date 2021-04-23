@@ -488,11 +488,7 @@ async def transfer(botti, message, botData):
     
         if userToTransferTo.id == message.author.id:
             await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Du kannst dir nicht selbst Cookies überweisen!")
-            return                
-            
-        if userToTransferTo.id == ids.userIDs.ITZFLUBBY:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Diesem Nutzer kannst du keine Cookies überweisen!")
-            return             
+            return                     
     
         transferValue = message.content.split(" ")[2]
         if not transferValue.isdigit():
@@ -527,7 +523,7 @@ async def wheel(botti, message, botData):
     costToPlay = 1000
     winAmounts = [ 1000, 2000, 3000, 10000, 25000, 60000, 100000, 1000000 ]
     
-    checkBal = _checkBalance(botData, message.author.id, 1000)
+    checkBal = _checkBalance(botData, message.author.id, costToPlay)
     if checkBal == -1:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Sieht so aus, als hättest du wohl noch kein Konto. Verwende `!balance`, um eins anzulegen!")
         return 
