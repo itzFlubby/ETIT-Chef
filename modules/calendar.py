@@ -18,6 +18,21 @@ def _compareDate(first, second):
         return 2
         
     return 0
+
+def _getCourseAndSemester(message):
+    buildInfo = ""
+    if "ETIT" in message.channel.category.name:
+        buildInfo += "ETIT_SEM_"
+    elif "MIT" in message.channel.category.name:
+        buildInfo += "MIT_SEM_"
+    else:
+        return None
+        
+    try:
+        sem = message.channel.category.name[0]
+        return buildInfo + sem
+    except:
+        return None
     
 def _getCurrentTime():
     return datetime.datetime.now(tzlocal())
@@ -70,7 +85,7 @@ def _shortenSummary(summary):
         },
         "Komplexe Analysis und Integraltransformationen": {
             "emoji": ":triangular_ruler:",
-            "value": "kai"
+            "value": "KAI"
         },
         "Informationstechnik": {
             "emoji": ":computer:",
@@ -90,13 +105,19 @@ async def updatecalendar(botti, message, botData):
     Dieser Befehl aktualisiert den Kalender.
     !updatecalendar
     """
-    request = requests.get(botData.calendarURL)
-    with open(botData.modulesDirectory + "data/calendar/cal.ical", "w+") as f:
+    
+    courseAndSemester = _getCourseAndSemester(message)
+    if courseAndSemester == None:
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Dein Semester und Studiengang wurde nicht erkannt. Verwende den Befehl in einem Text-Kanal von deinem Semester!")    
+        return
+        
+    request = requests.get(botData.calendarURLs[courseAndSemester])
+    with open(botData.modulesDirectory + "data/calendar/" + courseAndSemester + ".ical", "w+") as f:
         f.write(request.text.replace("\r", ""))
         
     _retrieveExams(botData, request.text)
     
-    await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Der Kalender wurde aktualisiert!")
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Der Kalender für `{courseAndSemester}` wurde aktualisiert!".format(courseAndSemester = courseAndSemester))    
 
 async def wochenplan(botti, message, botData):
     """ 
@@ -117,8 +138,13 @@ async def wochenplan(botti, message, botData):
             await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "wochenplan"))      
             return         
     
+    courseAndSemester = _getCourseAndSemester(message)
+    if courseAndSemester == None:
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Dein Semester und Studiengang wurde nicht erkannt. Verwende den Befehl in einem Text-Kanal von deinem Semester!")    
+        return
+        
     content = ""
-    with open(botData.modulesDirectory + "data/calendar/cal.ical", "r") as f:
+    with open(botData.modulesDirectory + "data/calendar/" + courseAndSemester + ".ical", "r") as f:
         content += f.read()
         
     calendar = Calendar.from_ical(content)
@@ -224,7 +250,7 @@ async def wochenplan(botti, message, botData):
                 
         data.add_field(name = weekdayNames[i] + (startOfWeek + datetime.timedelta(days = i)).strftime(" `(%d.%m.%Y)`"), value = dayString if dayString is not "" else "-", inline = False)
     
-    data.set_author(name = "🗓️ Wochenplan für ETIT")
+    data.set_author(name = "🗓️ Wochenplan für " + courseAndSemester)
     data.set_thumbnail(url = botti.user.avatar_url)
     data.set_footer(text = "Vorlesung, wenn nicht anderweitig angegeben.\nJegliche Angaben ohne Gewähr.\nStand: {}".format(modules.bottiHelper._toGermanTimestamp(lastModified)))
     
