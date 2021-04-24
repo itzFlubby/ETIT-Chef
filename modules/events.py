@@ -2,6 +2,7 @@ import discord
 import modules.bottiHelper
 import modules.data.ids as ids
 import modules.gamble
+import modules.lerngruppe
 import modules.roles
 
 from __main__ import botti
@@ -154,6 +155,19 @@ async def on_raw_reaction_add(payload):
                 role = message.role_mentions[0]
                 if role not in payload.member.roles:
                     await payload.member.add_roles(role, reason = "Requested by user.")
+   
+    # LERNGRUPPE
+    if payload.emoji.name == "approve":
+        if payload.member.id == botti.user.id:
+            return
+        
+        channel = guild.get_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
+        if (message.author.id == botti.user.id) and ("lerngruppe-" in message.content.lower()):
+            id = int(message.content.split("-")[1].split("**:")[0])
+            
+            dummyMessage = modules.bottiHelper._createDummyMessage(payload.member, guild.get_channel(payload.channel_id), "{prefix}lerngruppe join {id}".format(prefix = botData.botPrefix, id = id))
+            await modules.lerngruppe._subcommandJoin(dummyMessage, dummyMessage.content.split(" "), botData)
    
     # DANKE               
     if payload.emoji.id == ids.emojiIDs.DANKE["id"]:

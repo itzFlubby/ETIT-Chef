@@ -34,7 +34,7 @@ bottiIntents.reactions = True
 bottiIntents.presences = False
 botti = discord.Client(intents = bottiIntents, guild_subscriptions = True)
 
-slash = SlashCommand(botti, sync_commands = False)
+slash = SlashCommand(botti, sync_commands = True)
 import modules.slash  # MUSS unter der Deklaration und Initialisierung von den Objekten slash und botti stehen
 import modules.events # MUSS unter der Deklaration und Initialisierung vom Objekten botti stehen
              
@@ -134,7 +134,7 @@ async def on_message(message):
                     if not await modules.guard._checkPerms(botti, message, module.allowedRoles, module.enableTrustet ):
                         return
                 await getattr(module.module, command)(botti, message, botData)
-                botData.befehlsCounter =+ 1
+                botData.befehlsCounter += 1
                 return
                 
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Befehl **'{0}'** existiert nicht!".format(message.content))        

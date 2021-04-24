@@ -7,6 +7,33 @@ import modules.data.ids as ids
 import requests
 import time
 
+async def _updateJson(botData):
+    response = requests.get(url = botData.mensaURL, auth = requests.auth.HTTPBasicAuth(botData.mensaUsername, botData.mensaUserpassword))
+    
+    jsonResponse = response.content
+    
+    jsonData = json.loads(jsonResponse.decode('utf8'))
+    
+    with open(botData.modulesDirectory + "/data/mensa/mensaData.txt", 'w') as outfile:
+        json.dump(jsonData, outfile)
+
+async def _dailyMensa(botti, botData):
+    while(True):
+        now = datetime.datetime.now()
+        nextPing = now
+        if now.hour > 8:
+            nextPing = now + datetime.timedelta(days = 1)
+
+        nextPing = datetime.datetime(nextPing.year, nextPing.month, nextPing.day, 8, 0, 0)
+        
+        diff = nextPing - now
+        
+        await asyncio.sleep(diff.seconds)
+        
+        if nextPing.weekday() < 4:
+            msg = modules.bottiHelper._createDummyMessage(botti.get_guild(ids.serverIDs.ETIT_KIT).get_member(botti.user.id), discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.MENSA), "")
+            await modules.mensa.mensa(botti, msg, botData)
+
 async def mensa(botti, message, botData):
     """
     Für alle ausführbar
@@ -197,30 +224,13 @@ async def mensazusatz(botti, message, botData):
     ":earth_africa: `- kontrolliert biologischer Anbau mit EU Bio-Siegel / DE-Öko-007 Kontrollstelle`\n"
     ":fish: `- MSC aus zertifizierter Fischerei`\n")
     await modules.bottiHelper._sendMessage(message, ":fork_knife_plate: Dies sind die Mensa-Zusätze {}:\n{}Eine komplette Liste aller gesetzlich ausweisungspflichtigen Zusatzstoffe und Allergene findest du unter:\n{}".format(message.author.mention, mensaZusatzString, botData.mensaZusatzURL))
-
-async def _updateJson(botData):
-    response = requests.get(url = botData.mensaURL, auth = requests.auth.HTTPBasicAuth(botData.mensaUsername, botData.mensaUserpassword))
     
-    jsonResponse = response.content
+async def updatemensa(botti, message, botData):
+    """
+    Für alle ausführbar
+    Dieser Befehl aktualisiert den Mensa-Speiseplan.
+    !updatemensa
+    """
+    await _updateJson(botData)
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":fork_knife_plate: Der Mensa-Speiseplan wurde aktualisiert.")
     
-    jsonData = json.loads(jsonResponse.decode('utf8'))
-    
-    with open(botData.modulesDirectory + "/data/mensa/mensaData.txt", 'w') as outfile:
-        json.dump(jsonData, outfile)
-
-async def _dailyMensa(botti, botData):
-    while(True):
-        now = datetime.datetime.now()
-        nextPing = now
-        if now.hour > 8:
-            nextPing = now + datetime.timedelta(days = 1)
-
-        nextPing = datetime.datetime(nextPing.year, nextPing.month, nextPing.day, 8, 0, 0)
-        
-        diff = nextPing - now
-        
-        await asyncio.sleep(diff.seconds)
-        
-        if nextPing.weekday() < 4:
-            msg = modules.bottiHelper._createDummyMessage(botti.get_guild(ids.serverIDs.ETIT_KIT).get_member(botti.user.id), discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.MENSA), "")
-            await modules.mensa.mensa(botti, msg, botData)
