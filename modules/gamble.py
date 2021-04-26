@@ -42,12 +42,12 @@ async def betflip(botti, message, botData):
     Für alle ausführbar
     Dieser Befehl wirft eine Münzte mit Einsatz.
     !betflip {EINSATZ}
-    {EINSATZ} Ganze Zahl >= 0
+    {EINSATZ} Ganze Zahl >= 0, "allin" [Setzt alles]
     !betflip 1000
     """
     try:
         betValue = message.content.split(" ")[1]
-        if (not betValue.isdigit()) and (betValue is not "allin"):
+        if (not betValue.isdigit()) and (not (betValue == "allin")):
             raise IndexError()
             
             
@@ -207,14 +207,14 @@ async def guess(botti, message, botData):
     Dieser Befehl schätzt eine Zahl zwischen 1 und 100 mit Einsatz.
     !guess {ZAHL} {EINSATZ}
     {ZAHL} Ganze positive Zahl  <= 100
-    {EINSATZ} Ganze Zahl >= 0
+    {EINSATZ} Ganze Zahl >= 0, "allin" [Setzt alles]
     !guess 50 1000
     """
     try:
         guessValue = message.content.split(" ")[1]
     
         betValue = message.content.split(" ")[2]
-        if ((not betValue.isdigit()) and (betValue is not "allin")) or (not guessValue.isdigit()):
+        if ((not betValue.isdigit()) and (not (betValue == "allin"))) or (not guessValue.isdigit()):
             raise IndexError()
             
         guessValue = int(guessValue)
@@ -415,12 +415,12 @@ async def slots(botti, message, botData):
     Für alle ausführbar
     Dieser Befehl spielt Slots mit Einsatz.
     !slots {EINSATZ}
-    {EINSATZ} Ganze Zahl >= 0
+    {EINSATZ} Ganze Zahl >= 0, "allin" [Setzt alles]
     !slots 1000
     """
     try:
         betValue = message.content.split(" ")[1]
-        if (not betValue.isdigit()) and (betValue is not "allin"):
+        if (not betValue.isdigit()) and (not (betValue == "allin")):
             raise IndexError()
             
         if betValue == "allin":    
