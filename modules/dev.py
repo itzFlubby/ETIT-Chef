@@ -123,9 +123,9 @@ async def give(botti, message, botData):
         
         returnVal = modules.gamble._addBalance(botData, user.id, value)
         if returnVal == 1:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: Cookies konnten an **{}#{}** __nicht__ vergeben werden!".format(user.name, user.discriminator)) 
+            await modules.bottiHelper._sendMessagePingAuthor(message, "{emoji} {currencyNamePlural} konnten an {userMention} __nicht__ vergeben werden!".format(emoji = botData.botCurrency["emoji"], currencyNamePlural = botData.botCurrency["plural"], userMention = user.mention)) 
             return
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":cookie: **{}** Cookies an {} vergeben!".format(str(value), user.mention)) 
+        await modules.bottiHelper._sendMessagePingAuthor(message, "{emoji} **{value}** {currencyNamePlural} an {userMention} vergeben!".format(emoji = botData.botCurrency["emoji"], value = modules.bottiHelper._spaceIntToString(value), currencyNamePlural = botData.botCurrency["plural"], userMention = user.mention)) 
     except IndexError:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "give"))      
         return   
