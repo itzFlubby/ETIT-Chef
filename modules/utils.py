@@ -290,46 +290,6 @@ async def kekse(botti, message, botData):
     await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.OH))
     await botMessage.add_reaction("🍪")
 
-async def klausuren(botti, message, botData):
-    """ 
-    Für alle ausführbar
-    Dieser Befehl zeigt alle anstehenden Klausuren an.
-    !klausuren
-    """
-    klausurNamen = []
-    klausurDaten = []
-    klausurDauer = []
-    klausurOrte = []
-    with open(botData.modulesDirectory + "/data/klausuren/klausuren.txt") as fp: 
-        lines = fp.readlines() 
-        for line in lines: 
-            if "#" in line:
-                continue
-            klausurNamen.append(line.split(" ")[0])
-            klausurDaten.append(datetime.datetime(int(line.split(" ")[3]), int(line.split(" ")[2]), int(line.split(" ")[1]), int(line.split(" ")[4])))
-            klausurDauer.append(int(line.split(" ")[5]))
-            klausurOrte.append(line.split("\"")[1])
-    
-    klausurString = ":dizzy_face: Die anstehenden Klausuren sind\n"
-    
-    now = datetime.datetime.now()
-    counter = 0
-    
-    maxLength = len(max(klausurNamen, key=len))
-    
-    for klausur in klausurNamen:
-        if (klausurDaten[counter] - now).days >= 0:
-            klausurString = klausurString + "```ml\n" + klausur 
-            for i in range(0, (maxLength - len(klausur))):
-                klausurString = klausurString + " " 
-            klausurString = klausurString + " am " + klausurDaten[counter].strftime("%d.%m.%Y um %H:%M:%S") + " (in " + str((klausurDaten[counter] - now).days).zfill(2) + " Tagen!) 'Ort: \"" + klausurOrte[counter] + "\"```"
-
-        counter = counter + 1
-        
-    
-    klausurString = klausurString  
-    await modules.bottiHelper._sendMessagePingAuthor(message, klausurString + "Jegliche Angaben ohne Gewähr.")
-
 async def random(botti, message, botData):
     """ 
     Für alle ausführbar

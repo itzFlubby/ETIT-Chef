@@ -7,6 +7,13 @@ import requests
 from dateutil.tz import tzlocal
 from icalendar import Calendar, vDatetime
 
+class Exam:
+    def __init__(self, pName, pDate, pDuration, pLocation):
+        self.name = pName
+        self.date = pDate
+        self.duration = pDuration
+        self.location = pLocation
+
 def _appendItem(itemList, day, start, end, summary):
     itemList[day].append("`" + start.strftime("%H:%M") + " - " + end.strftime("%H:%M` ") + summary + "\n")
     
@@ -49,8 +56,9 @@ def _getTimeInCorrectTimezone(component):
 def _getUTCOffset():
     return int(datetime.datetime.now(tzlocal()).utcoffset().seconds / 3600)
 
-def _retrieveExams(botData, content):
+def _retrieveExams(botData, message, content):
     calendar = Calendar.from_ical(content)
+    courseAndSemester = _getCourseAndSemester(message)
     
     exams = []
     
@@ -59,9 +67,12 @@ def _retrieveExams(botData, content):
             summary = component.decoded("summary").decode("utf-8")
             if summary[:7] == "KLAUSUR": # Here is the '==' REQUIRED instead of 'is', because the value is being checked
                 dtstart, dtend = _getTimeInCorrectTimezone(component)
-                exams.append(component.decoded("summary").decode("utf-8")[10:].replace(" ", "_") + dtstart.strftime(" %d %m %Y %H 0 \"UNBEKANNT\"\n"))
+                location = component.decoded("location").decode("utf-8")
+                location = "UNBEKANNT" if (location == "") else location
+                    
+                exams.append(component.decoded("summary").decode("utf-8")[10:].replace(" ", "_") + dtstart.strftime(" %d %m %Y %H 0 \"" + location + "\"\n"))
                 
-    with open(botData.modulesDirectory + "data/klausuren/klausuren.txt", "w+") as f:
+    with open(botData.modulesDirectory + "data/klausuren/" + courseAndSemester + ".txt", "w+") as f:
         for exam in exams:
             f.write(exam)
 
@@ -98,6 +109,47 @@ def _shortenSummary(summary):
             summary = "{emoji} {summary}".format(emoji = replacementDict[key]["emoji"], summary = summary.replace(key, replacementDict[key]["value"]))
     
     return summary
+
+async def klausuren(botti, message, botData):
+    """ 
+    Für alle ausführbar
+    Dieser Befehl zeigt alle anstehenden Klausuren an.
+    !klausuren
+    """
+    exams = []
+    
+    courseAndSemester = _getCourseAndSemester(message)
+    if courseAndSemester == None:
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Dein Semester und Studiengang wurde nicht erkannt. Verwende den Befehl in einem Text-Kanal von deinem Semester!")    
+        return
+    
+    with open(botData.modulesDirectory + "/data/klausuren/" + courseAndSemester + ".txt") as fp: 
+        lines = fp.readlines() 
+        for line in lines: 
+            if "#" in line:
+                continue
+                
+            contents = line.split(" ")    
+            exams.append(Exam(  pName = contents[0], 
+                                pDate = datetime.datetime(int(contents[3]), int(contents[2]), int(contents[1]), int(contents[4])),
+                                pDuration = int(contents[5]),
+                                pLocation = line.split("\"")[1] 
+                              ))
+    
+    examString = ":dizzy_face: Die anstehenden Klausuren sind\n"
+    
+    now = datetime.datetime.now()
+    
+    maxLength = len(max([exam.name for exam in exams], key = len))
+    
+    for exam in exams:
+        if (exam.date - now).days >= 0: # If Exam 
+            examString += "```ml\n" + exam.name 
+            for i in range(maxLength - len(exam.name)):
+                examString = examString + " " 
+            examString += " am {date} (in {days} Tagen!) 'Ort: \"{location}\"```".format(date = modules.bottiHelper._toGermanTimestamp(exam.date), days = str((exam.date - now).days).zfill(2), location = exam.location)
+         
+    await modules.bottiHelper._sendMessagePingAuthor(message, examString + "Jegliche Angaben ohne Gewähr.")
     
 async def updatecalendar(botti, message, botData):
     """
@@ -115,7 +167,7 @@ async def updatecalendar(botti, message, botData):
     with open(botData.modulesDirectory + "data/calendar/" + courseAndSemester + ".ical", "w+") as f:
         f.write(request.text.replace("\r", ""))
         
-    _retrieveExams(botData, request.text)
+    _retrieveExams(botData, message, request.text)
     
     await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Der Kalender für `{courseAndSemester}` wurde aktualisiert!".format(courseAndSemester = courseAndSemester))    
 
