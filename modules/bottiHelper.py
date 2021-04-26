@@ -87,7 +87,7 @@ def _toSTRFTimestamp(datetimeObject):
     return datetimeObject.strftime("%d.%m.%Y um %H:%M:%S")
 
 def _toUTCTimestamp(datetimeObject):
-    return "UTC " + _toSTRFTimestamp(datetimeObject)
+    return _toSTRFTimestamp(datetimeObject) + " UTC"
 
 def _toGermanTimestamp(datetimeObject):
     return datetimeObject.strftime("%d.%m.%Y um %H:%M:%S")
