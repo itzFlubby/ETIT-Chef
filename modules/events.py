@@ -19,8 +19,8 @@ async def on_member_join(member):
         color = 0x00FF00,
         description = "<@!" + str(member.id) + "> ist dem Server beigetreten!"
     )
-    data.add_field(name = "Server beigetreten am", value = modules.bottiHelper._toGermanTimestamp(member.joined_at), inline = False)
-    data.add_field(name = "Account erstellt am", value = modules.bottiHelper._toGermanTimestamp(member.created_at), inline = False)
+    data.add_field(name = "Server beigetreten am", value = modules.bottiHelper._toUTCTimestamp(member.joined_at), inline = False)
+    data.add_field(name = "Account erstellt am", value = modules.bottiHelper._toUTCTimestamp(member.created_at), inline = False)
     
 
     data.set_author(name = "💎 Mitglieder-Beitritt")
@@ -40,8 +40,8 @@ async def on_member_remove(member):
         color = 0xFF0000,
         description = "hat den Server verlassen!"
     )
-    data.add_field(name = "Server beigetreten am", value = modules.bottiHelper._toGermanTimestamp(member.joined_at), inline = False)
-    data.add_field(name = "Account erstellt am", value = modules.bottiHelper._toGermanTimestamp(member.created_at), inline = False)
+    data.add_field(name = "Server beigetreten am", value = modules.bottiHelper._toUTCTimestamp(member.joined_at), inline = False)
+    data.add_field(name = "Account erstellt am", value = modules.bottiHelper._toUTCTimestamp(member.created_at), inline = False)
     
 
     data.set_author(name = "😭 Mitglieder-Austritt")

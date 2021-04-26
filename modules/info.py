@@ -17,9 +17,9 @@ async def botinfo(botti, message, botData):
     data = discord.Embed(
         title = "",
         color = 0x005dff,
-        description = ""
+        description = botti.user.mention
     )
-    data.add_field(name = "Präfix", value = "!")
+    data.add_field(name = "Präfix", value = botData.botPrefix)
     data.add_field(name = "Name", value = botti.user.name)
     data.add_field(name = "Discriminator", value = str(("#" + botti.user.discriminator)))
     
@@ -27,9 +27,9 @@ async def botinfo(botti, message, botData):
     data.add_field(name = "Vertretene Server" , value = str(len(botti.guilds)))
     data.add_field(name = "OS", value = platform.system() + "-" + str(os.name).upper() + "-" + platform.release())
     
-    data.add_field(name = "Discord API Version", value = discord.__version__)
+    data.add_field(name = "discord.py Version", value = discord.__version__)
     data.add_field(name = "Latenz", value = str(round((botti.latency * 1000), 2)) + "ms")
-    data.add_field(name = "Entwickler", value = "itzFlubby")
+    data.add_field(name = "Entwickler", value = "<@!{itzFlubbyID}>".format(itzFlubbyID = ids.userIDs.ITZFLUBBY))
     
     data.add_field(name = "GitHub", value = "https://github.com/itzFlubby/ETIT-Chef/", inline = False)
     
@@ -54,13 +54,13 @@ async def channelinfo(botti, message, botData):
     data =  discord.Embed(
         title = "",
         color = 0x005dff,
-        description = ""
+        description = channelToGetInfo.mention
     )
     data.add_field(name = "Name", value = channelToGetInfo.name)
     data.add_field(name = "Typ", value = channelToGetInfo.type)
     data.add_field(name = "Position", value = str(channelToGetInfo.position + 1))
     
-    data.add_field(name = "Erstellt am", value = modules.bottiHelper._toGermanTimestamp(channelToGetInfo.created_at))
+    data.add_field(name = "Erstellt am", value = modules.bottiHelper._toUTCTimestamp(channelToGetInfo.created_at))
     data.add_field(name = "Slow-Modus", value = str(channelToGetInfo.slowmode_delay) + "s") 
     data.add_field(name = "Mitglieder", value = str(len(channelToGetInfo.members))) 
     
@@ -76,6 +76,31 @@ async def channelinfo(botti, message, botData):
     
     await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
 
+async def listroles(botti, message, botData):
+                          # MATH                 ELEK      INFO    TM
+    includeRoleColors = [ 0x00b0f0, 0x3ed5e3, 0xffc000, 0x92d050, 0xe67e22 ]
+    includeRoleNames = [ "Bachelor", "Master" ]
+    
+    totalStrings = []
+    totalString = ":receipt: Rollen-Übersicht: \n```ml\n           Rollen-Name           | Mitgliederzahl\n=================================================\n"
+    
+    for role in message.guild.roles:
+        if role.color.value in includeRoleColors or (True in [roleName in role.name for roleName in includeRoleNames]):
+            roleName = role.name
+            if len(roleName) > 33: # 33 = len("           Rollen-Name           ")
+                roleName = roleName[:30] + "..." # 30 = len("           Rollen-Name           ") - len("...")
+                
+            totalString += "{:<33}| {:<4}\n".format(roleName, modules.bottiHelper._spaceIntToString(len(role.members)))
+           
+            if len(totalString) > botData.maxMessageLength:
+                totalStrings.append(totalString + "```")
+                totalString = "```ml\n"
+                    
+    totalStrings.append(totalString + "```")
+        
+    for string in totalStrings:
+        await modules.bottiHelper._sendMessage(message, string) 
+            
 async def minecraft(botti, message, botData):
     """ 
     Für alle ausführbar
@@ -177,13 +202,13 @@ async def roleinfo(botti, message, botData):
     data = discord.Embed(
         title = "",
         color = role.color.value,
-        description = ""
+        description = role.mention
     )
     data.add_field(name = "Name", value = role.name)
     data.add_field(name = "Position", value = str(role.position))
     data.add_field(name = "Gruppiert", value = str(role.hoist))
     
-    data.add_field(name = "Rolle erstellt am", value = modules.bottiHelper._toGermanTimestamp(role.created_at))
+    data.add_field(name = "Rolle erstellt am", value = modules.bottiHelper._toUTCTimestamp(role.created_at))
     data.add_field(name = "Farbe", value = hex(role.color.value))
     data.add_field(name = "Mitglieder", value = len(role.members))
     
@@ -210,15 +235,17 @@ async def serverinfo(botti, message, botData):
     
     data.add_field(name = "Name", value = message.guild.name)
     data.add_field(name = "Region", value = str(message.guild.region))
-    data.add_field(name = "Eigentümer", value = message.guild.owner.name + "#" + str(message.guild.owner.discriminator))
+    data.add_field(name = "Eigentümer", value = message.guild.owner.mention)
     
-    data.add_field(name = "User", value = message.guild.member_count)
+    data.add_field(name = "Mitglieder", value = message.guild.member_count)
     data.add_field(name = "Rollen", value = len(message.guild.roles))
     data.add_field(name = "Emojis", value = len(message.guild.emojis))
     
+    data.add_field(name = "Kategorien", value = len(message.guild.categories))
     data.add_field(name = "Text Channels", value = len(message.guild.text_channels))
     data.add_field(name = "Sprach Channels", value = len(message.guild.voice_channels))
-    data.add_field(name = "Erstellt am", value = modules.bottiHelper._toGermanTimestamp(message.guild.created_at))
+    
+    data.add_field(name = "Erstellt am", value = modules.bottiHelper._toUTCTimestamp(message.guild.created_at), )
     
     data.add_field(name = "Icon", value = message.guild.icon_url, inline = False)
     
@@ -328,7 +355,7 @@ async def userinfo(botti, message, botData):
     data = discord.Embed(
         title = "",
         color = user.top_role.color.value,
-        description = ""
+        description = user.mention
     )
     
     data.add_field(name = "Name", value = user.name)
@@ -338,8 +365,8 @@ async def userinfo(botti, message, botData):
     data.add_field(name = "Bot-User", value = user.bot)
     data.add_field(name = "Höchste Rolle", value = user.top_role)
     
-    data.add_field(name = "Server beigetreten am", value = modules.bottiHelper._toGermanTimestamp(user.joined_at))
-    data.add_field(name = "Account erstellt am", value = modules.bottiHelper._toGermanTimestamp(user.created_at))
+    data.add_field(name = "Server beigetreten am", value = modules.bottiHelper._toUTCTimestamp(user.joined_at))
+    data.add_field(name = "Account erstellt am", value = modules.bottiHelper._toUTCTimestamp(user.created_at))
     
     data.add_field(name = "Profilbild", value = user.avatar_url, inline = False)
     
@@ -373,7 +400,6 @@ async def voiceinfo(botti, message, botData):
     data.add_field(name = "Kanal", value = voiceClient.channel.name)
     data.add_field(name = "Kategorie", value = voiceClient.channel.category.name)
     data.add_field(name = "Verbundene Nutzer", value = len(voiceClient.channel.members))
-    
     
     data.add_field(name = "Bitrate", value = str(int(voiceClient.channel.bitrate / 1000)) + "kbps")
     data.add_field(name = "Latenz", value = str(round((voiceClient.latency * 1000), 2)) + "ms")
