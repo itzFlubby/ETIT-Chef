@@ -47,7 +47,7 @@ def _isLerngruppenChannel(categoryChannel):
 def _isModUser(categoryChannel, user):
     userPermissions = categoryChannel.permissions_for(user)
     
-    return userPermissions.manage_channels
+    return userPermissions.manage_permissions
  
 async def _overwritePermissionsForUser(categoryChannel, user, overwrites):    
     await categoryChannel.set_permissions(user, overwrite = overwrites)
@@ -93,7 +93,6 @@ async def _subcommandCreateLerngruppe(message, userInput):
     nextFreeID = _getNextFreeID(message)
 
     userPermissions = discord.PermissionOverwrite.from_pair(allow = discord.Permissions.all(), deny = discord.Permissions.none())
-    userPermissions.update(manage_permissions = False)
     userPermissions.update(manage_channels = False)
 
     overwrites = {
@@ -161,7 +160,6 @@ async def _subcommandMakemod(message):
         return 
     
     userPermissions = discord.PermissionOverwrite.from_pair(allow = discord.Permissions.all(), deny = discord.Permissions.none())
-    userPermissions.manage_permissions = False
     userPermissions.manage_channels = False
 
     await _overwritePermissionsForUser(message.channel.category, message.mentions[0], userPermissions)
