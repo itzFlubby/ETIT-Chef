@@ -47,7 +47,7 @@ def _isLerngruppenChannel(categoryChannel):
 def _isModUser(categoryChannel, user):
     userPermissions = categoryChannel.permissions_for(user)
     
-    return userPermissions.manage_permissions
+    return userPermissions.manage_webhooks
  
 async def _overwritePermissionsForUser(categoryChannel, user, overwrites):    
     await categoryChannel.set_permissions(user, overwrite = overwrites)
@@ -94,6 +94,7 @@ async def _subcommandCreateLerngruppe(message, userInput):
 
     userPermissions = discord.PermissionOverwrite.from_pair(allow = discord.Permissions.all(), deny = discord.Permissions.none())
     userPermissions.update(manage_channels = False)
+    userPermissions.update(manage_permissions = False)
 
     overwrites = {
         message.guild.default_role: discord.PermissionOverwrite(read_messages = False),
@@ -161,6 +162,7 @@ async def _subcommandMakemod(message):
     
     userPermissions = discord.PermissionOverwrite.from_pair(allow = discord.Permissions.all(), deny = discord.Permissions.none())
     userPermissions.manage_channels = False
+    userPermissions.manage_permissions = False
 
     await _overwritePermissionsForUser(message.channel.category, message.mentions[0], userPermissions)
     await modules.bottiHelper._sendMessagePingAuthor(message, ":books: {newModMention} ist jetzt Moderator dieser Lerngruppe!".format(newModMention = message.mentions[0].mention))

@@ -87,7 +87,8 @@ def _createAccount(botData, id):
     botData.balanceKeeper.append([id, 5000])
 
 async def _cyclicBotDetection(botti, botData, runInLoop):
-    channel = botti.get_guild(ids.guildIDs.ETIT_KIT).get_channel(ids.channelIDs.SPIELHALLE)
+    channel = botti.get_guild(ids.serverIDs.ETIT_KIT).get_channel(ids.channelIDs.SPIELHALLE)
+    
     run = True
     
     while(run):
@@ -98,9 +99,6 @@ async def _cyclicBotDetection(botti, botData, runInLoop):
         allUsers = []
         async for message in channel.history(after = detectionStartMessage):
             if len(message.mentions) == 0:
-                continue
-            if message.mentions[0].id not in allUsers:
-                allUsers.append(message.author.id)
                 continue
             if message.author.id == botti.user.id:
                 if len(message.mentions) == 1:

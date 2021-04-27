@@ -100,7 +100,7 @@ async def listroles(botti, message, botData):
         
     for string in totalStrings:
         await modules.bottiHelper._sendMessage(message, string) 
-            
+
 async def minecraft(botti, message, botData):
     """ 
     Für alle ausführbar
@@ -129,7 +129,7 @@ async def minecraft(botti, message, botData):
         data.add_field(name = "Offline", value = "Der Server ist nicht erreichbar.")
     
     await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
-    
+
 async def permissions(botti, message, botData):
     """ 
     Für alle ausführbar

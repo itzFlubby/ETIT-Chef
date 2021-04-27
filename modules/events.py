@@ -21,7 +21,6 @@ async def on_member_join(member):
     )
     data.add_field(name = "Server beigetreten am", value = modules.bottiHelper._toUTCTimestamp(member.joined_at), inline = False)
     data.add_field(name = "Account erstellt am", value = modules.bottiHelper._toUTCTimestamp(member.created_at), inline = False)
-    
 
     data.set_author(name = "💎 Mitglieder-Beitritt")
     data.set_thumbnail(url = member.avatar_url)
