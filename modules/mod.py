@@ -71,8 +71,7 @@ async def debugger(botti, message, botData):
         if option == "add":
             await modules.bottiHelper._sendMessagePingAuthor(message, ":fly: {} ist bereits ein Debugger!".format(user.mention))
         else:
-            newUserRoles = modules.roles._changeRole(userRoles, [ ids.roleIDs.DEBUGGER ], -1, message.guild)
-            await user.edit(roles = newUserRoles, reason = "Set by {}#{}.".format(message.author.name, str(message.author.discriminator)))
+            newUserRoles = modules.roles._removeRoles(user, [ ids.roleIDs.DEBUGGER ])
             await modules.bottiHelper._sendMessagePingAuthor(message, ":fly: {} ist jetzt kein Debugger mehr!".format(user.mention))
     else:
         if option == "remove":

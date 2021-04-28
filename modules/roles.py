@@ -2,22 +2,34 @@ import discord
 import modules.bottiHelper
 import modules.data.ids as ids
 
-def _changeRole(userRoles, removeIDs, addRole, guild):
-    i = 0
-    while(i < len(userRoles)):
-        if userRoles[i].id in removeIDs:
-            del userRoles[i]
-            i = i - 1
+emojiToRoleID = {   "💬": ids.roleIDs.ZITATE, 
+                    "🎼": ids.roleIDs.MUSIK, 
+                    "👾": ids.roleIDs.MEMES,
+                    "🎮": ids.roleIDs.GAMING,
+                    "😺": ids.roleIDs.KATZEN,
+                    "💻": ids.roleIDs.TECH_TALK,
+                    "🎰": ids.roleIDs.SPIELHALLE,
+                    "🐖": ids.roleIDs.VORLESUNGSSPAM,
+                    "⚽": ids.roleIDs.SPORT,
+                    "🚀": ids.roleIDs.STONKS
+                }        
+
+async def _addRoles(member, addIDs):
+    memberRoles = member.roles
+    for roleID in addIDs:
+        role = member.guild.get_role(roleID)
+        if not (role in memberRoles):
+            memberRoles.append(role)
             
-        try:    
-            if userRoles[i].id == addRole.id:
-                return userRoles
-        except AttributeError:
-            pass
+    await member.edit(roles = memberRoles) 
+    
+async def _removeRoles(member, removeIDs):
+    memberRoles = member.roles
+    for roleID in removeIDs:
+        role = member.guild.get_role(roleID)
+        if (role in memberRoles):
+            memberRoles.remove(role)
             
-        i = i + 1
-        
-    if addRole != -1:
-        userRoles.append(addRole)
-        
-    return userRoles
+    await member.edit(roles = memberRoles)
+    
+           

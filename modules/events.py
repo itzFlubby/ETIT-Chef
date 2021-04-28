@@ -52,14 +52,21 @@ async def on_member_remove(member):
 @botti.event
 async def on_raw_reaction_remove(payload):
     guild = botti.get_guild(ids.serverIDs.ETIT_KIT)
+    member = guild.get_member(payload.user_id)
     
     if payload.channel_id in [ ids.channelIDs.AUSWAHL_ETIT_BSC, ids.channelIDs.AUSWAHL_MIT_BSC, ids.channelIDs.AUSWAHL_ETIT_MSC ]:
         if payload.emoji.name == "approve":
-            member = guild.get_member(payload.user_id)
             channel = guild.get_channel(payload.channel_id)
             message = await channel.fetch_message(payload.message_id)
             if len(message.role_mentions) != 0:
-                await member.remove_roles(message.role_mentions[0], reason = "Requested by user.")    
+                await member.remove_roles(message.role_mentions[0], reason = "Requested by user.")
+
+    if payload.message_id == ids.messageIDs.REMOVE_ROLE_SELECT:
+        if payload.emoji.name == "❌":     
+            await modules.roles._addRoles(member, ids.roleIDs.freetimeRoles)
+        else:
+            await modules.roles._addRoles(member, [ modules.roles.emojiToRoleID[payload.emoji.name] ])
+                
 
 @botti.event
 async def on_raw_reaction_add(payload): 
@@ -71,24 +78,18 @@ async def on_raw_reaction_add(payload):
             await botti.get_user(ids.userIDs.ITZFLUBBY).create_dm()
         vorschlagMessage = (await botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel.fetch_message(payload.message_id)).content
         channel_BOT_TEST_LOBBY = guild.get_channel(ids.channelIDs.BOT_TEST_LOBBY)
-        emojiToStatusname = { "✅": "angenommen", "💤": "on hold", "❌": "abgelehnt" }
+        emojiToStatusname = {   "✅": "angenommen", 
+                                "💤": "on hold", 
+                                "❌": "abgelehnt" 
+                            }
         await channel_BOT_TEST_LOBBY.send(":bookmark_tabs: Statusänderung für Vorschlag von **{0}** ({1}) <@!{1}> `@{2}`\n`{3}`\nwurde auf {4} **{5}** gesetzt!".format(vorschlagMessage.split("**")[1], vorschlagMessage.split("(")[1][:18], vorschlagMessage.split("| ")[1], vorschlagMessage.split("'")[1], payload.emoji.name, emojiToStatusname[payload.emoji.name])) 
     
     # Personalisierung
-    if payload.message_id == ids.messageIDs.REMOVE_ROLE_SELECT:
-        emojiToRole = { "💬": ids.roleIDs.ZITATE, 
-                        "🎼": ids.roleIDs.MUSIK, 
-                        "👾": ids.roleIDs.MEMES,
-                        "🎮": ids.roleIDs.GAMING,
-                        "😺": ids.roleIDs.KATZEN,
-                        "💻": ids.roleIDs.TECH_TALK,
-                        "🎰": ids.roleIDs.SPIELHALLE,
-                        "🐖": ids.roleIDs.VORLESUNGSSPAM }     
+    if payload.message_id == ids.messageIDs.REMOVE_ROLE_SELECT: 
         if payload.emoji.name == "❌":     
-            userRoles = modules.roles._changeRole(payload.member.roles, [ ids.roleIDs.ZITATE, ids.roleIDs.MUSIK, ids.roleIDs.MEMES, ids.roleIDs.GAMING, ids.roleIDs.KATZEN, ids.roleIDs.TECH_TALK, ids.roleIDs.SPIELHALLE, ids.roleIDs.VORLESUNGSSPAM, ids.roleIDs.FREIZEIT ], -1, guild)          
+            await modules.roles._removeRoles(payload.member, ids.roleIDs.freetimeRoles)
         else:
-            userRoles = modules.roles._changeRole(payload.member.roles, [ emojiToRole[payload.emoji.name] ], -1, guild)
-        await payload.member.edit(roles = userRoles, reason = "Requested by user.")  
+            await modules.roles._removeRoles(payload.member, [ modules.roles.emojiToRoleID[payload.emoji.name] ])
         
     if payload.message_id == ids.messageIDs.MATLAB_SELECT:
         await payload.member.add_roles(guild.get_role(ids.roleIDs.MATLAB), reason = "Requested by user.")
