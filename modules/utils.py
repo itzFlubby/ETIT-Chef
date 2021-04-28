@@ -30,6 +30,33 @@ async def antwortaufalles(botti, message, botData):
     """
     await modules.bottiHelper._sendMessagePingAuthor(message, ":milky_way: Die Antwort auf die Frage nach dem Leben, dem Universum und dem ganzen Rest ist :four::two:!")
 
+async def bullshit(botti, message, botData):
+    """ 
+    Für alle ausführbar
+    Dieser Befehl hat noch nie so einen riesigen Haufen Scheiße gesehen...
+    !bullshit
+    """
+    
+    file = botData.modulesDirectory + "data/images/temp/bullshit_{}.png".format(message.author.id)
+    
+    titleFont = ImageFont.truetype(botData.modulesDirectory + "data/images/fonts/Tahoma.ttf", 31) 
+    
+    imageString = message.author.nick if not (message.author.nick is None) else message.author.name
+    fontColor = (247, 233, 26)    
+    cacheString = ""
+    if not (exists(file)):
+        imageToEdit = Image.open(botData.modulesDirectory + "data/images/bullshit.png").convert('RGB') 
+        drawImage = ImageDraw.Draw(imageToEdit)
+        
+        drawImage.text((10, 345), imageString, fontColor, font = titleFont)
+        
+        imageToEdit.save(file)
+        
+    else:
+        cacheString = " _(cached image)_"
+    
+    await message.channel.send(content = "{}{}".format(message.author.mention, cacheString), file = discord.File(file))
+
 async def choose(botti, message, botData):
     """ 
     Für alle ausführbar
@@ -202,7 +229,6 @@ async def dontask(botti, message, botData):
     
     await modules.bottiHelper._sendEmbedPingAuthor(message, "", embed = data)
     
-
 async def flip(botti, message, botData):
     """ 
     Für alle ausführbar
