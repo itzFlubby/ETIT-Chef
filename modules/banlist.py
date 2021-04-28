@@ -34,9 +34,9 @@ async def botunban(botti, message, botData):
     """
     Reserviert für Entwickler
     Dieser Befehl entbannt einen Nutzer von der Nutzung des Bots.
-    !botban {@USER}
+    !botunban {@USER}
     {@user} Nutzer-Erwähnung
-    !botban @ETIT-Chef
+    !botunban @ETIT-Chef
     """
     try:
         user = message.mentions[0]
