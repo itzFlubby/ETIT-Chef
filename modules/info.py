@@ -77,6 +77,11 @@ async def channelinfo(botti, message, botData):
     await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
 
 async def listroles(botti, message, botData):
+    """ 
+    Für alle ausführbar
+    Dieser Befehl listet Rollen mit ihrer Mitgliederzahl auf.
+    !listroles
+    """
                           # MATH                 ELEK      INFO    TM
     includeRoleColors = [ 0x00b0f0, 0x3ed5e3, 0xffc000, 0x92d050, 0xe67e22 ]
     includeRoleNames = [ "Bachelor", "Master" ]
