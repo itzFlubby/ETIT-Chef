@@ -135,57 +135,41 @@ async def mensa(botti, message, botData):
             data.set_thumbnail(url = botti.user.avatar_url)
             data.set_footer(text = "Stand: {0}".format(modules.bottiHelper._getTimestamp()))
             
-            counter = 0
-            for foodLine in foodLines[requestedMensa]: 
-                foodLineName = foodLineNames[requestedMensa][counter]
+            for run, foodLine in enumerate(foodLines[requestedMensa]):
+                foodLineName = foodLineNames[requestedMensa][run]
                 mealValues = ""
-                try:
-                    for i in range(len(jsonData[mensaOptions[requestedMensa]][key][foodLine])):
-                        try:
-                            noData = jsonData[mensaOptions[requestedMensa]][key][foodLine][i]["nodata"]
-                            if noData == True:
-                                mealValues = "__Leider gibt es für diesen Tag hier keine Informationen!__"
-                                break
-                        except:
-                            pass
-                    
-                        meal = jsonData[mensaOptions[requestedMensa]][key][foodLine][i]["meal"]
-                        price = " (" + format(jsonData[mensaOptions[requestedMensa]][key][foodLine][i]["price_1"], ".2f") + "€)"
-                        if price == " (0.00€)":
-                            price = ""
-                        meal = "__" + meal + price + "__\n"
+                for foodLineData in jsonData[mensaOptions[requestedMensa]][key][foodLine]:
+                    if ("nodata" in foodLineData) and foodLineData["nodata"]:
+                        mealValues = "__Leider gibt es für diesen Tag hier keine Informationen!__"
                         
-                        dish = jsonData[mensaOptions[requestedMensa]][key][foodLine][i]["dish"]
-                        if dish != "" and dish != ".":
-                            mealValues = mealValues + meal + dish + "\n"
-                        else:
-                            mealValues = mealValues + meal
-
-                        additions = len(jsonData[mensaOptions[requestedMensa]][key][foodLine][i]["add"])
-                        if additions > 1:
-                            additionString = "["
-                            for j in range(additions):
-                                additionString = additionString + jsonData[mensaOptions[requestedMensa]][key][foodLine][i]["add"][j] + ", "
-                                
-                            additionString = additionString[:-2] + "]"
-                            
-                            mealValues = mealValues + "_Zusatz: " + additionString + "_"
-                        else:
-                            mealValues = mealValues + "_Keine Zusätze_ "
-                            
-                        foodContainsStrings = [ "bio", "fish", "pork", "pork_aw", "cow", "cow_aw", "vegan", "veg", "mensa_vit" ]
-                        foodContainsEmojis = [ ":earth_africa:", ":fish:", ":pig2:", ":pig:", ":cow2:", ":cow:", ":broccoli:", ":salad:", "Mensa Vital" ]
-                        
-                        for j in range(len(foodContainsStrings)):
-                            if jsonData[mensaOptions[requestedMensa]][key][foodLine][i][foodContainsStrings[j]] == True:
-                                mealValues = mealValues + " " + foodContainsEmojis[j]
-                                
-                        mealValues = mealValues + "\n\n"    
-                    counter = counter + 1
+                    price = " ({price:.2f}€)".format(price = foodLineData["price_1"]) if not (foodLineData["price_1"] == 0) else ""
+                    meal = "__{meal} {price}__\n".format(meal = foodLineData["meal"], price = price)
                     
-                    data.add_field(name = "⠀\n:arrow_forward: " + foodLineName + " :arrow_backward:", value = mealValues + "\n", inline = False)
-                except KeyError:
-                    counter = counter + 1
+                    dish = foodLineData["dish"]
+                    mealValues += "{meal}{dish}\n".format(meal = meal, dish = dish) if not (dish in [ "", "." ]) else meal
+    
+                    allAdditions = ", ".join(addition for addition in foodLineData["add"])
+                    
+                    mealValues += "_Zusatz: [{additions}]_".format(additions = allAdditions) if not (allAdditions == "") else "_Keine Zusätze_"
+                        
+                    foodContainsStringToEmoji = {
+                        "bio": ":earth_africa:",
+                        "fish": ":fish:", 
+                        "pork": ":pig2:", 
+                        "pork_aw": ":pig:", 
+                        "cow": ":cow2:",
+                        "cow_aw": ":cow:",
+                        "vegan": ":broccoli:",
+                        "veg": ":salad:",
+                        "mensa_vit": "Mensa Vital" 
+                    }
+                    
+                    for foodContainsKey in foodContainsStringToEmoji.keys():
+                        if foodLineData[foodContainsKey]:
+                            mealValues += " " + foodContainsStringToEmoji[foodContainsKey]
+                 
+                    mealValues += "\n\n"
+                data.add_field(name = "⠀\n:arrow_forward:{}:arrow_backward:".format(foodLineName), value = mealValues + "\n", inline = False)
             break
 
     await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
