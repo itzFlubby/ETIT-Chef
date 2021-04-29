@@ -7,6 +7,16 @@ import modules.data.ids as ids
 import requests
 import time
 
+class FoodLine():
+    def __init__(self, pName, pValue):
+        self.name = pName
+        self.value = pValue
+
+class Weekday():
+    def __init__(self, pName, pIndex):
+        self.name = pName
+        self.index = pIndex
+
 async def _updateJson(botData):
     response = requests.get(url = botData.mensaURL, auth = requests.auth.HTTPBasicAuth(botData.mensaUsername, botData.mensaUserpassword))
     
@@ -45,147 +55,149 @@ async def mensa(botti, message, botData):
     """
     with open(botData.modulesDirectory + "/data/mensa/mensaData.txt", "r") as outfile:
         jsonData = json.loads(outfile.read())
+            
+    weekdayOptions = {
+        "mo": Weekday("Montag", 0),
+        "di": Weekday("Dienstag", 1),
+        "mi": Weekday("Mittwoch", 2),
+        "do": Weekday("Donnerstag", 3),
+        "fr": Weekday("Freitag", 4),
+        "sa": Weekday("Samstag", 5),
+        "so": Weekday("Sonntag", 6)
+    }
+
+    currentWeekday = datetime.datetime.now().weekday()
+    requestedWeekday = None
+    requestedWeekdayIndex = None
+
+    mensaOptions = {
+        "adenauerring": {
+            "name": "Am Adenauerring",
+            "foodLines": [
+                FoodLine("l1", "Linie 1"),
+                FoodLine("l2", "Linie 2"),
+                FoodLine("aktion", "[Kœri]werk 11-14 Uhr"),
+                FoodLine("pizza", "[pizza]werk")
+            ]
+        },
+        "erzberger": {
+            "name": "Erzbergstraße",
+            "foodLines": [
+                FoodLine("wahl1", "Wahlessen 1"),
+                FoodLine("wahl2", "Wahlessen 2"),
+                FoodLine("wahl3", "Wahlessen 3")
+            ]
+        },
+        "gottesaue": {
+            "name": "Schloss Gottesaue",
+            "foodLines": [
+                FoodLine("wahl1", "Wahlessen 1"),
+                FoodLine("wahl2", "Wahlessen 2"),
+            ]
+        },
+        "tiefenbronner": {
+            "name": "Tiefbronner Straße",
+            "foodLines": [
+                FoodLine("wahl1", "Wahlessen 1"),
+                FoodLine("wahl2", "Wahlessen 2"),
+                FoodLine("gut", "Gut & Günstig"),
+                FoodLine("buffet", "Buffet"),
+                FoodLine("curryqueen", "[Kœri]werk")
+            ]
+        },
+        "x1moltkestrasse": {
+            "name": "Caféteria Moltkestraße 30",
+            "foodLines": [
+                FoodLine("gut", "Gut & Günstig"),
+            ]
+        }
+    }
+    
+    requestedMensa = "adenauerring" # default
+    
+    params = [str.lower() for str in message.content.split(" ")]
+    
+    for weekday in weekdayOptions.keys():
+        if weekday in params:
+            requestedWeekday = weekday
+            requestedWeekdayIndex = weekdayOptions[weekday].index
+            if requestedWeekdayIndex > weekdayOptions["fr"].index:
+                await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "mensa"))      
+                return
+        
+    for mensa in mensaOptions.keys():
+        if mensa in params:
+            requestedMensa = mensa
+    
+
+    if requestedWeekday == None:
+        modifyDate = 1 if (datetime.datetime.now().hour >= 15) else 0
+        for weekday in weekdayOptions.keys():
+            if weekdayOptions[weekday].index == (currentWeekday + modifyDate):
+                requestedWeekday = weekday
+                requestedWeekdayIndex = (currentWeekday + modifyDate)
+                requestedDifference = modifyDate
+    else:
+        if (requestedWeekdayIndex - currentWeekday) <= 0:
+            requestedDifference = len(weekdayOptions.keys()) - currentWeekday + requestedWeekdayIndex
+        else:
+            requestedDifference = requestedWeekdayIndex - currentWeekday
         
     currentDate = int(time.time())
-    lastDate = int(list(jsonData["adenauerring"].keys())[-1])
+    lastDate = int(list(jsonData[requestedMensa].keys())[-1])
     
     if (currentDate + (7 * 86400)) > lastDate: # 7 * 86400 : number of seconds in one week
         await modules.bottiHelper._sendMessage(message, ":fork_knife_plate: Aktualisiere JSON... Dies dauert ein paar Sekunden...\n")
         await _updateJson(botData)
         await asyncio.sleep(5)
     
-    weekdayOptions = [ "mo", "di", "mi", "do", "fr", "sa", "so" ]
-    weekdayNames = [ "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" ]
-    
-    requestedWeekday = -1
-    
-    mensaOptions = [ "adenauerring", "erzberger", "gottesaue", "tiefenbronner", "x1moltkestrasse" ]
-    mensaNames = [ "Am Adenauerring", "Erzbergstraße", "Schloss Gottesaue", "Tiefbronner Straße", "Caféteria Moltkestraße 30" ]
-    
-    requestedMensa = -1
-    
-    try:
-        if message.content.split(" ")[1].lower() in weekdayOptions or message.content.split(" ")[1].lower() in mensaOptions:
-            for i in range(len(weekdayOptions)): #Wochentag
-                if message.content.split(" ")[1].lower() == weekdayOptions[i]:
-                    requestedWeekday = i
-            for i in range(len(mensaOptions)): #Mensa       
-                if message.content.split(" ")[1].lower() == mensaOptions[i]:
-                    requestedMensa = i
-                    
-            if requestedWeekday != -1:
-                for i in range(len(mensaOptions)):      
-                    if message.content.split(" ")[2].lower() == mensaOptions[i]:
-                        requestedMensa = i   
-            
-            if requestedMensa != -1:
-                for i in range(len(mensaOptions)):      
-                    if message.content.split(" ")[2].lower() == weekdayOptions[i]:
-                        requestedWeekday = i       
-    except: 
-        pass
-    
-    
-    currentWeekday = datetime.datetime.now().weekday()
-    
-    if datetime.datetime.now().hour >= 15 and requestedWeekday == -1:
-        requestedWeekday = currentWeekday + 1   
-
-    if requestedWeekday > 4:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "mensa"))      
-        return
-    
-    if requestedWeekday != - 1:
-        if (requestedWeekday - currentWeekday) <= 0:
-            requestedDifference = len(weekdayNames) - currentWeekday + requestedWeekday
-        else:
-            requestedDifference = requestedWeekday - currentWeekday
-    else:
-        requestedWeekday = currentWeekday
-        requestedDifference = 0
-        
-    if requestedMensa == -1:    
-        requestedMensa = 0
-    
-    foodLines = [ 
-    [ "l1", "l2", "aktion", "pizza" ], 
-    [ "wahl1", "wahl2", "wahl3" ], 
-    [ "wahl1", "wahl2" ], 
-    [ "wahl1", "wahl2", "gut", "buffet", "curryqueen" ], 
-    [ "gut" ], 
-    ]
-
-    foodLineNames = [ 
-    [ "Linie 1", "Linie 2", "[Kœri]werk 11-14 Uhr", "[pizza]werk" ],
-    [ "Wahlessen 1", "Wahlessen 2", "Wahlessen 3" ], 
-    [ "Wahlessen 1", "Wahlessen 2" ], 
-    [ "Wahlessen 1", "Wahlessen 2", "Gut & Günstig", "Buffet", "[Kœri]werk" ], 
-    [ "Gut & Günstig" ], 
-    ]            
-    
-    for key in jsonData["adenauerring"].keys():
-        if int(key) > currentDate - 86400 + (86400 * requestedDifference): # 86400 number of seconds in one day
+    for timestamp in jsonData[requestedMensa].keys():
+        if int(timestamp) > currentDate - 86400 + (86400 * requestedDifference): # 86400 number of seconds in one day
             data = discord.Embed(
-                title = "Mensa " + mensaNames[requestedMensa],
+                title = "Mensa " + mensaOptions[requestedMensa]["name"],
                 color = 0xfad51b,
-                description = "{}, den {}".format(weekdayNames[requestedWeekday], datetime.datetime.fromtimestamp(int(key)).strftime('%d.%m.%Y'))
+                description = "{}, den {}".format(weekdayOptions[requestedWeekday].name, datetime.datetime.fromtimestamp(int(timestamp)).strftime('%d.%m.%Y'))
             )
             
             data.set_author(name = "🍽️ Mensa-Speiseplan")
             data.set_thumbnail(url = botti.user.avatar_url)
             data.set_footer(text = "Stand: {0}".format(modules.bottiHelper._getTimestamp()))
             
-            counter = 0
-            for foodLine in foodLines[requestedMensa]: 
-                foodLineName = foodLineNames[requestedMensa][counter]
+            for foodLine in mensaOptions[requestedMensa]["foodLines"]:
                 mealValues = ""
-                try:
-                    for i in range(len(jsonData[mensaOptions[requestedMensa]][key][foodLine])):
-                        try:
-                            noData = jsonData[mensaOptions[requestedMensa]][key][foodLine][i]["nodata"]
-                            if noData == True:
-                                mealValues = "__Leider gibt es für diesen Tag hier keine Informationen!__"
-                                break
-                        except:
-                            pass
-                    
-                        meal = jsonData[mensaOptions[requestedMensa]][key][foodLine][i]["meal"]
-                        price = " (" + format(jsonData[mensaOptions[requestedMensa]][key][foodLine][i]["price_1"], ".2f") + "€)"
-                        if price == " (0.00€)":
-                            price = ""
-                        meal = "__" + meal + price + "__\n"
+                for foodLineData in jsonData[requestedMensa][timestamp][foodLine.name]:
+                    if ("nodata" in foodLineData) and foodLineData["nodata"]:
+                        mealValues = "__Leider gibt es für diesen Tag hier keine Informationen!__"
+                        break
                         
-                        dish = jsonData[mensaOptions[requestedMensa]][key][foodLine][i]["dish"]
-                        if dish != "" and dish != ".":
-                            mealValues = mealValues + meal + dish + "\n"
-                        else:
-                            mealValues = mealValues + meal
-
-                        additions = len(jsonData[mensaOptions[requestedMensa]][key][foodLine][i]["add"])
-                        if additions > 1:
-                            additionString = "["
-                            for j in range(additions):
-                                additionString = additionString + jsonData[mensaOptions[requestedMensa]][key][foodLine][i]["add"][j] + ", "
-                                
-                            additionString = additionString[:-2] + "]"
-                            
-                            mealValues = mealValues + "_Zusatz: " + additionString + "_"
-                        else:
-                            mealValues = mealValues + "_Keine Zusätze_ "
-                            
-                        foodContainsStrings = [ "bio", "fish", "pork", "pork_aw", "cow", "cow_aw", "vegan", "veg", "mensa_vit" ]
-                        foodContainsEmojis = [ ":earth_africa:", ":fish:", ":pig2:", ":pig:", ":cow2:", ":cow:", ":broccoli:", ":salad:", "Mensa Vital" ]
-                        
-                        for j in range(len(foodContainsStrings)):
-                            if jsonData[mensaOptions[requestedMensa]][key][foodLine][i][foodContainsStrings[j]] == True:
-                                mealValues = mealValues + " " + foodContainsEmojis[j]
-                                
-                        mealValues = mealValues + "\n\n"    
-                    counter = counter + 1
+                    price = " ({price:.2f}€)".format(price = foodLineData["price_1"]) if not (foodLineData["price_1"] == 0) else ""
+                    meal = "__{meal} {price}__\n".format(meal = foodLineData["meal"], price = price)
                     
-                    data.add_field(name = "⠀\n:arrow_forward: " + foodLineName + " :arrow_backward:", value = mealValues + "\n", inline = False)
-                except KeyError:
-                    counter = counter + 1
+                    dish = foodLineData["dish"]
+                    mealValues += "{meal}{dish}\n".format(meal = meal, dish = dish) if not (dish in [ "", "." ]) else meal
+    
+                    allAdditions = ", ".join(addition for addition in foodLineData["add"])
+                    
+                    mealValues += "_Zusatz: [{additions}]_".format(additions = allAdditions) if not (allAdditions == "") else "_Keine Zusätze_"
+                        
+                    foodContainsStringToEmoji = {
+                        "bio": ":earth_africa:",
+                        "fish": ":fish:", 
+                        "pork": ":pig2:", 
+                        "pork_aw": ":pig:", 
+                        "cow": ":cow2:",
+                        "cow_aw": ":cow:",
+                        "vegan": ":broccoli:",
+                        "veg": ":salad:",
+                        "mensa_vit": "Mensa Vital" 
+                    }
+                    
+                    for foodContainsKey in foodContainsStringToEmoji.keys():
+                        if foodLineData[foodContainsKey]:
+                            mealValues += " " + foodContainsStringToEmoji[foodContainsKey]
+                 
+                    mealValues += "\n\n"
+                data.add_field(name = "⠀\n:arrow_forward: {} :arrow_backward:".format(foodLine.value), value = mealValues + "\n", inline = False)
             break
 
     await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
