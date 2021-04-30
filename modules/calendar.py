@@ -25,7 +25,30 @@ def _compareDate(first, second):
         return 2
         
     return 0
-
+    
+def _dateNotExcluded(component, startDate, checkRange):
+    appendDate = True
+    if "exdate" in component:
+        if hasattr(component.decoded("exdate"), "dts"):
+            for vDDDType in component.decoded("exdate").dts:
+                if (vDDDType.dt - startDate).days in checkRange:
+                    appendDate = False
+                    break
+        else:   
+            for exdate in component.decoded("exdate"):
+                for vDDDType in exdate.dts:
+                    if (vDDDType.dt.date() - startDate.date()).days in checkRange:
+                        appendDate = False
+                        break
+    return appendDate
+        
+def _extractLink(component):
+    description = component.decoded("description").decode("utf-8")
+    if "</a>" in description:
+        return description.split("\"")[1]
+    else:
+        return description
+        
 def _getCourseAndSemester(message):
     buildInfo = ""
     if "ETIT" in message.channel.category.name:
@@ -55,6 +78,11 @@ def _getTimeInCorrectTimezone(component):
    
 def _getUTCOffset():
     return int(datetime.datetime.now(tzlocal()).utcoffset().seconds / 3600)
+
+def _hasLinkEmbedded(component):
+    if "description" in component:
+        return "zoom" in component.decoded("description").decode("utf-8").lower()
+    return False
 
 def _retrieveExams(botData, message, content):
     calendar = Calendar.from_ical(content)
@@ -101,6 +129,22 @@ def _shortenSummary(summary):
         "Informationstechnik": {
             "emoji": ":computer:",
             "value": "IT"
+        },
+        "Optik und Festkörperelektronik": {
+            "emoji": ":eyes:",
+            "value": "OFE"
+        },
+        "Grundlagen der Hochfrequenztechnik": {
+            "emoji": ":satellite:",
+            "value": "GHF"
+        },
+        "MKL": {
+            "emoji": ":gear:",
+            "value": "MKL"
+        },
+        "TM": {
+            "emoji": ":wrench:",
+            "value": "TM"
         }
     }
     
@@ -159,6 +203,7 @@ async def updatecalendar(botti, message, botData):
     """
     
     courseAndSemester = _getCourseAndSemester(message)
+    
     if courseAndSemester == None:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Dein Semester und Studiengang wurde nicht erkannt. Verwende den Befehl in einem Text-Kanal von deinem Semester!")    
         return
@@ -191,6 +236,7 @@ async def wochenplan(botti, message, botData):
             return         
     
     courseAndSemester = _getCourseAndSemester(message)
+    
     if courseAndSemester == None:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Dein Semester und Studiengang wurde nicht erkannt. Verwende den Befehl in einem Text-Kanal von deinem Semester!")    
         return
@@ -210,6 +256,9 @@ async def wochenplan(botti, message, botData):
         if component.name == "VEVENT":
             summary = _shortenSummary(component.decoded("summary").decode("utf-8"))
             dtstart, dtend = _getTimeInCorrectTimezone(component)
+            
+            if _hasLinkEmbedded(component):
+                summary = "{summary} [[Zoom-Link]({link})]".format(summary = summary, link = _extractLink(component))
                 
             if not lastModified:
                 lastModified = component.decoded("last-modified")
@@ -231,49 +280,25 @@ async def wochenplan(botti, message, botData):
                 
                 if "INTERVAL" in rrule:
                     if (abs(startOfWeek.isocalendar()[1] - dtstart.isocalendar()[1]) % rrule["INTERVAL"][0]) is 0:
-                        _appendItem(weekdayItems, dtstart.weekday(), dtstart, dtend, summary)
+                        if _dateNotExcluded(component, startOfWeek, range(0, 7)):
+                            _appendItem(weekdayItems, dtstart.weekday(), dtstart, dtend, summary)
                     continue
                     
                 if "BYDAY" in rrule:
                     if len(rrule["BYDAY"]) > 1:
-                        for i in range(len(rrule["BYDAY"])):
+                        for byday in rrule["BYDAY"]:
                             appendDate = True
                             weekdayIndex = { "MO": 0, "TU": 1, "WE": 2, "TH": 3, "FR": 4, "SA": 5, "SU": 6 }
-                            indexDay = weekdayIndex[rrule["BYDAY"][i]]
+                            indexDay = weekdayIndex[byday]
                             datetimeDay = startOfWeek + datetime.timedelta(days = indexDay)
-                            if "exdate" in component:
-                                if hasattr(component.decoded("exdate"), "dts"):
-                                    for vDDDType in component.decoded("exdate").dts:
-                                        if (vDDDType.dt - datetimeDay).days is 0:
-                                            appendDate = False
-                                            break
-                                else:   
-                                    for exdate in component.decoded("exdate"):
-                                        for vDDDType in exdate.dts:
-                                            if (vDDDType.dt.date() - datetimeDay.date()).days is 0:
-                                                appendDate = False
-                                                break
 
-                            if appendDate:
+                            if _dateNotExcluded(component, datetimeDay, range(0, 1)):
                                 if (datetimeDay - dtend).days >= -1:
                                     _appendItem(weekdayItems, indexDay, dtstart, dtend, summary)
                             continue
                         
                 if "exdate" in component:
-                    returnToMainloop = False
-                    if hasattr(component.decoded("exdate"), "dts"):
-                        for vDDDType in component.decoded("exdate").dts:
-                            if (vDDDType.dt - startOfWeek).days < 7: # < 7 : If event is in this week (7 days in week)
-                                returnToMainloop = True
-                                break
-                    else:   
-                        for exdate in component.decoded("exdate"):
-                            for vDDDType in exdate.dts:
-                                if (vDDDType.dt - startOfWeek).days < 7: # < 7 : If event is in this week (7 days in week)
-                                    returnToMainloop = True
-                                    break
-                    
-                    if not returnToMainloop:
+                    if _dateNotExcluded(component, startOfWeek, range(0, 7)): # range(0, 7) : If event is in this week (7 days in week)
                         _appendItem(weekdayItems, dtstart.weekday(), dtstart, dtend, summary)
                     continue
                     
