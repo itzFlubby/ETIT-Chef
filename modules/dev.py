@@ -89,9 +89,9 @@ async def devtest(botti, message, botData):
     !devtest {*ARGS}
     {*ARGS} *args
     !devtest
-    """
+    """ 
     pass
-
+                  
 async def give(botti, message, botData):
     """ 
     Reserviert für Entwickler 

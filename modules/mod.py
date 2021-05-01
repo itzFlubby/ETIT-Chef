@@ -71,7 +71,7 @@ async def debugger(botti, message, botData):
         if option == "add":
             await modules.bottiHelper._sendMessagePingAuthor(message, ":fly: {} ist bereits ein Debugger!".format(user.mention))
         else:
-            newUserRoles = modules.roles._removeRoles(user, [ ids.roleIDs.DEBUGGER ])
+            await user.remove_roles(debuggerRole, reason = "Set by {}#{}.".format(message.author.name, str(message.author.discriminator)))
             await modules.bottiHelper._sendMessagePingAuthor(message, ":fly: {} ist jetzt kein Debugger mehr!".format(user.mention))
     else:
         if option == "remove":
@@ -259,25 +259,26 @@ async def purge(botti, message, botData):
     """
     Reserviert für Moderator oder höher
     Dieser Befehl löscht Nachrichten.
-    !purge {ANZAHL} {OPTIONS}
-    {ANZAHL} Ganz positive Zahl <= 100
-    {OPTIONS} "-q"
-    !purge 100\r!purge 100 -q
+    !purge {OPTION} {PARAMS}
+    {OPTION} x in range(101), "until"
+    {PARAMS} <leer>, Message-ID
+    !purge 100\r!purge until 832059964651701097
     """
-    try:
-        if not str(message.content.split(" ")[1]).isdigit():
+    options = message.content.split(" ")
+    if len(options) == 2:
+        if (not options[1].isdigit()) or (int(options[1]) not in range(101)):
             await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "purge")) 
             return
-        if not 0 <= int(message.content.split(" ")[1]) <= 100:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Du musst eine Zahl zwischen einschließlich **0 und 100** wählen.")
-            return
         deleted = await message.channel.purge(limit = int(message.content.split(" ")[1]), check = None)
-        
-        parameters = modules.bottiHelper._getParametersFromMessage(message.content, 14)
-        
-        if "q" not in parameters:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":recycle: Es wurden **{0}** Nachrichten gelöscht.".format(len(deleted)))
-    except:
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":recycle: Es wurden **{0}** Nachrichten gelöscht.".format(len(deleted)))
+    elif len(options) == 3:
+        if (options[1] != "until") or (not options[2].isdigit()):
+            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "purge")) 
+            return
+        msg = await message.channel.fetch_message(int(options[2]))
+        deleted = await message.channel.purge(after = msg.created_at)
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":recycle: Es wurden **{0}** Nachrichten gelöscht.".format(len(deleted)))        
+    else:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "purge"))   
 
 async def purgemax(botti, message, botData):

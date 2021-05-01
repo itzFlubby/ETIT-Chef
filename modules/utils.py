@@ -228,7 +228,7 @@ async def dontask(botti, message, botData):
     data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
     
     await modules.bottiHelper._sendEmbedPingAuthor(message, "", embed = data)
-    
+ 
 async def flip(botti, message, botData):
     """ 
     Für alle ausführbar

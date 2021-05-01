@@ -17,7 +17,7 @@ async def on_member_join(member):
     data = discord.Embed(
         title = member.name + "#" + str(member.discriminator),
         color = 0x00FF00,
-        description = "<@!" + str(member.id) + "> ist dem Server beigetreten!"
+        description = "<@" + str(member.id) + "> ist dem Server beigetreten!"
     )
     data.add_field(name = "Server beigetreten am", value = modules.bottiHelper._toUTCTimestamp(member.joined_at), inline = False)
     data.add_field(name = "Account erstellt am", value = modules.bottiHelper._toUTCTimestamp(member.created_at), inline = False)
@@ -47,8 +47,9 @@ async def on_member_remove(member):
     data.set_thumbnail(url = member.avatar_url)
     data.set_footer(text = "Stand: {0}".format(modules.bottiHelper._getTimestamp()))
     
-    await channel.send(embed = data)
-
+    botMessage = await channel.send(embed = data)
+    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.PAYRESPECT))
+    
 @botti.event
 async def on_raw_reaction_remove(payload):
     guild = botti.get_guild(ids.serverIDs.ETIT_KIT)
