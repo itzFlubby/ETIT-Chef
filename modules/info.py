@@ -5,8 +5,84 @@ import modules.data.ids as ids
 import os
 import platform
 import psutil
+import requests
 
 from mcstatus import MinecraftServer
+
+def _format(content, botData, embed):
+    replacementDict = {
+        "<p>":      "",
+        "</p>":     "",
+        "<strong>": "**",
+        "</strong>":"**",
+        "<em>":     "_",
+        "</em>":    "_",
+        "<div>":    "",
+        "</div>":   "",
+        "&nbsp;":   ""
+    }
+    
+    for key in replacementDict.keys():
+        content = content.replace(key, replacementDict[key])
+        
+    if "<img" in content:
+        urlStart = content[(content.find("src=\"") + 6):] # 6 = len("src=\"")
+        url = urlStart[:urlStart.find("\"")]
+        
+        content = content[:content.find("<img")] + content[(content.find("/>") + 2):]
+    
+        embed.set_image(url = (botData.fachschaftURL + url))
+    
+    while (content.find("<") != -1) and (content.find(">") != -1):
+        print(content)
+        print("\n")
+        content = content[:content.find("<")] + content[(content.find(">") + 1):]
+        print(content)
+        print("\n\n\n\n\n")
+    
+    return content[:(1012-len(botData.fachschaftURL))] # 1012 = 1024 - len(" [...mehr]()") | 1024 = max embed value length
+
+def _getContent(content, botData):
+    stringIndex = content.find("spField") + 9 # 9 = len("spField'>")
+    content = content[stringIndex:]
+    return content[:content.find("</div>")]
+
+def _getLastEdited(content):
+    stringIndex = content.find("spEntriesListTitleTag") + 32 # 32 = len("spEntriesListTitleTag>          ")
+    return content[stringIndex:stringIndex + 30] # 30 = len("Zuletzt bearbeitet: DD.MM.YYYY")
+
+def _getTitle(content, botData):
+    stringIndex = content.find("spEntriesListTitle") + 30 # 30 = len("spEntriesListTitle> <a href='/")
+    tagInfo = content[stringIndex:]
+    url = tagInfo[:tagInfo.find("\"")]
+    title = tagInfo[(len(url) + 2):tagInfo.find("</a>")] # 2 = len("'>")
+    
+    return "[{title}]({baseURL}{url})".format(title = title, url = url, baseURL = botData.fachschaftURL)
+
+async def _printNews(message, botData, post):
+    data = discord.Embed(
+        title = "",
+        description = "",
+        color = 0xeeeeee,
+        
+    )
+    websiteContent = requests.get(botData.fachschaftURL).text
+    
+    news = websiteContent.split("<div class=\"spEntriesListContainer\">")[1].split("<div style=\"clear:both;\">")[post]
+    
+    title = _getTitle(news, botData)        
+    data.title = title[1:].split("]")[0]
+    data.url = title.split("](")[1][:-1]
+    
+    content = _format(_getContent(news, botData), botData, data)
+    data.add_field(name = "Neues aus der Fachschaft", value = content + " [...mehr]({})".format(botData.fachschaftURL))
+    
+    data.set_thumbnail(url = botData.fachschaftURL + "templates/joomlakit/images/britzel-white.png")
+    
+    lastEdited = _getLastEdited(news)
+    data.set_footer(text = "{}".format(lastEdited))
+    
+    await modules.bottiHelper._sendEmbedPingAuthor(message, "", data)
 
 async def botinfo(botti, message, botData):
     """ 
@@ -75,6 +151,60 @@ async def channelinfo(botti, message, botData):
     data.set_footer(text = "ID: {0}\nStand: {1}".format(str(channelToGetInfo.id), modules.bottiHelper._getTimestamp()))
     
     await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+
+async def fachschaft(botti, message, botData):
+    """ 
+    Für alle ausführbar
+    Dieser Befehl zeigt Info über die Fachschaft an.
+    !fachschaft {OPTION} {PARAMS}
+    {OPTION} "news", "link", "sitzung"
+    {PARAMS} <leer>, Newspost in range(7)
+    !fachschaft news\r!fachschaft news 1
+    """
+    options = message.content.split(" ")
+    if len(options) == 2:
+        if options[1].lower() == "news":
+            await _printNews(message, botData, 0) # 0 : latest post
+        elif options[1].lower() == "link":
+            data = discord.Embed(
+                title = "Fachschaft ETEC",
+                color = 0x009AFF,
+                description = "",
+                url = botData.fachschaftURL
+            )
+            
+            data.set_author(name = "🌐 Shortcut Link")   
+            data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
+            data.set_thumbnail(url = botData.fachschaftURL + "templates/joomlakit/images/britzel-white.png")
+            await modules.bottiHelper._sendEmbedPingAuthor(message, "", embed = data)
+            
+        elif options[1].lower() == "sitzung":
+            data = discord.Embed(
+                title = "Fachschafts-Sitzung ETEC",
+                color = 0x009AFF,
+                description = "",
+                url = botData.fachschaftSitzungURL
+            )
+            
+            data.set_author(name = "🌐 Shortcut Link")   
+            data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
+            data.set_thumbnail(url = botData.fachschaftURL + "templates/joomlakit/images/britzel-white.png")
+            await modules.bottiHelper._sendEmbedPingAuthor(message, "", embed = data)
+        else:
+            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "fachschaft"))
+
+    elif len(options) == 3:
+        if options[1].lower() == "news":
+            if not (options[2].isdigit()) or int(options[2]) > 7:
+                await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "fachschaft"))
+                return
+                
+            await _printNews(message, botData, int(options[2]))
+        else:
+            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "fachschaft"))
+
+    else:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "fachschaft"))
 
 async def listroles(botti, message, botData):
     """ 
