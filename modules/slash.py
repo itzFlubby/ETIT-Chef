@@ -59,7 +59,7 @@ async def _klausuren(ctx: SlashContext):
     await modules.bottiHelper._logSlashCommand(ctx, botData)
     msg = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, "")
     await ctx.send(content = "Slash-Command: Klausuren")   
-    await modules.utils.klausuren(botti, msg, botData)    
+    await modules.calendar.klausuren(botti, msg, botData)    
 
 @slash.subcommand(base="lerngruppe", name="add", description="Fügt einen Nutzer einer Lerngruppe hinzu.", guild_ids = [ ids.serverIDs.ETIT_KIT ], 
     options = [ 
