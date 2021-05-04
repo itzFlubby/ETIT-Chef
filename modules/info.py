@@ -547,3 +547,34 @@ async def voiceinfo(botti, message, botData):
     data.set_footer(text = "ID: {0}\nStand: {1}".format(str(voiceClient.channel.id), modules.bottiHelper._getTimestamp()))
     
     await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    
+async def zitate(botti, message, botData):
+    """ 
+    Für alle ausführbar
+    Dieser Befehl zeigt die beliebtesten Zitate an.
+    !zitate
+    """
+    citationRanking = []
+    channel = message.guild.get_channel(ids.channelIDs.ZITATE)
+    messages = await channel.history(limit=200).flatten()
+    for cite in messages:
+        if len(cite.reactions) > 0:
+            highestReaction = sorted(cite.reactions, key = lambda reaction: reaction.count, reverse = True)[0]
+            citationRanking.append([cite, highestReaction])
+            
+    citationRanking = sorted(citationRanking, key = lambda citation: citation[1].count, reverse = True)
+
+    data = discord.Embed(
+        title = "",
+        color = 0x005dff,
+        description = ""
+    )
+    
+    for run, citation in enumerate(citationRanking[:10]):
+        data.add_field(name = "Platz #{place}".format(place = (run+1)), value = "Festgehalten von {citation.author.mention} | {reaction.count} {reaction.emoji}\n{citation.content}".format(citation = citation[0], reaction = citation[1]), inline = False)
+
+    data.set_author(name = "💬 Zitate-Ranking")
+    data.set_thumbnail(url = message.guild.icon_url)
+    data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
+    
+    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
