@@ -418,7 +418,7 @@ async def thisisfine(botti, message, botData):
     shadowcolor = "black"    
     fontColor = (255, 255, 255)    
     cacheString = ""
-    if exists(file) == False:
+    if not exists(file):
         if not isGIFResquested:
             drawImage = ImageDraw.Draw(imageToEdit)
             x = 5
