@@ -130,6 +130,59 @@ async def _vorschlag(ctx: SlashContext, nachricht):
 
     await ctx.send(content = ":bookmark_tabs: Deine Nachricht wurde erfolgreich zugestellt!", hidden = True) 
 
+@slash.slash(name="mensa", description="Zeigt den Speiseplan an.", options = [ manage_commands.create_option(
+    name = "mensa",
+    description = "Optional kannst du hier eine Mensa auswählen. Standard: Mensa am Adenauerring.",
+    option_type = 3,
+    choices = [ {
+            "name": "Am Adenauerring", 
+            "value": "adenauerring"
+        }, {
+            "name": "Erzbergstraße", 
+            "value": "erzberger"
+        }, {
+            "name": "Schloss Gottesaue", 
+            "value": "gottesaue"
+        }, {
+            "name": "Tiefbronner Straße", 
+            "value": "tiefenbronner"
+        }, {
+            "name": "Caféteria Moltkestraße 30",
+            "value": "x1moltkestrasse"
+    } ],
+    required = False ),
+    manage_commands.create_option(
+    name = "wochentag",
+    description = "Optional kannst du hier den gewünschten Wochentag angeben. Standard: Morgen.",
+    option_type = 3,
+    choices = [ {
+            "name": "Montag", 
+            "value": "mo"
+        }, {
+            "name": "Dienstag", 
+            "value": "di"
+        }, {
+            "name": "Mittwoch", 
+            "value": "mi"
+        }, {
+            "name": "Donnerstag", 
+            "value": "do"
+        }, {
+            "name": "Freitag", 
+            "value": "fr"
+        } ],
+    required = False )])
+async def _mensa(ctx, mensa = "adenauerring", wochentag = "none"):
+    modules.bottiHelper._logSlashCommand(ctx, botData)
+    commandArgs = "!mensa " + mensa + " "
+    if wochentag != "none":
+        commandArgs = commandArgs + wochentag
+
+    msg = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, commandArgs)
+    await ctx.send(content = "Slash-Command: Mensa")
+    await modules.mensa.mensa(botti, msg, botData)
+
+
 
 @botti.event
 async def on_slash_command_error(ctx, ex):
