@@ -1,5 +1,7 @@
+import datetime
 import modules.bottiHelper
 import modules.data.ids as ids
+import modules.calendar
 import modules.info
 import modules.lerngruppe
 import modules.mensa
@@ -14,6 +16,21 @@ from discord_slash import SlashContext
 from discord_slash.utils import manage_commands
 
 from modules.data.botData import botData
+
+@slash.slash(name="wochenplan", description="Zeigt dir deinen personalisierten Wochenplan an.", guild_ids = [ ids.serverIDs.ETIT_KIT ], 
+    options = [ manage_commands.create_option(
+        name = "Datum",
+        description = "Optionales Datum im Format TT.MM.JJJJ",
+        option_type = 3,
+        required = False 
+    )])
+async def _wochenplan(ctx: SlashContext, date = ""):
+    await modules.bottiHelper._logSlashCommand(ctx, botData)
+    date = date if date != "" else datetime.datetime.now().strftime("%d.%m.%Y")
+    dummyMessage = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, "{prefix}wochenplan {date} slash".format(prefix = botData.botPrefix, date = date))
+    embed = await modules.calendar.wochenplan(botti, dummyMessage, botData)
+    await ctx.send(content = "Slash-Command: Wochenplan")
+    await ctx.send(content = "{userMention} Dies ist dein **persönlicher** Wochenplan, basierend auf deinen Rollen!".format(userMention = ctx.author.mention), embed = embed, hidden = True)
 
 @slash.slash(name="convert", description="Konvertiert einen Inhalt.", guild_ids = [ ids.serverIDs.ETIT_KIT ], 
     options = [ manage_commands.create_option(
@@ -54,12 +71,13 @@ async def _convert(ctx, typ, inhalt):
     await ctx.send(content = "Slash-Command: Convert")
     await modules.utils.convert(botti, msg, botData)
 
-@slash.slash(name="klausuren", description="Zeigt die anstehenden Klausuren an.", guild_ids = [ ids.serverIDs.ETIT_KIT ])
+@slash.slash(name="klausuren", description="Zeigt dir personalisiert deine anstehenden Klausuren an.", guild_ids = [ ids.serverIDs.ETIT_KIT ])
 async def _klausuren(ctx: SlashContext):
     await modules.bottiHelper._logSlashCommand(ctx, botData)
-    msg = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, "")
+    dummyMessage = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, "{prefix}klausuren slash".format(prefix = botData.botPrefix))
+    examString = await modules.calendar.klausuren(botti, dummyMessage, botData)
     await ctx.send(content = "Slash-Command: Klausuren")   
-    await modules.calendar.klausuren(botti, msg, botData)    
+    await ctx.send(content = "Dies sind deine **persönlichen** Klausuren, basierend auf deinen Rollen! {authorMention}\n{examString}".format(examString = examString, authorMention = ctx.author.mention), hidden = True)    
 
 @slash.subcommand(base="lerngruppe", name="add", description="Fügt einen Nutzer einer Lerngruppe hinzu.", guild_ids = [ ids.serverIDs.ETIT_KIT ], 
     options = [ 

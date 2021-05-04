@@ -6,6 +6,7 @@ import requests
 
 from dateutil.tz import tzlocal
 from icalendar import Calendar, vDatetime
+from os.path import exists
 
 class Exam:
     def __init__(self, pName, pDate, pDuration, pLocation):
@@ -27,27 +28,29 @@ def _compareDate(first, second):
     return 0
     
 def _dateNotExcluded(component, startDate, checkRange):
-    appendDate = True
     if "exdate" in component:
         if hasattr(component.decoded("exdate"), "dts"):
             for vDDDType in component.decoded("exdate").dts:
                 if (vDDDType.dt - startDate).days in checkRange:
-                    appendDate = False
-                    break
+                    return False
         else:   
             for exdate in component.decoded("exdate"):
                 for vDDDType in exdate.dts:
                     if (vDDDType.dt.date() - startDate.date()).days in checkRange:
-                        appendDate = False
-                        break
-    return appendDate
+                        return False
+    return True
+
+def _displayToUser(userRoleNames, name):
+    if name not in userRoleNames:
+        return False
+
+    return True
         
 def _extractLink(component):
     description = component.decoded("description").decode("utf-8")
     if "</a>" in description:
         return description.split("\"")[1]
-    else:
-        return description
+    return description
         
 def _getCourseAndSemester(message):
     buildInfo = ""
@@ -84,9 +87,12 @@ def _hasLinkEmbedded(component):
         return "zoom" in component.decoded("description").decode("utf-8").lower()
     return False
 
-def _retrieveExams(botData, message, content):
+def _retrieveExams(botData, courseAndSemester):
+    content = ""
+    with open(botData.modulesDirectory + "data/calendar/" + courseAndSemester + ".ical", "r") as f:
+        content += f.read()
+        
     calendar = Calendar.from_ical(content)
-    courseAndSemester = _getCourseAndSemester(message)
     
     exams = []
     
@@ -98,7 +104,7 @@ def _retrieveExams(botData, message, content):
                 location = component.decoded("location").decode("utf-8")
                 location = "UNBEKANNT" if (location == "") else location
                     
-                exams.append(component.decoded("summary").decode("utf-8")[10:].replace(" ", "_") + dtstart.strftime(" %d %m %Y %H 0 \"" + location + "\"\n"))
+                exams.append(component.decoded("summary").decode("utf-8")[10:] + dtstart.strftime(",%d,%m,%Y,%H,0,\"" + location + "\"\n"))
                 
     with open(botData.modulesDirectory + "data/klausuren/" + courseAndSemester + ".txt", "w+") as f:
         for exam in exams:
@@ -138,13 +144,17 @@ def _shortenSummary(summary):
             "emoji": ":satellite:",
             "value": "GHF"
         },
-        "MKL": {
+        "Maschinenkonstruktionslehre": {
             "emoji": ":gear:",
             "value": "MKL"
         },
-        "TM": {
+        "Technische Mechanik": {
             "emoji": ":wrench:",
             "value": "TM"
+        },
+        "Elektroenergiesysteme": {
+            "emoji": ":battery:",
+            "value": "EES"
         }
     }
     
@@ -153,6 +163,22 @@ def _shortenSummary(summary):
             summary = "{emoji} {summary}".format(emoji = replacementDict[key]["emoji"], summary = summary.replace(key, replacementDict[key]["value"]))
     
     return summary
+
+def _updateAll(botData):
+    content = ""
+    for courseAndSemester in botData.calendarURLs.keys():
+        calendarFile = botData.modulesDirectory + "data/calendar/" + courseAndSemester + ".ical"
+        if exists(calendarFile):
+            
+            with open(calendarFile, "r") as f:
+                calendarContents = f.read()
+                content += calendarContents[calendarContents.find("BEGIN:VEVENT"):].split("END:VCALENDAR")[0]
+    
+    with open(botData.modulesDirectory + "data/calendar/scheme.txt", "r") as f:
+        scheme = f.read().split("#")
+    
+    with open(botData.modulesDirectory + "data/calendar/all.ical", "w+") as f:
+        f.write(scheme[0] + content.replace("\r", "") + scheme[1])               
 
 async def klausuren(botti, message, botData):
     """ 
@@ -163,56 +189,80 @@ async def klausuren(botti, message, botData):
     exams = []
     
     courseAndSemester = _getCourseAndSemester(message)
+    
+    if "slash" in message.content:
+        courseAndSemester = "all"
+        userRoleNames = [ role.name for role in message.author.roles ]
+        
     if courseAndSemester == None:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Dein Semester und Studiengang wurde nicht erkannt. Verwende den Befehl in einem Text-Kanal von deinem Semester!")    
         return
+    
+    umlautCharmap = { ord("ä"): "ae", ord("ü"): "ue", ord("ö"): "oe", ord("ß"): "ss" }
     
     with open(botData.modulesDirectory + "/data/klausuren/" + courseAndSemester + ".txt") as fp: 
         lines = fp.readlines() 
         for line in lines: 
             if "#" in line:
                 continue
-                
-            contents = line.split(" ")    
-            exams.append(Exam(  pName = contents[0], 
+            
+            contents = line.split(",")  
+            if "slash" in message.content:
+                if not _displayToUser(userRoleNames, contents[0]):
+                    continue
+              
+            exams.append(Exam(  pName = contents[0].translate(umlautCharmap), 
                                 pDate = datetime.datetime(int(contents[3]), int(contents[2]), int(contents[1]), int(contents[4])),
                                 pDuration = int(contents[5]),
                                 pLocation = line.split("\"")[1] 
-                              ))
+                            ))
     
-    examString = ":dizzy_face: Die anstehenden Klausuren sind\n"
+    if len(exams) == 0:
+        examString = "```Gerade sind keine anstehenden Klausuren vermerkt!```"
+    else:
+        now = datetime.datetime.now()
+        exams = sorted(exams, key = lambda exam: (exam.date - now).days)
+        
+        maxLength = len(max([exam.name for exam in exams], key = len))
+        
+        examString = ":dizzy_face: Die anstehenden Klausuren sind\n"
+        for exam in exams:
+            if (exam.date - now).days >= 0: # If Exam not in past
+                examString += "```ml\n" + exam.name
+                examString += " " * (maxLength - len(exam.name))
+                examString += " am {date} (in {days} Tagen!) 'Ort: \"{location}\"```".format(date = modules.bottiHelper._toGermanTimestamp(exam.date), days = str((exam.date - now).days).zfill(2), location = exam.location)
     
-    now = datetime.datetime.now()
-    
-    maxLength = len(max([exam.name for exam in exams], key = len))
-    
-    for exam in exams:
-        if (exam.date - now).days >= 0: # If Exam 
-            examString += "```ml\n" + exam.name 
-            for i in range(maxLength - len(exam.name)):
-                examString = examString + " " 
-            examString += " am {date} (in {days} Tagen!) 'Ort: \"{location}\"```".format(date = modules.bottiHelper._toGermanTimestamp(exam.date), days = str((exam.date - now).days).zfill(2), location = exam.location)
-         
-    await modules.bottiHelper._sendMessagePingAuthor(message, examString + "Jegliche Angaben ohne Gewähr.")
-    
+    examString += "Jegliche Angaben ohne Gewähr."   
+    if not "slash" in message.content:
+        await modules.bottiHelper._sendMessagePingAuthor(message, examString)
+    else:
+        return examString # Return examString to slash-command-handler to send hidden message
+        
 async def updatecalendar(botti, message, botData):
     """
     Für alle ausführbar
     Dieser Befehl aktualisiert den Kalender.
     !updatecalendar
     """
-    
     courseAndSemester = _getCourseAndSemester(message)
     
     if courseAndSemester == None:
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Dein Semester und Studiengang wurde nicht erkannt. Verwende den Befehl in einem Text-Kanal von deinem Semester!")    
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Semester und Studiengang wurde nicht erkannt. Verwende den Befehl in einem Text-Kanal von dem Semester, dessen Kalender aktualisiert werden soll!")    
         return
-        
+    
+    if botData.calendarURLs[courseAndSemester] == None:
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Für dieses Semester gibt es in diesem Studiengang noch kein Kalender!")    
+        return
+    
     request = requests.get(botData.calendarURLs[courseAndSemester])
     with open(botData.modulesDirectory + "data/calendar/" + courseAndSemester + ".ical", "w+") as f:
         f.write(request.text.replace("\r", ""))
         
-    _retrieveExams(botData, message, request.text)
+    
+    _retrieveExams(botData, courseAndSemester)
+    
+    _updateAll(botData)
+    _retrieveExams(botData, "all")
     
     await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Der Kalender für `{courseAndSemester}` wurde aktualisiert!".format(courseAndSemester = courseAndSemester))    
 
@@ -237,8 +287,12 @@ async def wochenplan(botti, message, botData):
     
     courseAndSemester = _getCourseAndSemester(message)
     
+    if "slash" in message.content:
+        courseAndSemester = "all"
+        userRoleNames = [ role.name for role in message.author.roles ]
+        
     if courseAndSemester == None:
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Dein Semester und Studiengang wurde nicht erkannt. Verwende den Befehl in einem Text-Kanal von deinem Semester!")    
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Dein Semester und Studiengang wurde nicht erkannt. Verwende den Befehl in einem Text-Kanal von deinem Semester, oder benutze `/wochenplan` um einen personalisierten Kalender zu erhalten!")    
         return
         
     content = ""
@@ -254,7 +308,14 @@ async def wochenplan(botti, message, botData):
     
     for component in calendar.walk():
         if component.name == "VEVENT":
-            summary = _shortenSummary(component.decoded("summary").decode("utf-8"))
+            decodedSummary = component.decoded("summary").decode("utf-8")
+            if "slash" in message.content:
+                try:    
+                    if not _displayToUser(userRoleNames, decodedSummary.split(" - ")[1].split(" (")[0]):
+                        continue
+                except: # If somebody fucked up naming-scheme
+                    continue
+            summary = _shortenSummary(decodedSummary)
             dtstart, dtend = _getTimeInCorrectTimezone(component)
             
             if _hasLinkEmbedded(component):
@@ -279,7 +340,7 @@ async def wochenplan(botti, message, botData):
                         continue
                 
                 if "INTERVAL" in rrule:
-                    if (abs(startOfWeek.isocalendar()[1] - dtstart.isocalendar()[1]) % rrule["INTERVAL"][0]) is 0:
+                    if (abs(startOfWeek.isocalendar()[1] - dtstart.isocalendar()[1]) % rrule["INTERVAL"][0]) is 0: # If interval event in this week
                         if _dateNotExcluded(component, startOfWeek, range(0, 7)):
                             _appendItem(weekdayItems, dtstart.weekday(), dtstart, dtend, summary)
                     continue
@@ -323,11 +384,16 @@ async def wochenplan(botti, message, botData):
         dayString = ""
         for entry in weekdayItems[i]:
             dayString += entry
-                
-        data.add_field(name = weekdayNames[i] + (startOfWeek + datetime.timedelta(days = i)).strftime(" `(%d.%m.%Y)`"), value = dayString if dayString is not "" else "-", inline = False)
+            
+        if not dayString:
+            continue
+        data.add_field(name = weekdayNames[i] + (startOfWeek + datetime.timedelta(days = i)).strftime(" `(%d.%m.%Y)`"), value = dayString[:1024], inline = False)
     
-    data.set_author(name = "🗓️ Wochenplan für " + courseAndSemester)
+    data.set_author(name = "🗓️ Wochenplan für " + (courseAndSemester if (courseAndSemester != "all") else message.author.name))
     data.set_thumbnail(url = botti.user.avatar_url)
     data.set_footer(text = "Vorlesung, wenn nicht anderweitig angegeben.\nJegliche Angaben ohne Gewähr.\nStand: {}".format(modules.bottiHelper._toGermanTimestamp(lastModified)))
     
-    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    if not "slash" in message.content:
+        await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    else:
+        return data # Return data to slash-command-handler to send hidden message
