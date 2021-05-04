@@ -377,8 +377,8 @@ async def serverinfo(botti, message, botData):
     data.add_field(name = "Emojis", value = len(message.guild.emojis))
     
     data.add_field(name = "Kategorien", value = len(message.guild.categories))
-    data.add_field(name = "Text Channels", value = len(message.guild.text_channels))
-    data.add_field(name = "Sprach Channels", value = len(message.guild.voice_channels))
+    data.add_field(name = "Text-Kanäle", value = len(message.guild.text_channels))
+    data.add_field(name = "Sprach-Kanäle", value = len(message.guild.voice_channels))
     
     data.add_field(name = "Erstellt am", value = modules.bottiHelper._toUTCTimestamp(message.guild.created_at), )
     
