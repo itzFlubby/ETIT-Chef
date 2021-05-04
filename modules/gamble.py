@@ -348,19 +348,11 @@ async def ranking(botti, message, botData):
     
     for i in range(5):
         user = message.guild.get_member(int(sortedList[i][0]))
-        if user.nick is not None:
-            nick = "({})".format(user.nick)
-        else:
-            nick = ""
+        
+        prefix = "" if (i == 0) else " \n"
+        suffix = ":crown:" if (i == 0) else ("#" + str(i+1))
             
-        if i == 0:
-            prefix = ""
-            suffix = ":crown:"
-        else:
-            prefix = "⠀\n"
-            suffix = "#" + str(i+1)
-            
-        data.add_field(name = "{}{} __{}#{}__ {}".format(prefix, suffix, user.name, user.discriminator, nick), value = "{balance} {currency}".format(balance = modules.bottiHelper._spaceIntToString(int(sortedList[i][1])), currency = botData.botCurrency["emoji"]),inline = False)
+        data.add_field(name = "{}{} {}".format(prefix, suffix, user.mention), value = "{balance} {currency}".format(balance = modules.bottiHelper._spaceIntToString(int(sortedList[i][1])), currency = botData.botCurrency["emoji"]),inline = False)
     
     data.set_author(name = "{currencyEmoji} {currencyNameSingular}-Leaderboard".format(currencyEmoji = botData.botCurrency["emoji"], currencyNameSingular = botData.botCurrency["singular"]))
     data.set_thumbnail(url = botti.user.avatar_url)
@@ -407,6 +399,20 @@ async def _saveKeeperToFile(botti, botData):
         await asyncio.sleep(3600 * 3) # sleep 3 hours
         _directSave(botti, botData)
         botData.noRiskNoFunQueue.clear()
+        
+        guild = botti.get_guild(ids.serverIDs.ETIT_KIT)
+        spielhalleChannel = guild.get_channel(ids.channelIDs.SPIELHALLE)
+        gambleKingRole = guild.get_role(ids.roleIDs.GAMBLEKING)
+        
+        sortedList = sorted(botData.balanceKeeper, key = lambda x: int(x[1]), reverse = True)
+        user = guild.get_member(int(sortedList[0][0])) # 1st Place
+        
+        if gambleKingRole not in user.roles:
+            for member in gambleKingRole.members:
+                await member.remove_roles(gambleKingRole)
+                
+            await user.add_roles(gambleKingRole)
+            await spielhalleChannel.send(":crown: {userMention} ist jetzt der neue {roleMention}!".format(user.mention, gambleKingRole.mention))
 
 async def slots(botti, message, botData):    
     """ 
