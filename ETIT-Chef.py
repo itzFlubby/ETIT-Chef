@@ -42,6 +42,7 @@ from modules.data.commandModule import commandModule
              
 @botti.event
 async def on_ready():
+    #await manage_commands.remove_all_commands(botti.user.id, botData.botToken, guild_ids = [ids.serverIDs.ETIT_KIT])
     if botData.firstBoot:
         modules.bottiHelper._loadSettings(botData)
         botData.totalSlashCommands = len(slash.commands)
@@ -147,16 +148,16 @@ async def on_error(error, *args, **kwargs):
     ex = sys.exc_info()
     fullError = ""
     for i in traceback.format_exception(ex[0], ex[1], ex[2]):
-        fullError = fullError + i.replace(os.getcwd()[:-10], "..")
+        fullError += i.replace(os.getcwd()[:-10], "..")
         
     fullError = fullError.replace("..", "").replace("```", "´´´")
 
     botData.lastError = ":warning: Error in `{}()` • Traceback _(Timestamp: {})_\n```py\n{}```".format(error, modules.bottiHelper._getTimestamp(), fullError)
     
-    if len(botData.lastError) > 1900:
+    if len(botData.lastError) > botData.maxMessageLength:
         j = 0
-        for i in range(0, len(botData.lastError), 1900):
-            await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(content = "```py\n{}```".format(botData.lastError[(1900*j):(1900*(j+1))]))
+        for i in range(0, len(botData.lastError), botData.maxMessageLength):
+            await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(content = "```py\n{}```".format(botData.lastError[(botData.maxMessageLength*j):(botData.maxMessageLength*(j+1))]))
             j =+ 1
     else:    
         await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(content = botData.lastError)
