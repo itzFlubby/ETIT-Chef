@@ -330,7 +330,7 @@ async def rank(botti, message, botData):
     if user.id != message.author.id:
         paramString = "<@{userID}> befindet".format(userID = user.id)
      
-    await modules.bottiHelper._sendMessagePingAuthor(message, "{currency} {paramString} sich im Ranking auf Platz **#{rank}** (von {totalAccounts}) !".format(currency = botData.botCurrency["emoji"], paramString = paramString, rank = (userRank + 1), totalAccounts = len(sortedList)))
+    await modules.bottiHelper._sendMessagePingAuthor(message, "{currency} {paramString} dich im Ranking auf Platz **#{rank}** (von {totalAccounts}) !".format(currency = botData.botCurrency["emoji"], paramString = paramString, rank = (userRank + 1), totalAccounts = len(sortedList)))
     
 async def ranking(botti, message, botData):
     """ 
