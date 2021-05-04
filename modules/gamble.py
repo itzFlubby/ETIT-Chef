@@ -352,7 +352,9 @@ async def ranking(botti, message, botData):
         prefix = "" if (i == 0) else " \n"
         suffix = ":crown:" if (i == 0) else ("#" + str(i+1))
             
-        data.add_field(name = "{}{} {}".format(prefix, suffix, user.mention), value = "{balance} {currency}".format(balance = modules.bottiHelper._spaceIntToString(int(sortedList[i][1])), currency = botData.botCurrency["emoji"]),inline = False)
+        nick = "" if user.nick is None else " ({})".format(user.nick)
+        
+        data.add_field(name = "{prefix}{suffix} __{user.name}#{user.discriminator}__{nick}".format(prefix = prefix, suffix = suffix, user = user, nick = nick), value = "{balance} {currency}".format(balance = modules.bottiHelper._spaceIntToString(int(sortedList[i][1])), currency = botData.botCurrency["emoji"]),inline = False)
     
     data.set_author(name = "{currencyEmoji} {currencyNameSingular}-Leaderboard".format(currencyEmoji = botData.botCurrency["emoji"], currencyNameSingular = botData.botCurrency["singular"]))
     data.set_thumbnail(url = botti.user.avatar_url)
