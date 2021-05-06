@@ -360,7 +360,7 @@ async def ranking(botti, message, botData):
     data.set_thumbnail(url = botti.user.avatar_url)
     data.set_footer(text = "Stand: {0}".format(modules.bottiHelper._getTimestamp()))
  
-    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def rob(botti, message, botData):
     """ 
@@ -414,7 +414,7 @@ async def _saveKeeperToFile(botti, botData):
                 await member.remove_roles(gambleKingRole)
                 
             await user.add_roles(gambleKingRole)
-            await spielhalleChannel.send(":crown: {userMention} ist jetzt der neue {roleMention}!".format(user.mention, gambleKingRole.mention))
+            await spielhalleChannel.send(":crown: {userMention} ist jetzt der neue {roleMention}!".format(userMention = user.mention, roleMention = gambleKingRole.mention))
 
 async def slots(botti, message, botData):    
     """ 

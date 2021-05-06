@@ -394,6 +394,6 @@ async def wochenplan(botti, message, botData):
     data.set_footer(text = "Vorlesung, wenn nicht anderweitig angegeben.\nJegliche Angaben ohne Gewähr.\nStand: {}".format(modules.bottiHelper._toGermanTimestamp(lastModified)))
     
     if not "slash" in message.content:
-        await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+        await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
     else:
         return data # Return data to slash-command-handler to send hidden message
