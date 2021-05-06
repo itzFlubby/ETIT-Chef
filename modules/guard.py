@@ -28,13 +28,13 @@ async def _checkPerms(botti, message, allowed, enableTrustet = False):
     else:
         await modules.bottiHelper._sendMessagePingAuthor(message, "[:shield:] `Guard`: **Fehlende Berechtigung!**")
         return False
-        
+
 def _checkPermsQuiet(botti, message, allowed):
     if message.author.id in allowedIDs or any(role.name in allowed for role in message.author.roles):
         return True
     else:
         return False
- 
+
 async def _floodDetection(message, botti, botData): 
     try:
         lastAuthorID = botData.lastCommands[0].author.id

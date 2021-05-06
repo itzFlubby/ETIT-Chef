@@ -141,7 +141,7 @@ async def play(botti, message, botData):
                 data.set_thumbnail(url = jsonData["thumbnails"][0]["url"])
                 data.set_footer(text = "ID: {0}\nStand: {1}".format(id, modules.bottiHelper._getTimestamp()))               
                 
-                await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+                await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
     except IndexError:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "play"))
     except FileNotFoundError:

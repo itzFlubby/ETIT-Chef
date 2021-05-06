@@ -72,11 +72,10 @@ def _getCurrentTime():
    
 def _getTimeInCorrectTimezone(component):
     dtstart = component.decoded("dtstart")
-    dtend = component.decoded("dtend")
+    dtend = component.decoded("dtend") if "dtend" in component else dtstart
     if component.content_line("dtend", dtend)[-6:] == "+00:00": # If timezone is UTC
         dtstart += datetime.timedelta(hours = _getUTCOffset())
         dtend += datetime.timedelta(hours = _getUTCOffset())
-        
     return dtstart, dtend
    
 def _getUTCOffset():

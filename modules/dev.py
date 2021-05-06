@@ -80,7 +80,7 @@ async def commandlist(botti, message, botData):
     data.set_author(name = botti.user.name + "#" + str(botti.user.discriminator), icon_url = "https://cdn.discordapp.com/app-assets/" + str(botti.user.id) + "/" + str(ids.assetIDs.PROFILE_PICTURE) + ".png")
     data.set_footer(text = "Insgesamt sind das " + str(botData.totalCommands) + " Befehle!")
     
-    await modules.bottiHelper._sendEmbed(message, message.author.mention, data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def devtest(botti, message, botData):
     """ 
@@ -195,7 +195,7 @@ async def mdtext(botti, message, botData):
         data.set_author(name = "🖊️ Markdown-Typen")
         data.set_thumbnail(url = botti.user.avatar_url)
 
-        await modules.bottiHelper._sendEmbedPingAuthor(message, "", data)
+        await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
     except:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "mdtext"))      
         return   
@@ -226,7 +226,7 @@ async def modulelist(botti, message, botData):
         if wantedModule == commandModule.moduleName:
             data.add_field(name = commandModule.moduleName.capitalize(), value = commandModule.commandNameList)
             data.set_footer(text = "{} hat {} Befehle!".format(commandModule.moduleName.capitalize(), len(commandModule.commandNameList)))
-            await modules.bottiHelper._sendEmbedPingAuthor(message, "", data)
+            await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
             return
     
     await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "modulelist"))
@@ -319,7 +319,7 @@ async def traceback(botti, message, botData):
             runs =+ 1
     else:
         await modules.bottiHelper._sendMessage(message, "{}".format(botData.lastError))
-        
+
 async def tts(botti, message, botData):
     """
     Reserviert für Moderator oder höher

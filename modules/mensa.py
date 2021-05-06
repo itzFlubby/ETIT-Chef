@@ -200,7 +200,7 @@ async def mensa(botti, message, botData):
                 data.add_field(name = "⠀\n:arrow_forward: {} :arrow_backward:".format(foodLine.value), value = mealValues + "\n", inline = False)
             break
 
-    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def mensazusatz(botti, message, botData):
     """

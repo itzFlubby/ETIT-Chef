@@ -130,20 +130,12 @@ def _maintenanceChange(configFile):
         for line in lines:
             conf.write(line)
             
-async def _sendEmbed(message, content, embed):
+async def _sendMessage(message, content = "", embed = None, file = None):
     await message.channel.trigger_typing()
-    await message.channel.send(content, embed = embed) 
+    return await message.channel.send(content, embed = embed, file = file)
 
-async def _sendEmbedPingAuthor(message, content, embed):
-    await message.channel.trigger_typing()
-    await message.channel.send(message.author.mention + " " + content, embed = embed) 
-                
-async def _sendMessage(message, content):
-    await message.channel.trigger_typing()
-    return await message.channel.send(content)
-
-async def _sendMessagePingAuthor(message, content):
-    return await _sendMessage(message, "{} {}".format(content, message.author.mention))
+async def _sendMessagePingAuthor(message, content = "", embed = None, file = None):
+    return await _sendMessage(message = message, content = "{} {}".format(content, message.author.mention), embed = embed, file = file)
         
 async def _setNormalStatus(botti, botData):
     await botti.change_presence(activity = discord.Activity(name = botData.botNormalStatus, type = discord.ActivityType.listening), status = discord.Status.online)

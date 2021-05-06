@@ -57,6 +57,20 @@ async def bullshit(botti, message, botData):
     
     await message.channel.send(content = "{}{}".format(message.author.mention, cacheString), file = discord.File(file))
 
+async def checkthepins(botti, message, botData):
+    """ 
+    Für alle ausführbar
+    Dieser Befehl... schau bitte einfach in die Pins.
+    !checkthepins {@USER}
+    {@USER} <leer>, Nutzer-Erwähnung
+    !checkthepins\r!checkthepins @ETIT-Chef
+    """
+    user = message.author if len(message.mentions) == 0 else message.mentions[0]
+        
+    
+    with open(botData.modulesDirectory + "data/images/checkthepins.gif", "rb") as f:
+        await modules.bottiHelper._sendMessage(message = message, content = user.mention, file = discord.File(f))
+
 async def choose(botti, message, botData):
     """ 
     Für alle ausführbar

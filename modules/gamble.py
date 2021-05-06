@@ -559,7 +559,7 @@ async def wheel(botti, message, botData):
     
     if randomint in range(1, 4):
         winSelect = ":blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :arrow_up: :blue_square: :blue_square: :blue_square: :blue_square:\n"
-        winMessage = "**UNFASSBARER GEWINN**!!! Glückwunsch :partying_face: :crown:! **{win}** {currency} {currency} <@&{channelID}>".format(win = modules.bottiHelper._spaceIntToString(winAmounts[7]), channelID = ids.channelIDs.SPIELHALLE, currency = botData.botCurrency["emoji"]) 
+        winMessage = "**UNFASSBARER GEWINN**!!! Glückwunsch :partying_face: :crown:! **{win}** {currency} {currency} <@&{roleID}>".format(win = modules.bottiHelper._spaceIntToString(winAmounts[7]), roleID = ids.roleIDs.SPIELHALLE, currency = botData.botCurrency["emoji"]) 
         _addBalance(botData, message.author.id, winAmounts[7] - costToPlay)
     elif randomint in range(4, 14):
         winSelect = ":blue_square: :arrow_up: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square: :blue_square:\n"

@@ -63,7 +63,7 @@ async def timer(botti, message, botData):
     data.set_thumbnail(url = botti.user.avatar_url)
     data.set_footer(text = "Start: {0}\nEnde: {1}".format(modules.bottiHelper._getTimestamp(), modules.bottiHelper._toSTRFTimestamp(later)))
     
-    await modules.bottiHelper._sendEmbedPingAuthor(message, ":alarm_clock: Dein Timer wurde registriert!", embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, content = ":alarm_clock: Dein Timer wurde registriert!", embed = data)
 
 async def timercancel(botti, message, botData):
     """
@@ -114,4 +114,4 @@ async def timerNotify(botti, delay, message, id):
     data.set_thumbnail(url = botti.user.avatar_url)
     data.set_footer(text = "Stand: {0}".format(modules.bottiHelper._getTimestamp()))
     
-    await modules.bottiHelper._sendEmbedPingAuthor(message, ":alarm_clock: Dein Timer ist abgelaufen!", embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, content = ":alarm_clock: Dein Timer ist abgelaufen!", embed = data)

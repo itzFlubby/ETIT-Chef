@@ -82,7 +82,7 @@ async def _printNews(message, botData, post):
     lastEdited = _getLastEdited(news)
     data.set_footer(text = "{}".format(lastEdited))
     
-    await modules.bottiHelper._sendEmbedPingAuthor(message, "", data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def botinfo(botti, message, botData):
     """ 
@@ -113,7 +113,7 @@ async def botinfo(botti, message, botData):
     data.set_thumbnail(url = botti.user.avatar_url)
     data.set_footer(text = "ID: {0}\nBei Verbesserungsvorschlägen: !vorschlag <NACHRICHT>\nStand: {1}".format(str(botti.user.id), modules.bottiHelper._getTimestamp()))
     
-    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def channelinfo(botti, message, botData):
     """ 
@@ -150,7 +150,7 @@ async def channelinfo(botti, message, botData):
     data.set_thumbnail(url = message.guild.icon_url)
     data.set_footer(text = "ID: {0}\nStand: {1}".format(str(channelToGetInfo.id), modules.bottiHelper._getTimestamp()))
     
-    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def fachschaft(botti, message, botData):
     """ 
@@ -176,7 +176,7 @@ async def fachschaft(botti, message, botData):
             data.set_author(name = "🌐 Shortcut Link")   
             data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
             data.set_thumbnail(url = botData.fachschaftURL + "templates/joomlakit/images/britzel-white.png")
-            await modules.bottiHelper._sendEmbedPingAuthor(message, "", embed = data)
+            await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
             
         elif options[1].lower() == "sitzung":
             data = discord.Embed(
@@ -189,7 +189,7 @@ async def fachschaft(botti, message, botData):
             data.set_author(name = "🌐 Shortcut Link")   
             data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
             data.set_thumbnail(url = botData.fachschaftURL + "templates/joomlakit/images/britzel-white.png")
-            await modules.bottiHelper._sendEmbedPingAuthor(message, "", embed = data)
+            await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
         else:
             await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "fachschaft"))
 
@@ -263,7 +263,7 @@ async def minecraft(botti, message, botData):
         data.color = 0xff0000
         data.add_field(name = "Offline", value = "Der Server ist nicht erreichbar.")
     
-    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def permissions(botti, message, botData):
     """ 
@@ -354,7 +354,7 @@ async def roleinfo(botti, message, botData):
     data.set_thumbnail(url = message.guild.icon_url)
     data.set_footer(text = "ID: {0}\nStand: {1}".format(str(role.id), modules.bottiHelper._getTimestamp()))
     
-    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def serverinfo(botti, message, botData):
     """ 
@@ -388,7 +388,7 @@ async def serverinfo(botti, message, botData):
     data.set_thumbnail(url = message.guild.icon_url)
     data.set_footer(text = "ID: {0}\nStand: {1}".format(str(message.guild.id), modules.bottiHelper._getTimestamp()))
     
-    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def stats(botti, message, botData):
     """ 
@@ -438,7 +438,7 @@ async def stats(botti, message, botData):
     data.set_footer(text = "Stand: {0}".format(modules.bottiHelper._getTimestamp()))
   
     
-    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def test(botti, message, botData):
     """ 
@@ -473,7 +473,7 @@ async def uptime(botti, message, botData):
     data.set_thumbnail(url = botti.user.avatar_url)
     data.set_footer(text = "Seitdem wurden {0} Befehle ausgeführt!\nStand: {1}".format(botData.befehlsCounter, modules.bottiHelper._getTimestamp()))
     
-    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def userinfo(botti, message, botData):
     """ 
@@ -509,7 +509,7 @@ async def userinfo(botti, message, botData):
     data.set_thumbnail(url = user.avatar_url)
     data.set_footer(text = "ID: {0}\nStand: {1}".format(str(user.id), modules.bottiHelper._getTimestamp()))
     
-    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def voiceinfo(botti, message, botData):
     """ 
@@ -546,7 +546,7 @@ async def voiceinfo(botti, message, botData):
     data.set_thumbnail(url = botti.user.avatar_url)
     data.set_footer(text = "ID: {0}\nStand: {1}".format(str(voiceClient.channel.id), modules.bottiHelper._getTimestamp()))
     
-    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
     
 async def zitate(botti, message, botData):
     """ 
@@ -577,4 +577,4 @@ async def zitate(botti, message, botData):
     data.set_thumbnail(url = message.guild.icon_url)
     data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
     
-    await modules.bottiHelper._sendEmbed(message, "{}".format(message.author.mention), embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
