@@ -115,7 +115,7 @@ async def command(botti, message, botData):
         else:
             data.add_field(name = "Beispiel", value = infoTextLines[i].replace("\r", "\n") + "\n⠀", inline = False)
     
-    await modules.bottiHelper._sendEmbedPingAuthor(message, "", embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def convert(botti, message, botData):
     """ 
@@ -227,7 +227,7 @@ async def dontask(botti, message, botData):
     data.set_author(name = "🌐 Shortcut Link")   
     data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
     
-    await modules.bottiHelper._sendEmbedPingAuthor(message, "", embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
  
 async def flip(botti, message, botData):
     """ 
@@ -315,13 +315,13 @@ async def invite(botti, message, botData):
         if invite.max_age == 0:
             data.add_field(name = "Permanent-Link", value = invite.url)
             data.set_footer(text = "Verwendungen: {0}\nErsteller: {1}#{2}".format(str(invite.uses), invite.inviter.name, str(invite.inviter.discriminator)))  
-            await modules.bottiHelper._sendEmbedPingAuthor(message, "", embed = data)
+            await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
             return
     
     invite = await message.channel.create_invite(max_age = 3600, unique = False, reason = "Requested by User.")       
     data.add_field(name = "Temporär-Link", value = invite.url)
     data.set_footer(text = "Gültigkeit: Eine Stunde\nErsteller: {0}#{1}".format(invite.inviter.name, str(invite.inviter.discriminator)))  
-    await modules.bottiHelper._sendEmbedPingAuthor(message, "", embed = data)
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def kekse(botti, message, botData):
     """ 
