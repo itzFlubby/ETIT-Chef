@@ -68,7 +68,6 @@ async def on_raw_reaction_remove(payload):
         else:
             await modules.roles._addRoles(member, [ modules.roles.emojiToRoleID[payload.emoji.name] ])
                 
-
 @botti.event
 async def on_raw_reaction_add(payload): 
     guild = botti.get_guild(ids.serverIDs.ETIT_KIT)

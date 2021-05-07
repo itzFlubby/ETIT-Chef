@@ -91,7 +91,6 @@ async def devtest(botti, message, botData):
     !devtest
     """ 
     pass
-                  
 async def give(botti, message, botData):
     """ 
     Reserviert für Entwickler 

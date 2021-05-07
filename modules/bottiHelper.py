@@ -15,7 +15,7 @@ async def _checkCommandIgnoreList(message):
     return True
         
 async def _checkPingTrigger(botti, botData, message):
-    if (not message.mention_everyone) and botti.user.mentioned_in(message) and (message.author.id not in [ ids.userIDs.ITZFLUBBY, ids.userIDs.CHRISTOPH ]):
+    if (not message.mention_everyone) and botti.user.mentioned_in(message) and (message.author.id not in [ ids.userIDs.ITZFLUBBY, ids.userIDs.CHRISTOPH, ids.userIDs.ETIT_CHEF , ids.userIDs.ETIT_DEV ]):
         helpString = ":100: Ich wurde erwähnt und da bin ich. Mit `{prefix}help` zeige ich dir eine Hilfe an!".format(prefix = botData.botPrefix)
         try:
             await message.reply(helpString)
