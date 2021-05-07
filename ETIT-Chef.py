@@ -10,40 +10,39 @@ from discord_slash import SlashCommand
 from discord_slash import SlashContext
 from discord_slash.utils import manage_commands
 
+from modules.data.botData import botData
+import modules.data.ids     as ids
+
+import modules.audio        #as audio
+import modules.banlist      #as banlist
+import modules.bottiHelper  #as bottiHelper
+import modules.calendar     #as calendar
+import modules.dev          #as dev
+import modules.gamble       #as gamble
+import modules.guard        #as guard
+import modules.info         #as info
+import modules.lerngruppe   #as lerngruppe
+import modules.mensa        #as mensa
+import modules.mod          #as mod
+import modules.polls        #as polls
+import modules.timer        #as timer
+import modules.utils        #as utils
+
 bottiIntents = discord.Intents.default()
 bottiIntents.members = True
 bottiIntents.reactions = True
 bottiIntents.presences = False
 botti = discord.Client(intents = bottiIntents, guild_subscriptions = True)
 
-from modules.data.botData import botData
-import modules.data.ids     as ids
-
-import modules.audio
-import modules.banlist
-import modules.bottiHelper
-import modules.calendar
-import modules.dev
-import modules.gamble
-import modules.guard
-import modules.info
-import modules.lerngruppe
-import modules.mensa
-import modules.mod
-import modules.newLectureVideoCheck # MUSS unter der Deklaration und Initialisierung vom Objekten botti stehen
-import modules.polls
-import modules.timer
-import modules.utils
-
 slash = SlashCommand(botti, sync_commands = True)
 import modules.slash  # MUSS unter der Deklaration und Initialisierung von den Objekten slash und botti stehen
 import modules.events # MUSS unter der Deklaration und Initialisierung vom Objekten botti stehen
-
+             
 from modules.data.commandModule import commandModule             
              
 @botti.event
 async def on_ready():
-
+    #await manage_commands.remove_all_commands(botti.user.id, botData.botToken, guild_ids = [ids.serverIDs.ETIT_KIT])
     if botData.firstBoot:
         modules.bottiHelper._loadSettings(botData)
         botData.totalSlashCommands = len(slash.commands)
@@ -70,8 +69,6 @@ async def on_ready():
             data.description = "Verbindung etabliert `@" + modules.bottiHelper._getTimestamp() + "`"
             data.color = 0xFF0000
             await botti.change_presence(activity = discord.Game(name = "⚒ Wartungsarbeiten ⚒"), status = discord.Status.dnd)
-            
-            botti.loop.create_task(modules.newLectureVideoCheck._cyclicNewLectureVideoCheck())
         else:
             await modules.bottiHelper._setNormalStatus(botti, botData)
         
@@ -81,11 +78,9 @@ async def on_ready():
             modules.banlist._loadBotBans(botData)
         
             botti.loop.create_task(modules.mensa._dailyMensa(botti, botData))
-            
-            botti.loop.create_task(modules.newLectureVideoCheck._cyclicNewLectureVideoCheck())
         
             #botti.loop.create_task(modules.gamble._cyclicBotDetection(botti, botData, True))
-            
+        
         botData.firstBoot = False
     else:
         data.title = "[{emoji}] RECONNECT".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.ONLINE))
