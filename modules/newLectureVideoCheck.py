@@ -18,8 +18,10 @@ async def _cyclicNewLectureVideoCheck():
         fileContent = response.text
         newLog = fileContent.split("\n")
            
-        with open(botData.modulesDirectory + "data/newLectureVideoCheck/" + botData.onedriveInfo["fileName"], 'rw+') as f:
+        with open(botData.modulesDirectory + "data/newLectureVideoCheck/" + botData.onedriveInfo["fileName"], 'r') as f:
             oldLog = f.read().split("\n")
+            
+        with open(botData.modulesDirectory + "data/newLectureVideoCheck/" + botData.onedriveInfo["fileName"], 'w') as f:
             f.write(fileContent)
            
         lastCycleLineIndexNew = _getLastCycleDate(newLog)
@@ -28,8 +30,8 @@ async def _cyclicNewLectureVideoCheck():
         if newLog[lastCycleLineIndexNew] == oldLog[lastCycleLineIndexOld]:
             continue
         
-        elementsString = "{emoji} Letzer Zyklus `@{date}`\n".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.ILIAS), date = newLog[lastCycleLineIndex].split(" - ")[1])
-        for run, line in enumerate(newLog[(lastCycleLineIndex+1):]):
+        elementsString = "{emoji} Letzer Zyklus `@{date}`\n".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.ILIAS), date = newLog[lastCycleLineIndexNew].split(" - ")[1])
+        for run, line in enumerate(newLog[(lastCycleLineIndexNew+1):]):
             if ".mp4" in line:
                 elementsString += "```fix\n" + line[8:] + "```" # 8 = len("Writing ")
            
