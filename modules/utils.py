@@ -36,7 +36,6 @@ async def bullshit(botti, message, botData):
     Dieser Befehl hat noch nie so einen riesigen Haufen Scheiße gesehen...
     !bullshit
     """
-    
     file = botData.modulesDirectory + "data/images/temp/bullshit_{}.png".format(message.author.id)
     
     titleFont = ImageFont.truetype(botData.modulesDirectory + "data/images/fonts/Tahoma.ttf", 31) 
@@ -349,6 +348,44 @@ async def kekse(botti, message, botData):
     await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.OH))
     await botMessage.add_reaction("🍪")
 
+async def our(botti, message, botData):
+    """ 
+    Für alle ausführbar
+    Dieser Befehl ist unser Befehl!
+    !our {PROPERTY}
+    {PROPERTY} [String]
+    !our bread
+    """    
+    if len(message.content.split(" ")) < 2:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "our"))
+        return
+    
+    imageString = "Our " + message.content[5:] # 5 = len("!our ")
+    file = botData.modulesDirectory + "data/images/temp/bugs_bunny_our_{}.png".format(imageString.replace(" ", "_"))
+    
+    titleFont = ImageFont.truetype(botData.modulesDirectory + "data/images/fonts/impact.ttf", 42) 
+    
+    fontColor = (224, 212, 64)    
+    shadowcolor = (0, 0, 0)
+    cacheString = ""
+    if not (exists(file)):
+        imageToEdit = Image.open(botData.modulesDirectory + "data/images/bugs_bunny_our.jpg").convert('RGB') 
+        drawImage = ImageDraw.Draw(imageToEdit)
+        x = 362 - int(titleFont.getsize(imageString)[0] / 2)
+        y = 345
+        drawImage.text((x-2, y-2), imageString, font = titleFont, fill = shadowcolor)
+        drawImage.text((x+2, y-2), imageString, font = titleFont, fill = shadowcolor)
+        drawImage.text((x-2, y+2), imageString, font = titleFont, fill = shadowcolor)
+        drawImage.text((x+2, y+2), imageString, font = titleFont, fill = shadowcolor)
+        drawImage.text((x, y), imageString, fontColor, font = titleFont)
+        
+        imageToEdit.save(file)
+        
+    else:
+        cacheString = " _(cached image)_"
+    
+    await message.channel.send(content = "{}{}".format(message.author.mention, cacheString), file = discord.File(file))
+          
 async def random(botti, message, botData):
     """ 
     Für alle ausführbar
@@ -435,9 +472,8 @@ async def thisisfine(botti, message, botData):
     if not exists(file):
         if not isGIFResquested:
             drawImage = ImageDraw.Draw(imageToEdit)
-            x = 5
+            x = 192 - int(titleFont.getsize(imageString)[0] / 2)
             y = 5
-            
             drawImage.text((x-2, y-2), imageString, font=titleFont, fill=shadowcolor)
             drawImage.text((x+2, y-2), imageString, font=titleFont, fill=shadowcolor)
             drawImage.text((x-2, y+2), imageString, font=titleFont, fill=shadowcolor)
@@ -451,7 +487,7 @@ async def thisisfine(botti, message, botData):
             for frame in ImageSequence.Iterator(imageToEdit):
                 frame = frame.convert('RGBA')
                 drawImage = ImageDraw.Draw(frame)
-                x, y = drawImage.textsize(imageString)
+                x, y = titleFont.getsize(imageString)
                 
                 drawImage.text(((x/2)-2, (y/2)-2 + 10), imageString, font=titleFont, fill=shadowcolor)
                 drawImage.text(((x/2)+2, (y/2)-2 + 10), imageString, font=titleFont, fill=shadowcolor)
