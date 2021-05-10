@@ -301,7 +301,8 @@ async def wochenplan(botti, message, botData):
     calendar = Calendar.from_ical(content)
 
     weekdayItems = [[], [], [], [], [], [], []]
-    startOfWeek = now - datetime.timedelta(days = now.weekday())
+    nowDiffToStartOfWeek = now - datetime.timedelta(days = now.weekday())
+    startOfWeek = datetime.datetime(nowDiffToStartOfWeek.year, nowDiffToStartOfWeek.month, nowDiffToStartOfWeek.day, 0, 0, 0, tzinfo = datetime.timezone.utc)
     
     lastModified = 0
     
@@ -316,7 +317,7 @@ async def wochenplan(botti, message, botData):
                     continue
             summary = _shortenSummary(decodedSummary)
             dtstart, dtend = _getTimeInCorrectTimezone(component)
-            
+
             if _hasLinkEmbedded(component):
                 summary = "{summary} [[Zoom-Link]({link})]".format(summary = summary, link = _extractLink(component))
                 
@@ -325,7 +326,6 @@ async def wochenplan(botti, message, botData):
             
             if "rrule" in component:
                 rrule = component.decoded("rrule")
-            
                 if (dtstart - startOfWeek).days > 6: # 7 days in week -> 0, 1, 2, 3, 4, 5, 6 -> +6 to include all events in week
                     continue
                 
@@ -335,7 +335,7 @@ async def wochenplan(botti, message, botData):
                         
                 if "COUNT" in rrule:
                     intervalModifier = rrule["INTERVAL"][0] if ("INTERVAL" in rrule) else 1
-                    if (dtstart + datetime.timedelta(days = (7 * intervalModifier * rrule["COUNT"][0])) - now).days < 0: # < 0 : if event is in the past
+                    if (dtstart + datetime.timedelta(days = (7 * intervalModifier * (rrule["COUNT"][0] - 1))) - startOfWeek).days < 0: # < 0 : if event is in the past
                         continue
                 
                 if "INTERVAL" in rrule:
@@ -356,6 +356,7 @@ async def wochenplan(botti, message, botData):
                                 if (datetimeDay - dtend).days >= -1:
                                     _appendItem(weekdayItems, indexDay, dtstart, dtend, summary)
                             continue
+                        continue
                         
                 if "exdate" in component:
                     if _dateNotExcluded(component, startOfWeek, range(0, 7)): # range(0, 7) : If event is in this week (7 days in week)
