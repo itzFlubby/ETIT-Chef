@@ -20,11 +20,12 @@ async def botban(botti, message, botData):
         if user.id == ids.userIDs.ITZFLUBBY:
             return
             
-        botData.botBanList.append([user.id, 1])
         for entry in botData.botBanList:
             if entry[0] == user.id:
                 await modules.bottiHelper._sendMessagePingAuthor(message, ":customs: Dieser Nutzer ist bereits von der Nutzung des Bots gebannt!")
                 return
+        
+        botData.botBanList.append([user.id, 1])
         await modules.bottiHelper._sendMessagePingAuthor(message, ":customs: Der Nutzer {} wurde von der Nutzung des Bots gebannt _(BL: 1)_!".format(user.mention))  
     except IndexError:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "botban"))      
