@@ -47,7 +47,7 @@ async def _floodDetection(message, botti, botData):
         if sameAuthor:
             diff = (botData.lastCommands[len(botData.lastCommands) - 1].created_at) - (botData.lastCommands[0].created_at)
             if (diff.seconds - 86400) > -15:
-                banmessage = await modules.bottiHelper._sendMessage(message, "[:shield:] `Guard`: **Flood erkannt! Nutzer {userMention} wird gebannt...**".format(message.author.mention))
+                banmessage = await modules.bottiHelper._sendMessage(message, "[:shield:] `Guard`: **Flood erkannt! Nutzer {userMention} wird gebannt...**".format(userMention = message.author.mention))
                 await modules.banlist.botban(botti, banmessage, botData)
     except:
         pass         
