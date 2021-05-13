@@ -223,24 +223,6 @@ async def convert(botti, message, botData):
             await modules.bottiHelper._sendMessagePingAuthor(message, ":arrows_counterclockwise: '{0}' ist konvertiert (`{1} -> {2}`):\n{3}".format(textToConvert, convertFrom, convertTo, convertResult)) 
     except ValueError:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Eingabetext ist nicht vom angegeben Typ `{}`".format(convertFrom))
-
-async def dontask(botti, message, botData):
-    """ 
-    Für alle ausführbar
-    Dieser Befehl schickt einen Link zu dontasktoask.com .
-    !dontask
-    """
-    data = discord.Embed(
-        title = "Don't ask to ask, just ask!",
-        color = 0x009AFF,
-        description = "",
-        url = "https://dontasktoask.com/"
-    )
-    
-    data.set_author(name = "🌐 Shortcut Link")   
-    data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
-    
-    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
  
 async def flip(botti, message, botData):
     """ 
