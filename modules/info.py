@@ -9,6 +9,14 @@ import requests
 
 from mcstatus import MinecraftServer
 
+class Quicklink():
+    def __init__(self, pName, pURL, pTitle, pThumbnail = None, pColor = 0x009AFF):
+        self.name = pName
+        self.URL = pURL
+        self.title = pTitle
+        self.thumbnail = pThumbnail
+        self.color = pColor
+
 def _format(content, botData, embed):
     replacementDict = {
         "<p>":      "",
@@ -320,6 +328,48 @@ async def ping(botti, message, botData):
     !ping
     """
     await modules.bottiHelper._sendMessagePingAuthor(message, ":satellite: Die Discord WebSocket-Protokoll-Latenz liegt bei **{0}ms**!".format(str(round((botti.latency * 1000), 2)))) 
+
+async def quicklink(botti, message, botData):
+    """ 
+    Für alle ausführbar
+    Dieser Befehl schickt einen Quicklink.
+    !quicklink {LINK}
+    {LINK} "dontask", "exmatrikulation", "kw", "duden"
+    !quicklink dontask\r!quicklink duden
+    """
+    linksDict = {
+        "dontask": Quicklink("dontask", "https://dontasktoask.com/", "Don't ask to ask, just ask!", "https://dontasktoask.com/favicon.png"),
+        "exmatrikulation": Quicklink("exmatrikulation", "https://www.sle.kit.edu/imstudium/exmatrikulation.php", "Wiederschauen und reingehauen!", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Logo_KIT.svg/800px-Logo_KIT.svg.png", 0x009682),
+        "kw": Quicklink("kw", "https://generationstrom.com/2020/01/07/kw-oder-kwh/", "KW oder KWh?", "https://i1.wp.com/generationstrom.com/wp-content/uploads/2017/07/generationstrom_avatar_v2.png"),
+        "duden": Quicklink("duden", "https://www.duden.de/", "Aufschlagen, nachschlagen, zuschlagen. Duden.", "https://www.duden.de/modules/custom/duden_og_image/images/Duden_FB_Profilbild.jpg", 0xFBC53E)
+    }
+    
+    arguments = message.content.split(" ")
+    if len(arguments) != 2:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "quicklink"))
+        return
+        
+    quicklink = arguments[1]
+    
+    if quicklink not in linksDict.keys():
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "quicklink"))
+        return
+        
+    data = discord.Embed(
+        title = linksDict[quicklink].title,
+        color = linksDict[quicklink].color,
+        description = linksDict[quicklink].URL,
+        url = linksDict[quicklink].URL
+    )
+    
+    if linksDict[quicklink].thumbnail is not None:
+        data.set_thumbnail(url = linksDict[quicklink].thumbnail)
+        data.add_field(name = "⠀", value = "[Thumbnail-Quelle]({link})".format(link = linksDict[quicklink].thumbnail))
+
+    data.set_author(name = "🌐 Shortcut Link")   
+    data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
+    
+    await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
 async def roleinfo(botti, message, botData):
     """ 
