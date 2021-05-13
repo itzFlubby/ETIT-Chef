@@ -10,7 +10,7 @@ from modules.data.botData import botData
 
 async def _cyclicNewLectureVideoCheck():
     while(True):
-        await asyncio.sleep(3600 * 2) # 2 hours
+        await asyncio.sleep(3600 * 4) # 2 hours
         accessToken, refreshToken = _getAccessAndRefreshToken()
         authenticationHeader = {'Authorization': 'Bearer ' + accessToken}
         response = requests.get("https://graph.microsoft.com/v1.0/me/drive/root:/{filePath}{fileName}:/content".format(filePath = botData.onedriveInfo["filePath"], fileName = botData.onedriveInfo["fileName"]), headers = authenticationHeader)
@@ -35,7 +35,7 @@ async def _cyclicNewLectureVideoCheck():
             if ".mp4" in line:
                 elementsString += "```fix\n" + line[8:] + "```" # 8 = len("Writing ")
            
-        if not run:
+        if not ("```fix\n" in elementsString):
             continue
             
         await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.VOD_PING).send(elementsString)
