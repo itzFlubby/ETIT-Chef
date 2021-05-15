@@ -334,14 +334,50 @@ async def quicklink(botti, message, botData):
     Für alle ausführbar
     Dieser Befehl schickt einen Quicklink.
     !quicklink {LINK}
-    {LINK} "dontask", "exmatrikulation", "kw", "duden"
+    {LINK} "dontask", "exmatrikulation", "kw", "duden", "github", "stackoverflow"
     !quicklink dontask\r!quicklink duden
     """
     linksDict = {
-        "dontask": Quicklink("dontask", "https://dontasktoask.com/", "Don't ask to ask, just ask!", "https://dontasktoask.com/favicon.png"),
-        "exmatrikulation": Quicklink("exmatrikulation", "https://www.sle.kit.edu/imstudium/exmatrikulation.php", "Wiederschauen und reingehauen!", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Logo_KIT.svg/800px-Logo_KIT.svg.png", 0x009682),
-        "kw": Quicklink("kw", "https://generationstrom.com/2020/01/07/kw-oder-kwh/", "KW oder KWh?", "https://i1.wp.com/generationstrom.com/wp-content/uploads/2017/07/generationstrom_avatar_v2.png"),
-        "duden": Quicklink("duden", "https://www.duden.de/", "Aufschlagen, nachschlagen, zuschlagen. Duden.", "https://www.duden.de/modules/custom/duden_og_image/images/Duden_FB_Profilbild.jpg", 0xFBC53E)
+        "dontask": Quicklink(
+                        "dontask", 
+                        "https://dontasktoask.com/", 
+                        "Don't ask to ask, just ask!", 
+                        "https://dontasktoask.com/favicon.png"
+                    ),
+        "exmatrikulation": Quicklink(
+                        "exmatrikulation", 
+                        "https://www.sle.kit.edu/imstudium/exmatrikulation.php", 
+                        "Wiederschauen und reingehauen!", 
+                        "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Logo_KIT.svg/800px-Logo_KIT.svg.png", 
+                        0x009682
+                    ),
+        "kw": Quicklink(
+                        "kw", 
+                        "https://generationstrom.com/2020/01/07/kw-oder-kwh/", 
+                        "KW oder KWh?", 
+                        "https://i1.wp.com/generationstrom.com/wp-content/uploads/2017/07/generationstrom_avatar_v2.png"
+                    ),
+        "duden": Quicklink(
+                        "duden", 
+                        "https://www.duden.de/", 
+                        "Aufschlagen, nachschlagen, zuschlagen. Duden.", 
+                        "https://www.duden.de/modules/custom/duden_og_image/images/Duden_FB_Profilbild.jpg", 
+                        0xFBC53E
+                    ),
+        "github": Quicklink(
+                        "github", 
+                        "https://github.com/itzFlubby/ETIT-Chef/", 
+                        "ETIT-Chef Github", 
+                        "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png", 
+                        0xFEFEFE
+                    ),
+        "stackoverflow": Quicklink(
+                        "stackoverflow", 
+                        "https://stackoverflow.com/", 
+                        "Hippety hoppety your code is now my property!", 
+                        "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Stack_Overflow_icon.svg/768px-Stack_Overflow_icon.svg.png", 
+                        0xEF8236
+                    )
     }
     
     arguments = message.content.split(" ")
