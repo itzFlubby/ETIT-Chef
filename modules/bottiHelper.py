@@ -26,6 +26,12 @@ async def _checkPurgemaxConfirm(message, botData):
     if (botData.purgemaxConfirm) and (message.content != "{prefix}purgemax".format(prefix = botData.botPrefix)):
         await _sendMessagePingAuthor(message, ":exclamation: Purgemax abgebrochen.")
         botData.purgemaxConfirm = False
+
+async def _createDM(botti, userID):
+    user = botti.get_user(userID)
+    if user.dm_channel is None:
+        await user.create_dm()
+    return user.dm_channel
         
 def _createDummyMessage(author, channel, content = "", mentions = []):
     dataDict = { 
