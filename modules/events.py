@@ -109,10 +109,17 @@ async def on_raw_reaction_add(payload):
         else:
             return
             
+        userRoles = payload.member.roles
+        userRoleIDs = [role.id for role in userRoles]    
         setupRole = guild.get_role(roleSetupIDs[emojiIDs[payload.emoji.id]])
         if setupRole not in payload.member.roles:
-            await payload.member.add_roles(setupRole, reason = "Requested by user.")
-            
+            userRoles.append(setupRole)
+            if setupRole.id == ids.roleIDs.GAST: # Add roles to guest, as guest doesn't see #modulauswahl
+                for roleID in ids.roleIDs.newMemberJoinRoles:
+                    if roleID not in userRoleIDs:
+                        userRoles.append(guild.get_role(roleID))
+            await payload.member.edit(roles = userRoles, reason = "User selected Group.")
+                
     # Modulauswahl
     if payload.channel_id in [ ids.channelIDs.AUSWAHL_ETIT_BSC, ids.channelIDs.AUSWAHL_MIT_BSC, ids.channelIDs.AUSWAHL_ETIT_MSC, ids.channelIDs.AUSWAHL_MIT_MSC ]:
         if payload.emoji.name == "approve":
