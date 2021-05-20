@@ -499,14 +499,11 @@ async def vorschlag(botti, message, botData):
     {MESSAGE} String [Nachricht, die gesendet werden soll]
     !vorschlag Dies ist ein Test
     """
-    if message.guild is not None:
-        if botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel is None:
-            await botti.get_user(ids.userIDs.ITZFLUBBY).create_dm()
-        sentMessage = await botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel.send("**{0}#{1}** ({2}) hat auf **{3} ({4}) / {5} ({6})** folgendes geschrieben: _'{7}'_. | {8}".format(message.author.name, message.author.discriminator, message.author.id, message.guild.name, message.guild.id, message.channel.name, message.channel.id, str(message.content[9:]), modules.bottiHelper._getTimestamp()))
-    else:
-        sentMessage = await botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel.send("**{0}#{1}** ({2}) hat im Privat-Chat folgendes geschrieben: _'{3}'_. | {4}".format(message.author.name, message.author.discriminator, message.author.id, str(message.content[9:]), modules.bottiHelper._getTimestamp()))
-    
+    userDM = await modules.bottiHelper._createDM(botti, ids.userIDs.ITZFLUBBY)
+    sentMessage = await userDM.send("**{author.name}#{author.discriminator}** ({author.id}) hat im **{guild.name} ({guild.id}) / {channel.name} ({channel.id})** folgendes geschrieben: _'{content}'_. | {timestamp}".format(author = message.author, guild = message.guild, channel = message.channel, content = message.content[11:], timestamp = modules.bottiHelper._getTimestamp()))
+
     await sentMessage.add_reaction("✅")
     await sentMessage.add_reaction("💤")
     await sentMessage.add_reaction("❌")
+    await sentMessage.add_reaction("👑")
     await modules.bottiHelper._sendMessagePingAuthor(message, ":bookmark_tabs: Deine Nachricht wurde erfolgreich zugestellt!")

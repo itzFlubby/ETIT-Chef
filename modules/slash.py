@@ -127,6 +127,7 @@ async def _vorschlag(ctx: SlashContext, nachricht):
     await sentMessage.add_reaction("✅")
     await sentMessage.add_reaction("💤")
     await sentMessage.add_reaction("❌")
+    await sentMessage.add_reaction("👑")
 
     await ctx.send(content = ":bookmark_tabs: Deine Nachricht wurde erfolgreich zugestellt!", hidden = True) 
 

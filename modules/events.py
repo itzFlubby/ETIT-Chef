@@ -74,15 +74,17 @@ async def on_raw_reaction_add(payload):
     
     # Vorschlag
     if payload.channel_id == ids.channelIDs.DM_ITZFLUBBY and payload.user_id == ids.userIDs.ITZFLUBBY:
-        if botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel is None:
-            await botti.get_user(ids.userIDs.ITZFLUBBY).create_dm()
-        vorschlagMessage = (await botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel.fetch_message(payload.message_id)).content
-        channel_BOT_TEST_LOBBY = guild.get_channel(ids.channelIDs.BOT_TEST_LOBBY)
+        devDM = await modules.bottiHelper._createDM(botti, ids.userIDs.ITZFLUBBY)
+        vorschlagMessage = (await devDM.fetch_message(payload.message_id)).content
+        userDM = await modules.bottiHelper._createDM(botti, int(vorschlagMessage.split("(")[1][:18]))
+        channel_BTL = guild.get_channel(ids.channelIDs.BOT_TEST_LOBBY)
         emojiToStatusname = {   "✅": "angenommen", 
                                 "💤": "on hold", 
-                                "❌": "abgelehnt" 
+                                "❌": "abgelehnt",
+                                "👑": "erledigt"
                             }
-        await channel_BOT_TEST_LOBBY.send(":bookmark_tabs: Statusänderung für Vorschlag von **{0}** ({1}) <@!{1}> `@{2}`\n`{3}`\nwurde auf {4} **{5}** gesetzt!".format(vorschlagMessage.split("**")[1], vorschlagMessage.split("(")[1][:18], vorschlagMessage.split("| ")[1], vorschlagMessage.split("'")[1], payload.emoji.name, emojiToStatusname[payload.emoji.name])) 
+        await userDM.send(":bookmark_tabs: Statusänderung für Vorschlag von **{0}** ({1}) <@!{1}> `@{2}`\n`{3}`\nwurde auf {4} **{5}** gesetzt!".format(vorschlagMessage.split("**")[1], vorschlagMessage.split("(")[1][:18], vorschlagMessage.split("| ")[1], vorschlagMessage.split("'")[1], payload.emoji.name, emojiToStatusname[payload.emoji.name])) 
+        await channel_BTL.send(":bookmark_tabs: Statusänderung für Vorschlag von **{0}** ({1}) <@!{1}> `@{2}`\n`{3}`\nwurde auf {4} **{5}** gesetzt!".format(vorschlagMessage.split("**")[1], vorschlagMessage.split("(")[1][:18], vorschlagMessage.split("| ")[1], vorschlagMessage.split("'")[1], payload.emoji.name, emojiToStatusname[payload.emoji.name])) 
     
     # Personalisierung
     if payload.message_id == ids.messageIDs.REMOVE_ROLE_SELECT: 
