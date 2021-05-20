@@ -86,6 +86,28 @@ def _hasLinkEmbedded(component):
         return "zoom" in component.decoded("description").decode("utf-8").lower()
     return False
 
+def _parseExams(message, botData, courseAndSemester):
+    exams = []
+    umlautCharmap = { ord("ä"): "ae", ord("ü"): "ue", ord("ö"): "oe", ord("ß"): "ss" }
+    
+    with open(botData.modulesDirectory + "/data/klausuren/" + courseAndSemester + ".txt") as fp: 
+        lines = fp.readlines() 
+        for line in lines: 
+            if "#" in line:
+                continue
+            
+            contents = line.split(",")  
+            if "slash" in message.content:
+                if not _displayToUser(userRoleNames, contents[0]):
+                    continue
+              
+            exams.append(Exam(  pName = contents[0].translate(umlautCharmap), 
+                                pDate = datetime.datetime(int(contents[3]), int(contents[2]), int(contents[1]), int(contents[4])),
+                                pDuration = int(contents[5]),
+                                pLocation = line.split("\"")[1] 
+                            ))
+    return exams
+
 def _retrieveExams(botData, courseAndSemester):
     content = ""
     with open(botData.modulesDirectory + "data/calendar/" + courseAndSemester + ".ical", "r") as f:
@@ -185,8 +207,6 @@ async def klausuren(botti, message, botData):
     Dieser Befehl zeigt alle anstehenden Klausuren an.
     !klausuren
     """
-    exams = []
-    
     courseAndSemester = _getCourseAndSemester(message)
     
     if "slash" in message.content:
@@ -197,24 +217,7 @@ async def klausuren(botti, message, botData):
         await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Dein Semester und Studiengang wurde nicht erkannt. Verwende den Befehl in einem Text-Kanal von deinem Semester!")    
         return
     
-    umlautCharmap = { ord("ä"): "ae", ord("ü"): "ue", ord("ö"): "oe", ord("ß"): "ss" }
-    
-    with open(botData.modulesDirectory + "/data/klausuren/" + courseAndSemester + ".txt") as fp: 
-        lines = fp.readlines() 
-        for line in lines: 
-            if "#" in line:
-                continue
-            
-            contents = line.split(",")  
-            if "slash" in message.content:
-                if not _displayToUser(userRoleNames, contents[0]):
-                    continue
-              
-            exams.append(Exam(  pName = contents[0].translate(umlautCharmap), 
-                                pDate = datetime.datetime(int(contents[3]), int(contents[2]), int(contents[1]), int(contents[4])),
-                                pDuration = int(contents[5]),
-                                pLocation = line.split("\"")[1] 
-                            ))
+    exams = _parseExams(message, botData, courseAndSemester)
     
     if len(exams) == 0:
         examString = "```Gerade sind keine anstehenden Klausuren vermerkt!```"
