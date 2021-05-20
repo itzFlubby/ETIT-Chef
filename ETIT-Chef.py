@@ -102,6 +102,11 @@ async def on_message(message):
         if message.author == botti.user:
             return
             
+        if message.channel.type == discord.ChannelType.private:
+            userDM = await modules.bottiHelper._createDM(botti, ids.userIDs.ITZFLUBBY)
+            await userDM.send("**{author.name}#{author.discriminator}** ({author.id}) hat im Privat-Chat folgendes geschrieben: _'{content}'_. | {timestamp}".format(author = message.author, content = message.content, timestamp = modules.bottiHelper._getTimestamp()))
+            
+            
         await modules.bottiHelper._checkPingTrigger(botti, botData, message)
         
         if not message.content.startswith(botData.botPrefix):
