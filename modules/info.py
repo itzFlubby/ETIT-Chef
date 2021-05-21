@@ -1,5 +1,6 @@
 import datetime
 import discord
+import json
 import modules.bottiHelper
 import modules.data.ids as ids
 import os
@@ -160,6 +161,38 @@ async def channelinfo(botti, message, botData):
     
     await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
+async def corona(botti, message, botData):
+    """ 
+    Für alle ausführbar
+    Dieser Befehl zeigt Informationen über das Corona-Virus an.
+    !corona
+    """
+    output = requests.get(botData.coronaAPI["url"])
+    
+    jsonData = json.loads(output.content.decode('utf8'))["features"][0]["attributes"]
+    
+    data = discord.Embed(
+        title = "{bez} {gen}".format(bez = jsonData["BEZ"], gen = jsonData["GEN"]),
+        description = "{debkg_id} {nuts}".format(debkg_id = jsonData["DEBKG_ID"], nuts = jsonData["NUTS"]),
+        color = 0xf55d42
+    )
+    
+    data.add_field(name = "7 Tage Inzidenz (pro 100k)\n{county}".format(county = jsonData["county"]), value = jsonData["cases7_per_100k"])
+    data.add_field(name = "⠀\n{bl}".format(bl = jsonData["BL"]), value = jsonData["cases7_bl_per_100k"])
+    data.add_field(name = "⠀", value = "⠀") # spacer
+    data.add_field(name = "Neuinfektionen pro Woche\n{county}".format(county = jsonData["county"]), value = jsonData["cases7_lk"])
+    data.add_field(name = "⠀\n{bl}".format(bl = jsonData["BL"]), value = jsonData["cases7_bl"])
+    data.add_field(name = "⠀", value = "⠀") # spacer
+    data.add_field(name = "Todesfälle pro Woche\n{county}".format(county = jsonData["county"]), value = jsonData["death7_lk"])
+    data.add_field(name = "⠀\n{bl}".format(bl = jsonData["BL"]), value = jsonData["death7_bl"])
+    data.add_field(name = "⠀", value = "⠀") # spacer
+    
+    data.add_field(name = "⠀", value = "[Quelle]({source})\n[Thumbnail-Quelle]({thumbnail})".format(source = botData.coronaAPI["source"], thumbnail = botData.coronaAPI["thumbnail"]))
+    data.set_thumbnail(url = botData.coronaAPI["thumbnail"])
+    data.set_footer(text = "Letztes Update: {updateTimestamp}.\nJegliche Angaben ohne Gewähr.".format(updateTimestamp = jsonData["last_update"]))
+    
+    await modules.bottiHelper._sendMessagePingAuthor(message, embed = data)
+
 async def fachschaft(botti, message, botData):
     """ 
     Für alle ausführbar
@@ -281,46 +314,69 @@ async def permissions(botti, message, botData):
     {@USER} "", Nutzer-Erwähnung
     !permissions\r!permissions @ETIT-Chef
     """
+    permissionsObject = None
     isUser = True
-    if len(message.role_mentions) != 0:
+    if len(message.role_mentions) > 0:
         isUser = False
-        role = message.role_mentions[0]
-        perm_list = list(role.permissions)
-    
-    if isUser:
-        user = message.author
-    
+        permissionsObject = message.role_mentions[0]
+        standardPerms = list(permissionsObject.permissions)
+    else:
+        permissionsObject = message.author
         if len(message.mentions) != 0:
-            user = message.mentions[0]
+            permissionsObject = message.mentions[0]
+        standardPerms = None
 
-        perm_list = list(user.permissions_in(message.channel))
+    channelPermissionsList = []
+    for textChannel in message.guild.text_channels:
+        channelMentionStrig = textChannel.mention
+        overwrites = textChannel.permissions_for(permissionsObject) if isUser else iter(textChannel.overwrites_for(permissionsObject).pair()[0]) + standardPerms
+        permissionType = 0
+        if overwrites.read_messages:
+            permissionType += 1
+        if overwrites.send_messages:
+            permissionType += 2
+        channelPermissionsList.append([channelMentionStrig, permissionType])
+     
+    permissionTypeToEmoji = {
+        0: modules.bottiHelper._constructEmojiString(ids.emojiIDs.DND) + " Keine Rechte",
+        1: modules.bottiHelper._constructEmojiString(ids.emojiIDs.IDLE) + " Lese Rechte",
+        2: modules.bottiHelper._constructEmojiString(ids.emojiIDs.OFFLINE) + " Undefinierte Rechte", # SHOULD never occur
+        3: modules.bottiHelper._constructEmojiString(ids.emojiIDs.ONLINE) + " Lese- und Schreibrechte"
+    }
     
-    perm_list = str(perm_list).split("[(")[1]
-    perm_list = perm_list.split(")]")[0]
-    total_string = ""
+    partialFieldStrings = [[], [], [], []]
+    
+    formattedString = ":shield: Berechtigungen in Text-Kanälen für {permissionsObjectMention}\n".format(permissionsObjectMention = permissionsObject.mention)
+    for element in channelPermissionsList:
+        channelMentionStrig = element[0]
+        permissionType = element[1]
+        
+        partialFieldStrings[permissionType].append(channelMentionStrig + "\n")
 
-    cuttedStrings = perm_list.split("), (")
-    ignoredPermissions = [  "'priority_speaker', False", 
-                            "'stream', False", 
-                            "'connect', False", 
-                            "'speak', False", 
-                            "'mute_members', False", 
-                            "'deafen_members', False", 
-                            "'move_members', False", 
-                            "'use_voice_activation', False" 
-                        ]
-    for i in range(len(cuttedStrings)):
-        if not isUser or not (cuttedStrings[i] in ignoredPermissions):
-            total_string += cuttedStrings[i] + "\n"
+    data = discord.Embed(
+        title = "",
+        color = 0x123456,
+        description = ""
+    )
 
-    total_string = total_string.replace(", True", " {emoji} (True)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.APPROVE)))
-    total_string = total_string.replace(", False", " {emoji} (False)".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.DENY)))
-    total_string = total_string.replace("'", "`")
-    if isUser:
-        await modules.bottiHelper._sendMessage(message, ":shield: Dies sind die Berechtigungen für **{0}** _in {1}_ {2}:\n{3}".format(user.mention, message.channel.name, message.author.mention, total_string))
-    else:    
-        await modules.bottiHelper._sendMessage(message, ":shield: Dies sind die globalen Berechtigungen für **{0}** _wenn nicht anderweitig gesetzt_:\n{1}".format(role.mention, total_string))
-
+    for run, permissionsTypeList in enumerate(partialFieldStrings):
+        if len(permissionsTypeList) == 0:
+            continue
+        
+        partialFieldString = ""
+        for channelMention in permissionsTypeList:
+            if len(partialFieldString + channelMention) > 1024:
+                data.add_field(name = permissionTypeToEmoji[run], value = partialFieldString)
+                partialFieldString = ""
+            partialFieldString += channelMention
+        data.add_field(name = permissionTypeToEmoji[run], value = partialFieldString)
+        
+    data.set_author(name = "📜 Berechtigungen")
+    data.set_thumbnail(url = botti.user.avatar_url)
+    data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
+    
+    await modules.bottiHelper._sendMessagePingAuthor(message, embed = data)
+            
 async def ping(botti, message, botData):
     """ 
     Für alle ausführbar
@@ -377,6 +433,13 @@ async def quicklink(botti, message, botData):
                         "Hippety hoppety your code is now my property!", 
                         "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Stack_Overflow_icon.svg/768px-Stack_Overflow_icon.svg.png", 
                         0xEF8236
+                    ),
+        "reddit": Quicklink(
+                        "reddit",
+                        "https://www.reddit.com/r/KaIT/",
+                        "r/KaIT",
+                        "https://www.redditinc.com/assets/images/site/reddit-logo.png",
+                        0xFF5700
                     )
     }
     
