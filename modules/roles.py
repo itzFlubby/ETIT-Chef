@@ -11,7 +11,8 @@ emojiToRoleID = {   "💬": ids.roleIDs.ZITATE,
                     "🎰": ids.roleIDs.SPIELHALLE,
                     "🐖": ids.roleIDs.VORLESUNGSSPAM,
                     "⚽": ids.roleIDs.SPORT,
-                    "🚀": ids.roleIDs.STONKS
+                    "🚀": ids.roleIDs.STONKS,
+                    "🎬": ids.roleIDs.MOVIE
                 }        
 
 async def _addRoles(member, addIDs):
