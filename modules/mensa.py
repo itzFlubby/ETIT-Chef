@@ -147,9 +147,10 @@ async def mensa(botti, message, botData):
     lastDate = int(list(jsonData[requestedMensa].keys())[-1])
     
     if (currentDate + (7 * 86400)) > lastDate: # 7 * 86400 : number of seconds in one week
-        await modules.bottiHelper._sendMessage(message, ":fork_knife_plate: Aktualisiere JSON... Dies dauert ein paar Sekunden...\n")
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":fork_knife_plate: Aktualisiere JSON...\n")
         await _updateJson(botData)
-        await asyncio.sleep(5)
+        with open(botData.modulesDirectory + "/data/mensa/mensaData.txt", "r") as outfile: # Reload JSON
+            jsonData = json.loads(outfile.read())
     
     for timestamp in jsonData[requestedMensa].keys():
         if int(timestamp) > currentDate - 86400 + (86400 * requestedDifference): # 86400 number of seconds in one day
@@ -164,10 +165,13 @@ async def mensa(botti, message, botData):
             data.set_footer(text = "Stand: {0}".format(modules.bottiHelper._getTimestamp()))
             
             for foodLine in mensaOptions[requestedMensa]["foodLines"]:
-                mealValues = ""
                 for foodLineData in jsonData[requestedMensa][timestamp][foodLine.name]:
                     if ("nodata" in foodLineData) and foodLineData["nodata"]:
                         mealValues = "__Leider gibt es für diesen Tag hier keine Informationen!__"
+                        break
+                        
+                    if "closing_start" in foodLineData:
+                        mealValues = "__Leider ist hier heute geschlossen. Grund: {reason}__".format(reason = foodLineData["closing_text"])
                         break
                         
                     price = " ({price:.2f}€)".format(price = foodLineData["price_1"]) if not (foodLineData["price_1"] == 0) else ""
