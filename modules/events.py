@@ -63,10 +63,7 @@ async def on_raw_reaction_remove(payload):
                 await member.remove_roles(message.role_mentions[0], reason = "Requested by user.")
 
     if payload.message_id == ids.messageIDs.REMOVE_ROLE_SELECT:
-        if payload.emoji.name == "❌":     
-            await modules.roles._addRoles(member, ids.roleIDs.freetimeRoles)
-        else:
-            await modules.roles._addRoles(member, [ modules.roles.emojiToRoleID[payload.emoji.name] ])
+        await modules.roles._addRoles(member, [ modules.roles.emojiToRoleID[payload.emoji.name] ])
                 
 @botti.event
 async def on_raw_reaction_add(payload): 
@@ -88,10 +85,7 @@ async def on_raw_reaction_add(payload):
     
     # Personalisierung
     if payload.message_id == ids.messageIDs.REMOVE_ROLE_SELECT: 
-        if payload.emoji.name == "❌":     
-            await modules.roles._removeRoles(payload.member, ids.roleIDs.freetimeRoles)
-        else:
-            await modules.roles._removeRoles(payload.member, [ modules.roles.emojiToRoleID[payload.emoji.name] ])
+        await modules.roles._removeRoles(payload.member, [ modules.roles.emojiToRoleID[payload.emoji.name] ])
         
     if payload.message_id == ids.messageIDs.MATLAB_SELECT:
         await payload.member.add_roles(guild.get_role(ids.roleIDs.MATLAB), reason = "Requested by user.")
