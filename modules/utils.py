@@ -22,6 +22,53 @@ from PIL import Image, ImageFont, ImageDraw, ImageSequence
 from random import choice
 from random import randint
 
+def _getFormattedCommands(module, botData):
+    formattedCommands = []
+    longestCommandLength = len(max(module.commandNameList, key = len)) + 1
+    
+    tempFormattedString = ""
+    for command in module.commandNameList:
+        commandLength = len(command)
+        infoText = getattr(module.module, command).__doc__
+        if not infoText:
+            infoText = "<NONE>\n<NONE>\n<NONE>\n<NONE>\n"
+        infoTextLines = infoText.replace("    ", "").replace("Dieser Befehl ", "...").split("\n")
+        
+        formattedCommand = "`" + botData.botPrefix + command + " " * (longestCommandLength - commandLength) + infoTextLines[2] + "`\n"
+        if(len(tempFormattedString + formattedCommand) > 1024):
+            formattedCommands.append(tempFormattedString)
+            tempFormattedString = ""
+        tempFormattedString += formattedCommand
+    formattedCommands.append(tempFormattedString)    
+    return formattedCommands
+
+def _getModuleListForAuthor(botti, message, botData):
+    moduleList = botData.allCommandModules.copy()
+    
+    if not modules.guard._checkPermsQuiet(botti, message, modules.guard.allowed_roles):
+        moduleList.remove(botData.audioCommands)
+        moduleList.remove(botData.banlistCommands)
+        moduleList.remove(botData.devCommands)
+        moduleList.remove(botData.modCommands)
+    
+    return moduleList
+  
+async def _updateHelpEmbed(message, moduleIndex, moduleList, botData):
+    embed = message.embeds[0]
+    embed.clear_fields()
+    
+    formattedCommands = _getFormattedCommands(moduleList[moduleIndex], botData)
+    for commandSection in formattedCommands:
+        embed.add_field(name = "⠀", value = commandSection, inline = False)
+    embed.set_footer(text = "Ausgewähles Modul: {module}\nIn diesem befinden sich {moduleCommands} Befehle!".format(module = moduleList[moduleIndex].moduleName, moduleCommands = len(moduleList[moduleIndex].commandNameList)))
+    
+    view = discord.ui.View(timeout = None)
+    for run, module in enumerate(moduleList):
+        buttonStyle = discord.ButtonStyle.secondary if run != moduleIndex else discord.ButtonStyle.success
+        view.add_item(discord.ui.Button(style = buttonStyle, emoji = module.emoji, label = module.moduleName, custom_id = str(run)))
+    
+    await message.edit(embed = embed, view = view)
+
 async def antwortaufalles(botti, message, botData):
     """ 
     Für alle ausführbar
@@ -115,7 +162,7 @@ async def command(botti, message, botData):
         description = ""
     )
     data.set_author(name = "❓ Befehls-Hilfe") 
-    data.set_thumbnail(url = botti.user.avatar_url)    
+    data.set_thumbnail(url = botti.user.avatar.url)    
     data.set_footer(text = infoTextLines[0])
     
     data.add_field(name = "Beschreibung", value = infoTextLines[1] + "\n⠀", inline = False)
@@ -241,55 +288,22 @@ async def help(botti, message, botData):
     Dieser Befehl zeigt die Befehls-Überischt an.
     !help
     """
-
-    moduleList = botData.allCommandModules.copy()
+    moduleList = _getModuleListForAuthor(botti, message, botData)
     
-    if not modules.guard._checkPermsQuiet(botti, message, modules.guard.allowed_roles):
-        moduleList.remove(botData.audioCommands)
-        moduleList.remove(botData.banlistCommands)
-        moduleList.remove(botData.devCommands)
-        moduleList.remove(botData.modCommands)
-
-    allHelpStrings = []
-    helpStr = "```yaml\n"
-    for module in moduleList:
-        moduleNameLen = len(module.moduleName)
-        spacerLen = int((19 - moduleNameLen) / 2)
-        moduleHeader = ""    
-        moduleHeader += "-"*spacerLen
-        moduleHeader = moduleHeader + " " + module.moduleName.upper() + " "
-        if ((19 - moduleNameLen) % 2) == 0:
-            moduleHeader += "-"*(spacerLen - 1)
-        else:
-            moduleHeader += "-"*spacerLen           
-        moduleStr = "--------------------\n" + moduleHeader + "\n--------------------\n"
-        for command in module.commandNameList:
-            infoText = getattr(module.module, command).__doc__
-            if infoText == None:
-                infoText = "<NONE>\n<NONE>\n<NONE>\n<NONE>\n"
-            infoTextLines = infoText.replace("    ", "").split("\n")
-            del(infoTextLines[0])
-            del(infoTextLines[-1])
-            if len(infoTextLines[2]) < 19:
-                infoTextLines[2] += " "*(19 - len(infoTextLines[2]))
-            moduleStr += infoTextLines[2] + " " + infoTextLines[1] + "\n"
+    data = discord.Embed(
+        title = ":question: Befehls-Hilfe",
+        color = 0x009AFF,
+        description = "Klicke unten auf die Knöpfe, um die Befehle aus den jeweiligen Modulen anzuzeigen!"
+    )
+    data.set_thumbnail(url = botti.user.avatar.url)
+    
+    DM = await modules.bottiHelper._createDM(botti, message.author.id)
+    messageInDM = await DM.send(embed = data)
+    await _updateHelpEmbed(messageInDM, 0, moduleList, botData)
+    
+    messageInChannel = await modules.bottiHelper._sendMessagePingAuthor(message, content = ":question: Hier ist eine Befehls-Hilfe! Diese wurde dir außerdem im Privat-Chat geschickt!", embed = data)
+    await _updateHelpEmbed(messageInChannel, 0, moduleList, botData)
         
-        if len(helpStr) + len(moduleStr) > botData.maxMessageLength:
-            allHelpStrings.append(helpStr)
-            helpStr = "```yaml\n"
-            
-        helpStr += moduleStr 
-    
-    allHelpStrings.append(helpStr)
-        
-    if botti.get_user(message.author.id).dm_channel is None:
-        await botti.get_user(message.author.id).create_dm()
-         
-    for string in allHelpStrings:
-        await botti.get_user(message.author.id).dm_channel.send(string + "```")
-    
-    await modules.bottiHelper._sendMessagePingAuthor(message, ":question: Dir wurde eine Hilfe zugesandt!\n:question: Nutze den Befehl `!command {Unterbefehl}`, um Informationen über einen Befehl, wie dessen Ausführung ein Beispiel Eingaben zu erhalten!\n:question: Nutze zum Beispiel `!command !help`")
-
 async def invite(botti, message, botData):
     """ 
     Für alle ausführbar
