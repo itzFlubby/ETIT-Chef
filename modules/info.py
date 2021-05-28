@@ -119,7 +119,7 @@ async def botinfo(botti, message, botData):
     data.add_field(name = "GitHub", value = "https://github.com/itzFlubby/ETIT-Chef/", inline = False)
     
     data.set_author(name = "🤖 Bot-Info")
-    data.set_thumbnail(url = botti.user.avatar_url)
+    data.set_thumbnail(url = botti.user.avatar.url)
     data.set_footer(text = "ID: {0}\nBei Verbesserungsvorschlägen: !vorschlag <NACHRICHT>\nStand: {1}".format(str(botti.user.id), modules.bottiHelper._getTimestamp()))
     
     await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
@@ -288,7 +288,7 @@ async def minecraft(botti, message, botData):
         color = 0x00ff00,
         description = botData.minecraftServerName
     )
-    data.set_thumbnail(url = botti.user.avatar_url)
+    data.set_thumbnail(url = botti.user.avatar.url)
     data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
     
     try:
@@ -372,7 +372,7 @@ async def permissions(botti, message, botData):
         data.add_field(name = permissionTypeToEmoji[run], value = partialFieldString)
         
     data.set_author(name = "📜 Berechtigungen")
-    data.set_thumbnail(url = botti.user.avatar_url)
+    data.set_thumbnail(url = botti.user.avatar.url)
     data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
     
     await modules.bottiHelper._sendMessagePingAuthor(message, embed = data)
@@ -581,7 +581,7 @@ async def stats(botti, message, botData):
     elif os.name == "posix":
         data.set_thumbnail(url = "https://www.raspberrypi.org/app/uploads/2011/10/Raspi-PGB001.png")
     else:
-        data.set_thumbnail(url = botti.user.avatar_url)
+        data.set_thumbnail(url = botti.user.avatar.url)
     
     data.set_author(name = "📑 Stats")
     data.set_footer(text = "Stand: {0}".format(modules.bottiHelper._getTimestamp()))
@@ -619,7 +619,7 @@ async def uptime(botti, message, botData):
     data.add_field(name = "Zeit seit letztem Neustart", value = "{0} Tage, {1} Stunden, {2} Minuten, {3} Sekunden".format(str(difference.days), hours, minutes, seconds))
     
     data.set_author(name = "⏱ Uptime")
-    data.set_thumbnail(url = botti.user.avatar_url)
+    data.set_thumbnail(url = botti.user.avatar.url)
     data.set_footer(text = "Seitdem wurden {0} Befehle ausgeführt!\nStand: {1}".format(botData.befehlsCounter, modules.bottiHelper._getTimestamp()))
     
     await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
@@ -652,10 +652,10 @@ async def userinfo(botti, message, botData):
     data.add_field(name = "Server beigetreten am", value = modules.bottiHelper._toUTCTimestamp(user.joined_at))
     data.add_field(name = "Account erstellt am", value = modules.bottiHelper._toUTCTimestamp(user.created_at))
     
-    data.add_field(name = "Profilbild", value = user.avatar_url, inline = False)
+    data.add_field(name = "Profilbild", value = user.avatar.url, inline = False)
     
     data.set_author(name = "👨‍🎓 User-Info")
-    data.set_thumbnail(url = user.avatar_url)
+    data.set_thumbnail(url = user.avatar.url)
     data.set_footer(text = "ID: {0}\nStand: {1}".format(str(user.id), modules.bottiHelper._getTimestamp()))
     
     await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
@@ -692,7 +692,7 @@ async def voiceinfo(botti, message, botData):
     data.add_field(name = "Endpoint", value = voiceClient.endpoint, inline = False)
     
     data.set_author(name = "🔊 Voice-Info")
-    data.set_thumbnail(url = botti.user.avatar_url)
+    data.set_thumbnail(url = botti.user.avatar.url)
     data.set_footer(text = "ID: {0}\nStand: {1}".format(str(voiceClient.channel.id), modules.bottiHelper._getTimestamp()))
     
     await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)

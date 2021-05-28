@@ -161,10 +161,11 @@ async def mensa(botti, message, botData):
             )
             
             data.set_author(name = "🍽️ Mensa-Speiseplan")
-            data.set_thumbnail(url = botti.user.avatar_url)
+            data.set_thumbnail(url = botti.user.avatar.url)
             data.set_footer(text = "Stand: {0}".format(modules.bottiHelper._getTimestamp()))
             
             for foodLine in mensaOptions[requestedMensa]["foodLines"]:
+                mealValues = ""
                 for foodLineData in jsonData[requestedMensa][timestamp][foodLine.name]:
                     if ("nodata" in foodLineData) and foodLineData["nodata"]:
                         mealValues = "__Leider gibt es für diesen Tag hier keine Informationen!__"

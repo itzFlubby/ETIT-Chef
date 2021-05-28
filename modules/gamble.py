@@ -357,7 +357,7 @@ async def ranking(botti, message, botData):
         data.add_field(name = "{prefix}{suffix} __{user.name}#{user.discriminator}__{nick}".format(prefix = prefix, suffix = suffix, user = user, nick = nick), value = "{balance} {currency}".format(balance = modules.bottiHelper._spaceIntToString(int(sortedList[i][1])), currency = botData.botCurrency["emoji"]),inline = False)
     
     data.set_author(name = "{currencyEmoji} {currencyNameSingular}-Leaderboard".format(currencyEmoji = botData.botCurrency["emoji"], currencyNameSingular = botData.botCurrency["singular"]))
-    data.set_thumbnail(url = botti.user.avatar_url)
+    data.set_thumbnail(url = botti.user.avatar.url)
     data.set_footer(text = "Stand: {0}".format(modules.bottiHelper._getTimestamp()))
  
     await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)

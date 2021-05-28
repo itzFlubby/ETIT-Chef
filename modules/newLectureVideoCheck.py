@@ -30,7 +30,7 @@ async def _cyclicNewLectureVideoCheck():
         if newLog[lastCycleLineIndexNew] == oldLog[lastCycleLineIndexOld]:
             continue
         
-        elementsString = "{emoji} Letzer Zyklus `@{date}`\n".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.ILIAS), date = newLog[lastCycleLineIndexNew].split(" - ")[1])
+        elementsString = "{emoji} Letzter Zyklus `@{date}`\n".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.ILIAS), date = newLog[lastCycleLineIndexNew].split(" - ")[1])
         for run, line in enumerate(newLog[(lastCycleLineIndexNew+1):]):
             if ".mp4" in line:
                 elementsString += "```fix\n" + line[8:] + "```" # 8 = len("Writing ")
@@ -43,7 +43,7 @@ async def _cyclicNewLectureVideoCheck():
 def _getLastCycleDate(log):
     for lineIndex in range(len(log) - 1, 0, -1): # step in reversed order
         if "Cycle" in log[lineIndex]:
-            return lineIndex            
+            return lineIndex
 
 def _getAccessAndRefreshToken():
     with open(botData.modulesDirectory + "data/newLectureVideoCheck/token.txt", 'r') as f:

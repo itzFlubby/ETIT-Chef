@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import discord
+import json
 import modules.banlist
 import modules.bottiHelper
 import modules.data.ids as ids
@@ -11,6 +12,8 @@ import xlrd
 import xlwt
 
 from discord_slash import SlashContext
+
+import requests
 
 async def balancekeeper(botti, message, botData):
     """ 
@@ -76,7 +79,7 @@ async def commandlist(botti, message, botData):
         
     data.add_field(name = "Slash-Commands", value = botData.slashCommandList, inline = False)
     
-    data.set_thumbnail(url = botti.user.avatar_url)
+    data.set_thumbnail(url = botti.user.avatar.url)
     data.set_author(name = botti.user.name + "#" + str(botti.user.discriminator), icon_url = "https://cdn.discordapp.com/app-assets/" + str(botti.user.id) + "/" + str(ids.assetIDs.PROFILE_PICTURE) + ".png")
     data.set_footer(text = "Insgesamt sind das " + str(botData.totalCommands) + " Befehle!")
     
@@ -178,7 +181,7 @@ async def mdtext(botti, message, botData):
         textStart = 8 if len(parameters) == 0 else 11 # 8 = len("!mdtext ") | 11 = len("!mdtext ") + len("-q ")
         showInline = False if "n" in parameters else True
         
-        text = message.content[textStart:] if message.content[textStart:] is not "" else "Beispiel Text! 1234567890 !\"§$%&/()='#*+-/<>{[]}\\" 
+        text = message.content[textStart:] if message.content[textStart:] != "" else "Beispiel Text! 1234567890 !\"§$%&/()='#*+-/<>{[]}\\" 
         
         markdownTypes = [ "asciidoc", "autohotkey", "bash", "coffescript", "cpp", "cs", "css", "diff", "fix", "glsl", "ini", "json", "md", "ml", "prolog", "py", "tex", "xl", "xml" ]
         
@@ -192,7 +195,7 @@ async def mdtext(botti, message, botData):
             data.add_field(name = markdownType, value = "```" + markdownType + "\n" + text + "```", inline = showInline)
         
         data.set_author(name = "🖊️ Markdown-Typen")
-        data.set_thumbnail(url = botti.user.avatar_url)
+        data.set_thumbnail(url = botti.user.avatar.url)
 
         await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
     except:
@@ -218,7 +221,7 @@ async def modulelist(botti, message, botData):
         color = 0x800080,
         description = ""
     )    
-    data.set_thumbnail(url = botti.user.avatar_url)
+    data.set_thumbnail(url = botti.user.avatar.url)
     data.set_author(name = botti.user.name + "#" + str(botti.user.discriminator), icon_url = "https://cdn.discordapp.com/app-assets/" + str(botti.user.id) + "/" + str(ids.assetIDs.PROFILE_PICTURE) + ".png")
     
     for commandModule in botData.allCommandModules:
@@ -244,7 +247,7 @@ async def restart(botti, message, botData):
     print("---")
     if "n" not in params:
         await save(botti, message, botData)
-    os.execv("/usr/bin/python3.7", ["python"] + [botData.baseDirectory + "ETIT-Chef.py"])
+    os.execv("/usr/bin/python3.8", ["python"] + [botData.baseDirectory + "ETIT-Chef.py"])
 
 async def save(botti, message, botData):
     """ 

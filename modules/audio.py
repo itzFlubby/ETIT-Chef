@@ -88,7 +88,6 @@ async def play(botti, message, botData):
             voiceClient = voiceClients[x]
     
     if voiceClient.is_playing() or voiceClient.is_paused():
-        
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Bot hat bereits Musik geladen. Nutze zuerst `!stop`, um ein weiteres Musikstück abspielen zu können!")
         return
         

@@ -35,8 +35,8 @@ import modules.polls
 import modules.timer
 import modules.utils
 
-slash = SlashCommand(botti, sync_commands = True)
-import modules.slash  # MUSS unter der Deklaration und Initialisierung von den Objekten slash und botti stehen
+#slash = SlashCommand(botti, sync_commands = True)
+#import modules.slash  # MUSS unter der Deklaration und Initialisierung von den Objekten slash und botti stehen
 import modules.events # MUSS unter der Deklaration und Initialisierung vom Objekten botti stehen
 
 from modules.data.commandModule import commandModule             
@@ -46,8 +46,8 @@ async def on_ready():
 
     if botData.firstBoot:
         modules.bottiHelper._loadSettings(botData)
-        botData.totalSlashCommands = len(slash.commands)
-        botData.slashCommandList = list(slash.commands)
+        botData.totalSlashCommands = 0#len(slash.commands)
+        botData.slashCommandList = 0#list(slash.commands)
 
     data = discord.Embed(
         title = "[{emoji}] Online".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.ONLINE)),
@@ -61,7 +61,7 @@ async def on_ready():
     data.add_field(name = "Nutzer", value = len(botti.users))
     data.add_field(name = "Python Build", value = str(platform.python_build()).replace("'", "").replace("(", "").replace(")", ""))
     data.set_footer(text = "[ID]: {}\nInsgesamt {} Befehle • {} Slash-Befehle!\nGestartet {}".format(str(botti.user.id), str(botData.totalCommands), str(botData.totalSlashCommands), modules.bottiHelper._toSTRFTimestamp(botData.startTimestamp)))
-    data.set_thumbnail(url = botti.user.avatar_url)
+    data.set_thumbnail(url = botti.user.avatar)
     data.set_author(name = botti.user.name + "#" + botti.user.discriminator, icon_url="https://cdn.discordapp.com/app-assets/" + str(botti.user.id) + "/" + str(ids.assetIDs.PROFILE_PICTURE) + ".png")
     
     if botData.firstBoot:
