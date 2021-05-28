@@ -1,91 +1,95 @@
 import discord
 import modules.bottiHelper
-import os
-import xlrd
-import xlwt
 
-from xlutils.copy import copy
+def _getStringAfter(string, after):
+    return string[(string.find(after)+len(after)):]
 
-async def polls(botti, message, botData):
-    """ 
-    Für alle ausführbar
-    Dieser Befehl listet alle aktiven Umfragen auf.
-    !polls
-    """
-    await modules.bottiHelper._sendMessage(message, ":grey_question: Es gibt die folgenden Umfragen {}:".format(message.author.mention))
-    all_polls = "```\n"
-    for filename in os.listdir(botData.modulesDirectory + "/data/polls"):
-        all_polls += filename.split(".")[0] + "\n";
-    await modules.bottiHelper._sendMessage(message, all_polls + "```")
-
-async def viewpoll(botti, message, botData):
-    """ 
-    Für alle ausführbar
-    Dieser Befehl listet alle Abstimmungsmöglichkeiten einer Umfrage auf.
-    !viewpoll {UMFRAGE}
-    {UMFRAGE} String [Umfragen-Name kann mit !polls angezeigt werden]
-    !viewpoll Umfrage
-    """
-    try:
-        pollname = message.content.split(" ")[1].lower()
-    except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "viewpoll"))      
-        return
-    try:
-        workbook = xlrd.open_workbook(botData.modulesDirectory + "/data/polls/" + pollname + ".xls")
-    except FileNotFoundError:
-        
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Diese Umfrage existiert nicht! Verwende `!polls`, um die aktuellen Abstimmungen anzuzeigen.")
-        return
-    sheet = workbook.sheet_by_index(0)
-    
-    await modules.bottiHelper._sendMessage(message, ":grey_question: Für die Umfrage `" + pollname + "` stehen die folgenen Abstimmungsmöglichkeiten zur Verfügung {}:".format(message.author.mention))
-    all_options = "```\n"
-    for i in range(2, sheet.ncols):
-        try:
-            content = sheet.cell_value(rowx=2, colx=i)
-            if content == "":
+async def _updatePoll(message, vote, user, botData):
+    embed = message.embeds[0]
+    for run, field in enumerate(embed.fields):
+        if field.name == vote:
+            if user.mention in field.value: # If user already voted
+                mentionBegin = field.value.find(user.mention)
+                mentionEnd = mentionBegin + len(user.mention)
+                clicked = field.value[mentionEnd:].split("`")[0]
+                restValue = _getStringAfter(field.value[mentionEnd:], "`\n`")
+                
+                if not clicked:
+                    clicked = 2
+                else:
+                    clicked = int(clicked[3:]) + 1
+                
+                newValue = field.value[:mentionEnd] + " x " + str(clicked) + "`\n`" + restValue
+                embed.set_field_at(index = run, name = field.name, value = newValue)
                 break
-        except IndexError:
+            embed.set_field_at(index = run, name = field.name, value = (user.mention + "`\n`") if (field.value == "Keine Stimmen") else field.value + user.mention + "`\n`")
             break
-        all_options += content + "\n"
-    await modules.bottiHelper._sendMessage(message, all_options + "```")
+    await message.edit(embed = embed)
     
-async def vote(botti, message, botData):
-    """ 
-    Für alle ausführbar
-    Dieser Befehl stimmt in einer Umfrage ab.
-    !vote {UMFRAGE} {OPTION}
-    {UMFRAGE} String [Name der Umfrage; Umfragen können mit !polls gelistet werden]
-    {OPTION} String [Optionen können mit !viewpoll {UMFRAGE} aufgelistet werden]
-    !vote Umfrage Option
+async def createpoll(botti, message, botData):
     """
-    try:
-        pollname = message.content[6:].split(" ")[0].lower()
-        polloption = message.content.split(" ")[2].lower()
-    except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "vote"))      
+    Reserviert für Moderator oder höher
+    Dieser Befehl erstellt eine Umfrage.
+    !createpoll {TITLE} {OPTIONS}
+    {TITLE} "String"
+    {OPTIONS} OPT1,OPT2,OPT3,...
+    !createpoll "Ist dieses Feature der Hammer?!" ja, nein, weiß ich nicht
+    """
+    if len(message.content.split(" ")) < 2 or len(message.content.split("\"")) < 2 or len(message.content.split(",")) < 2:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "createpoll"))      
+        return 
+    
+    embed = discord.Embed(
+        title = "Abstimmung",
+        color = 0xff5500,
+        description = "{pollTopic}".format(pollTopic = message.content.split("\"")[1])
+    )
+    
+    options = message.content.split("\"")[2][1:].split(",")
+    for option in options:
+        option = option[1:] if option[0] == " " else option # Remove whitespace if user set one
+        embed.add_field(name = option, value = "Keine Stimmen")
+    
+    embed.add_field(name = "Abstimmung von", value = message.author.mention, inline = False)
+    embed.set_thumbnail(url = message.author.avatar.url)
+    embed.set_footer(text = "Stand: {timestamp}".format(timestamp = modules.bottiHelper._getTimestamp()))
+    
+    view = discord.ui.View(timeout = None)
+    for run, field in enumerate(embed.fields):
+        if run == len(embed.fields) - 1:
+            break # If last element reached, don't make "Abstimmung von" a button
+        view.add_item(discord.ui.Button(style = discord.ButtonStyle.secondary, label = field.name, custom_id = field.name))
+        
+    message = await modules.bottiHelper._sendMessage(message, embed = embed, view = view)
+    await _updatePoll(message, None, None, botData)
+    
+async def repostpoll(botti, message, botData):
+    """
+    Reserviert für Moderator oder höher
+    Dieser Befehl postet eine Umfrage erneut.
+    !repostpoll {ID}
+    {ID} Message-ID
+    !repostpoll 1234567891011121314
+    """
+    if len(message.content.split(" ")) < 2:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "repostpoll"))      
+        return 
+        
+    message = await message.channel.fetch_message(int(message.content.split(" ")[1]))
+    if message == None:
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Diese Abstimmung konnte ich nicht finden!")
         return
-    try:
-        workbook = xlrd.open_workbook(botData.modulesDirectory + "/data/polls/" + pollname + ".xls")
-    except FileNotFoundError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Die Umfrage `{0}` existiert nicht! Verwende `!polls`, um die aktuellen Abstimmungen anzuzeigen.".format(pollname))
-        return
-    old_sheet = workbook.sheet_by_index(0)
-    wb = copy(workbook)
-    new_sheet = wb.get_sheet(0)
-    voted = False
-    for i in range(2, old_sheet.ncols):
-        content = old_sheet.cell_value(rowx=2, colx=i)
-        if content == polloption:
-            new_sheet.write(old_sheet.nrows, i, "X")
-            voted = True
-            break
-    if voted is False:
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Die Option **{0}** existiert in dieser Umfrage nicht!".format(polloption))
-        return
-    new_sheet.write(old_sheet.nrows, 0, message.author.name + "#" + message.author.discriminator)
-    new_sheet.write(old_sheet.nrows, 1, "")
-    wb.save(botData.modulesDirectory + "/data/polls/" + pollname + ".xls")
-    await modules.bottiHelper._sendMessagePingAuthor(message, ":grey_question: Du hast in der Umfrage `{0}` erfolgreich für **{1}** abgestimmt.".format(pollname, polloption))
- 
+        
+    if len(message.embeds) != 0:
+        if message.embeds[0].title != "Abstimmung":
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Bei dieser Nachricht handelt es sich um keine Abstimmung!")
+            return  
+            
+    view = discord.ui.View(timeout = None)
+    for run, field in enumerate(message.embeds[0].fields):
+        if run == len(message.embeds[0].fields) - 1:
+            break # If last element reached, don't make "Abstimmung von" a button
+        view.add_item(discord.ui.Button(style = discord.ButtonStyle.secondary, label = field.name, custom_id = field.name))
+     
+    await message.delete()
+    await modules.bottiHelper._sendMessage(message, content = ":arrow_double_down: Die Umfrage wurde nach unten gezogen!", embed = message.embeds[0], view = view)
