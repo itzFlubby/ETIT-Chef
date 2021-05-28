@@ -19,10 +19,14 @@ def _appendItem(itemList, day, start, end, summary):
     itemList[day].append("`" + start.strftime("%H:%M") + " - " + end.strftime("%H:%M` ") + summary + "\n")
     
 def _compareDate(first, second):
-    if first.month < second.month or first.day < second.day :
+    first = first.date() if isinstance(first, datetime.datetime) else first
+    second = second.date() if isinstance(second, datetime.datetime) else second
+    
+    if first < second:
         return 1
-
-    if first.month > second.month or first.day > (second.day + 6): # 7 days in week -> 0, 1, 2, 3, 4, 5, 6 -> +6 to include all events in week
+    
+    second += datetime.timedelta(days = 6) # 7 days in week -> 0, 1, 2, 3, 4, 5, 6 -> +6 to include all events in week
+    if first > second:
         return 2
         
     return 0
@@ -342,7 +346,7 @@ async def wochenplan(botti, message, botData):
                         continue
                 
                 if "INTERVAL" in rrule:
-                    if (abs(startOfWeek.isocalendar()[1] - dtstart.isocalendar()[1]) % rrule["INTERVAL"][0]) is 0: # If interval event in this week
+                    if (abs(startOfWeek.isocalendar()[1] - dtstart.isocalendar()[1]) % rrule["INTERVAL"][0]) == 0: # If interval event in this week
                         if _dateNotExcluded(component, startOfWeek, range(0, 7)):
                             _appendItem(weekdayItems, dtstart.weekday(), dtstart, dtend, summary)
                     continue
@@ -369,7 +373,8 @@ async def wochenplan(botti, message, botData):
                 _appendItem(weekdayItems, dtstart.weekday(), dtstart, dtend, summary)
                 continue    
                 
-            if _compareDate(dtstart, startOfWeek) is not 0:
+            if _compareDate(dtstart, startOfWeek) != 0:
+                print("excluded " +component.decoded("uid").decode("utf-8"))
                 continue
             else:
                 _appendItem(weekdayItems, dtstart.weekday(), dtstart, dtend, summary)
