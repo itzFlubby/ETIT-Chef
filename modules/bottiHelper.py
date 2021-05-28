@@ -136,11 +136,11 @@ def _maintenanceChange(configFile):
         for line in lines:
             conf.write(line)
             
-async def _sendMessage(message, content = "", embed = None, file = None):
+async def _sendMessage(message, content = "", embed = None, file = None, view = None):
     await message.channel.trigger_typing()
-    return await message.channel.send(content, embed = embed, file = file)
+    return await message.channel.send(content, embed = embed, file = file, view = view)
 
-async def _sendMessagePingAuthor(message, content = "", embed = None, file = None):
+async def _sendMessagePingAuthor(message, content = "", embed = None, file = None, view = None):
     return await _sendMessage(message = message, content = "{} {}".format(content, message.author.mention), embed = embed, file = file)
         
 async def _setNormalStatus(botti, botData):
