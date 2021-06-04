@@ -156,7 +156,7 @@ async def channelinfo(botti, message, botData):
     data.add_field(name = "Thema", value = channelToGetInfo.topic, inline = False)
     
     data.set_author(name = "💬 Kanal-Info")
-    data.set_thumbnail(url = message.guild.icon_url)
+    data.set_thumbnail(url = message.guild.icon.url)
     data.set_footer(text = "ID: {0}\nStand: {1}".format(str(channelToGetInfo.id), modules.bottiHelper._getTimestamp()))
     
     await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
@@ -500,7 +500,7 @@ async def roleinfo(botti, message, botData):
     data.add_field(name = "Standard", value = str(role.is_default()))
     
     data.set_author(name = "🧾 Rollen-Info")
-    data.set_thumbnail(url = message.guild.icon_url)
+    data.set_thumbnail(url = message.guild.icon.url)
     data.set_footer(text = "ID: {0}\nStand: {1}".format(str(role.id), modules.bottiHelper._getTimestamp()))
     
     await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
@@ -531,10 +531,10 @@ async def serverinfo(botti, message, botData):
     
     data.add_field(name = "Erstellt am", value = modules.bottiHelper._toUTCTimestamp(message.guild.created_at), )
     
-    data.add_field(name = "Icon", value = message.guild.icon_url, inline = False)
+    data.add_field(name = "Icon", value = message.guild.icon.url, inline = False)
     
     data.set_author(name = "📱 Server-Info")
-    data.set_thumbnail(url = message.guild.icon_url)
+    data.set_thumbnail(url = message.guild.icon.url)
     data.set_footer(text = "ID: {0}\nStand: {1}".format(str(message.guild.id), modules.bottiHelper._getTimestamp()))
     
     await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
@@ -723,7 +723,7 @@ async def zitate(botti, message, botData):
         data.add_field(name = "Platz #{place}".format(place = (run+1)), value = "Festgehalten von {citation.author.mention} | {reaction.count} {reaction.emoji}\n{citation.content}".format(citation = citation[0], reaction = citation[1]), inline = False)
 
     data.set_author(name = "💬 Zitate-Ranking")
-    data.set_thumbnail(url = message.guild.icon_url)
+    data.set_thumbnail(url = message.guild.icon.url)
     data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
     
     await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
