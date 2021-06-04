@@ -374,7 +374,6 @@ async def wochenplan(botti, message, botData):
                 continue    
                 
             if _compareDate(dtstart, startOfWeek) != 0:
-                print("excluded " +component.decoded("uid").decode("utf-8"))
                 continue
             else:
                 _appendItem(weekdayItems, dtstart.weekday(), dtstart, dtend, summary)
