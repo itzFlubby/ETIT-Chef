@@ -177,8 +177,8 @@ async def corona(botti, message, botData):
         color = 0xf55d42
     )
     
-    data.add_field(name = "7 Tage Inzidenz (pro 100k)\n{county}".format(county = jsonData["county"]), value = jsonData["cases7_per_100k"])
-    data.add_field(name = "⠀\n{bl}".format(bl = jsonData["BL"]), value = jsonData["cases7_bl_per_100k"])
+    data.add_field(name = "7 Tage Inzidenz (pro 100k)\n{county}".format(county = jsonData["county"]), value = "{:.2f}".format(jsonData["cases7_per_100k"]))
+    data.add_field(name = "⠀\n{bl}".format(bl = jsonData["BL"]), value = "{:.2f}".format(jsonData["cases7_bl_per_100k"]))
     data.add_field(name = "⠀", value = "⠀") # spacer
     data.add_field(name = "Neuinfektionen pro Woche\n{county}".format(county = jsonData["county"]), value = jsonData["cases7_lk"])
     data.add_field(name = "⠀\n{bl}".format(bl = jsonData["BL"]), value = jsonData["cases7_bl"])
