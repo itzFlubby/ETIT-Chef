@@ -41,17 +41,6 @@ def _getFormattedCommands(module, botData):
         tempFormattedString += formattedCommand
     formattedCommands.append(tempFormattedString)    
     return formattedCommands
-
-def _getModuleListForAuthor(botti, message, botData):
-    moduleList = botData.allCommandModules.copy()
-    
-    if not modules.guard._checkPermsQuiet(botti, message, modules.guard.allowed_roles):
-        moduleList.remove(botData.audioCommands)
-        moduleList.remove(botData.banlistCommands)
-        moduleList.remove(botData.devCommands)
-        moduleList.remove(botData.modCommands)
-    
-    return moduleList
   
 async def _updateHelpEmbed(message, moduleIndex, moduleList, botData):
     embed = message.embeds[0]
@@ -288,7 +277,7 @@ async def help(botti, message, botData):
     Dieser Befehl zeigt die Befehls-Überischt an.
     !help
     """
-    moduleList = _getModuleListForAuthor(botti, message, botData)
+    moduleList = botData.allCommandModules.copy()
     
     data = discord.Embed(
         title = ":question: Befehls-Hilfe",
@@ -316,7 +305,7 @@ async def invite(botti, message, botData):
         description = ""
     )
     data.set_author(name = "🥳 Einladung")
-    data.set_thumbnail(url = message.guild.icon_url)
+    data.set_thumbnail(url = message.guild.icon.url)
             
     invites = await message.guild.invites()
     
