@@ -1,4 +1,4 @@
-import datetime
+﻿import datetime
 import modules.bottiHelper
 import modules.data.ids as ids
 import modules.calendar
@@ -19,13 +19,13 @@ from modules.data.botData import botData
 
 @slash.slash(name="wochenplan", description="Zeigt dir deinen personalisierten Wochenplan an.", guild_ids = [ ids.serverIDs.ETIT_KIT ], 
     options = [ manage_commands.create_option(
-        name = "Datum",
+        name = "date",
         description = "Optionales Datum im Format TT.MM.JJJJ",
         option_type = 3,
         required = False 
     )])
 async def _wochenplan(ctx: SlashContext, date = ""):
-    await modules.bottiHelper._logSlashCommand(ctx, botData)
+    modules.bottiHelper._logCommand(botData, ctx = ctx)
     date = date if date != "" else datetime.datetime.now().strftime("%d.%m.%Y")
     dummyMessage = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, "{prefix}wochenplan {date} slash".format(prefix = botData.botPrefix, date = date))
     embed = await modules.calendar.wochenplan(botti, dummyMessage, botData)
@@ -65,7 +65,7 @@ async def _wochenplan(ctx: SlashContext, date = ""):
         required = True 
     )])
 async def _convert(ctx, typ, inhalt):
-    await modules.bottiHelper._logSlashCommand(ctx, botData)
+    modules.bottiHelper._logCommand(botData, ctx = ctx)
     
     msg = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, "!convert " + typ + " " + inhalt)
     await ctx.send(content = "Slash-Command: Convert")
@@ -73,7 +73,7 @@ async def _convert(ctx, typ, inhalt):
 
 @slash.slash(name="klausuren", description="Zeigt dir personalisiert deine anstehenden Klausuren an.", guild_ids = [ ids.serverIDs.ETIT_KIT ])
 async def _klausuren(ctx: SlashContext):
-    await modules.bottiHelper._logSlashCommand(ctx, botData)
+    modules.bottiHelper._logCommand(botData, ctx = ctx)
     dummyMessage = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, "{prefix}klausuren slash".format(prefix = botData.botPrefix))
     examString = await modules.calendar.klausuren(botti, dummyMessage, botData)
     await ctx.send(content = "Slash-Command: Klausuren")   
@@ -89,7 +89,7 @@ async def _klausuren(ctx: SlashContext):
         )
     ])
 async def _lerngruppe(ctx, user):
-    await modules.bottiHelper._logSlashCommand(ctx, botData)
+    modules.bottiHelper._logCommand(botData, ctx = ctx)
     commandArgs = "{prefix}lerngruppe add {userMention}".format(prefix = botData.botPrefix, userMention = user.mention)
     
     print(commandArgs)
@@ -106,7 +106,7 @@ async def _lerngruppe(ctx, user):
         required = True 
     )])
 async def _userinfo(ctx, benutzer):
-    await modules.bottiHelper._logSlashCommand(ctx, botData)
+    modules.bottiHelper._logCommand(botData, ctx = ctx)
     msg = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, "")
     msg.mentions = [ benutzer ]
     await ctx.send(content = "Slash-Command: Userinfo")
@@ -120,7 +120,7 @@ async def _userinfo(ctx, benutzer):
         required = True 
     )])
 async def _vorschlag(ctx: SlashContext, nachricht):
-    await modules.bottiHelper._logSlashCommand(ctx, botData)   
+    modules.bottiHelper._logCommand(botData, ctx = ctx)   
     if botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel is None:
         await botti.get_user(ids.userIDs.ITZFLUBBY).create_dm()
     sentMessage = await botti.get_user(ids.userIDs.ITZFLUBBY).dm_channel.send("**{0}#{1}** ({2}) hat per SlashCommand folgendes vorgeschlagen: _'{3}'_. | {4}".format(ctx.author.name, ctx.author.discriminator, ctx.author.id, nachricht, modules.bottiHelper._getTimestamp()))
@@ -174,7 +174,7 @@ async def _vorschlag(ctx: SlashContext, nachricht):
         } ],
     required = False )])
 async def _mensa(ctx, mensa = "adenauerring", wochentag = "none"):
-    modules.bottiHelper._logSlashCommand(ctx, botData)
+    modules.bottiHelper._logCommand(botData, ctx = ctx)
     commandArgs = "!mensa " + mensa + " "
     if wochentag != "none":
         commandArgs = commandArgs + wochentag
@@ -182,8 +182,6 @@ async def _mensa(ctx, mensa = "adenauerring", wochentag = "none"):
     msg = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, commandArgs)
     await ctx.send(content = "Slash-Command: Mensa")
     await modules.mensa.mensa(botti, msg, botData)
-
-
 
 @botti.event
 async def on_slash_command_error(ctx, ex):

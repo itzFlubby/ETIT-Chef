@@ -112,18 +112,26 @@ def _loadSettings(botData):
     
     botData.baseDirectory = lines[4][17:]
     
-def _logCommand(message, botData):
-    botData.lastCommands =  botData.lastCommands[-1:] + botData.lastCommands[:-1]
-    botData.lastCommands[0] = message
+def _logCommand(botData, message = None, ctx = None):
+    entryElement = message if message != None else ctx
     
-    if type(message.channel) is discord.DMChannel:
+    botData.lastCommands =  botData.lastCommands[-1:] + botData.lastCommands[:-1]
+    botData.lastCommands[0] = entryElement
+    
+    botData.log.append(entryElement)
+    if len(botData.log) > 10:
+        with open(botData.modulesDirectory + "data/log/log.txt", "a+") as f:
+            for entry in botData.log:
+                if type(entry) is discord.Message:
+                    f.write(_formatCommandLog(entry))
+                else:
+                    f.write(_formatSlashCommandLog(entry))
+        botData.log.clear()
+                    
+    if type(entryElement.channel) is discord.DMChannel:
         return -1
     else:
         return 0
-
-async def _logSlashCommand(ctx, botData):
-    botData.lastCommands =  botData.lastCommands[-1:] + botData.lastCommands[:-1]
-    botData.lastCommands[0] = ctx
         
 def _maintenanceChange(configFile):
     with open(configFile, "r") as conf:
