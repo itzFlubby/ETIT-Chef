@@ -90,7 +90,7 @@ def _hasLinkEmbedded(component):
         return "zoom" in component.decoded("description").decode("utf-8").lower()
     return False
 
-def _parseExams(message, botData, courseAndSemester):
+def _parseExams(message, botData, courseAndSemester, userRoleNames = None):
     exams = []
     umlautCharmap = { ord("ä"): "ae", ord("ü"): "ue", ord("ö"): "oe", ord("ß"): "ss" }
     
@@ -216,12 +216,14 @@ async def klausuren(botti, message, botData):
     if "slash" in message.content:
         courseAndSemester = "all"
         userRoleNames = [ role.name for role in message.author.roles ]
+    else:
+        userRoleNames = None
         
     if courseAndSemester == None:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Dein Semester und Studiengang wurde nicht erkannt. Verwende den Befehl in einem Text-Kanal von deinem Semester!")    
         return
     
-    exams = _parseExams(message, botData, courseAndSemester)
+    exams = _parseExams(message, botData, courseAndSemester, userRoleNames)
     
     if len(exams) == 0:
         examString = "```Gerade sind keine anstehenden Klausuren vermerkt!```"
@@ -397,7 +399,7 @@ async def wochenplan(botti, message, botData):
         data.add_field(name = weekdayNames[i] + (startOfWeek + datetime.timedelta(days = i)).strftime(" `(%d.%m.%Y)`"), value = dayString[:1024], inline = False)
     
     data.set_author(name = "🗓️ Wochenplan für " + (courseAndSemester if (courseAndSemester != "all") else message.author.name))
-    data.set_thumbnail(url = botti.user.avatar_url)
+    data.set_thumbnail(url = botti.user.avatar.url)
     data.set_footer(text = "Vorlesung, wenn nicht anderweitig angegeben.\nJegliche Angaben ohne Gewähr.\nStand: {}".format(modules.bottiHelper._toGermanTimestamp(lastModified)))
     
     if not "slash" in message.content:
