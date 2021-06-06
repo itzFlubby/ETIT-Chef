@@ -13,15 +13,14 @@ from modules.data.botData import botData
 async def on_interaction(interaction):
     message = interaction.message
     data = interaction.data
-    if message.embeds != None:
-        embed = message.embeds[0]
-        if ":question: Befehls-Hilfe" == embed.title:
-            await modules.utils._updateHelpEmbed(message, int(data["custom_id"]), botData.allCommandModules, botData)
-            
-        if "Abstimmung" == embed.title:
-            await modules.polls._updatePoll(message, data["custom_id"], interaction.user, botData)
-    
-    
+    if message != None:
+        if message.embeds != None:
+            embed = message.embeds[0]
+            if ":question: Befehls-Hilfe" == embed.title:
+                await modules.utils._updateHelpEmbed(message, int(data["custom_id"]), botData.allCommandModules, botData)
+                
+            if "Abstimmung" == embed.title:
+                await modules.polls._updatePoll(message, data["custom_id"], interaction.user, botData)
 
 @botti.event
 async def on_member_join(member):
