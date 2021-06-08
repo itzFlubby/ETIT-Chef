@@ -107,40 +107,6 @@ async def estimateprunes(botti, message, botData):
     
     await modules.bottiHelper._sendMessagePingAuthor(message, ":stopwatch: **{}** Mitglieder sind seit **{}** Tagen inaktiv.".format(estimated_prunes, nDays))
 
-async def eval(botti, message, botData):    
-    """
-    Reserviert für Moderator oder höher
-    Dieser Befehl evaluiert eine Umfrage.
-    !eval {UMFRAGE}
-    {UMFRAGE} String [Umfragen-Name; Umfragen können mit !polls gelistet wreden]
-    !eval Umfrage
-    """
-    try:
-        pollname = message.content.split(" ")[1]
-    except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "eval"))      
-        return  
-    try:
-        workbook = xlrd.open_workbook(botData.modulesDirectory + "/data/polls/" + pollname + ".xls")
-    except FileNotFoundError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Diese Umfrage existiert nicht! Verwende `{prefix}polls`, um die aktuellen Abstimmungen anzuzeigen.".format(prefix = botData.botPrefix))
-        return
-    sheet = workbook.sheet_by_index(0)
-    
-    await modules.bottiHelper._sendMessage(message, ":grey_question: Für die Umfrage `" + pollname + "` wurde folgendermaßen abgestimmt {0}:".format(message.author.mention))
-    all_votes = "```\n"
-    for i in range(2, sheet.ncols):
-        vote_count = 0
-        for k in range(3, sheet.nrows):
-            content = sheet.cell_value(rowx=k, colx=i)
-            if content == "X":
-                vote_count += 1    
-        
-        all_votes += sheet.cell_value(rowx=2, colx=i) + ": " + str(vote_count) + "\n"
-
-    
-    await modules.bottiHelper._sendMessage(message, all_votes + "```")
-
 async def kick(botti, message, botData):
     """
     Reserviert für Moderator oder höher
@@ -225,35 +191,6 @@ async def nick(botti, message, botData):
     
     except discord.errors.Forbidden:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Leider habe ich dazu keine Berechtigung")
-
-async def poll(botti, message, botData):
-    """
-    Reserviert für Moderator oder höher
-    Dieser Befehl erstellt eine Umfrage.
-    !poll {NAME} {OPTIONEN}
-    {NAME} String
-    {OPTIONEN} String;String;String;...
-    !poll Umfrage OPT1;OPT2;OPT3
-    """
-    try:
-        pollname = message.content.split(" ")[1].lower()
-        polloptions = message.content.split(" ")[2].lower().split(";")
-    except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "poll"))      
-        return  
-
-    wb = xlwt.Workbook()
-    ws = wb.add_sheet("Main sheet")
-    ws.write(0, 0, pollname)
-    ws.write(0, 1, datetime.datetime.now())
-    ws.write(2, 0, "Username")
-    i = 2
-    for option in polloptions:
-        ws.write(2, i, option)
-        i += 1
-    wb.save(botData.modulesDirectory + "/data/polls/" + pollname + ".xls")
-    
-    await modules.bottiHelper._sendMessagePingAuthor(message, ":grey_question: Die Umfrage **{0}** wurde erfolgreich erstellt.".format(pollname))
 
 async def purge(botti, message, botData):
     """
