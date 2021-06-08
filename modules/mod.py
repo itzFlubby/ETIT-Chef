@@ -306,14 +306,19 @@ async def unban(botti, message, botData):
     """
     Reserviert für Moderator oder höher
     Dieser Befehl entbannt einen Nutzer.
-    !unban {@USER}
-    {@USER} Nutzer-Erwähnung [Gebannte Nutzer können mit !listbans aufgelistet werden]
-    !unban @ETIT-Chef
+    !unban {USER-ID}
+    {USER-ID} Nutzer-ID [Gebannte Nutzer können mit !listbans aufgelistet werden]
+    !unban 770272473735233587
     """
-    username = str(message.content[7:])
+    userID = str(message.content[7:])
+    
+    if not userID.isdigit():
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "unban"))      
+        return  
+    
     bans = await message.guild.bans()
     for entry in bans:
-        if entry.user.name == username.split("#")[0] and entry.user.discriminator == username.split("#")[1]:
+        if entry.user.id == int(userID):
             banned_user_entry = await message.guild.fetch_ban(entry.user)
             
             await message.guild.unban(banned_user_entry.user)
@@ -323,4 +328,4 @@ async def unban(botti, message, botData):
             await modules.bottiHelper._sendMessagePingAuthor(message, ":judge: Der Nutzer **{0}** wurde entbannt.".format(banned_user_entry.user))
             return 
     
-    await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Nutzer **{0}** ist nicht gebannt.".format(username))
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Dieser Nutzer ist nicht gebannt!")
