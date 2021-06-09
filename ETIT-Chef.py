@@ -35,8 +35,8 @@ import modules.polls
 import modules.timer
 import modules.utils
 
-#slash = SlashCommand(botti, sync_commands = True)
-#import modules.slash  # MUSS unter der Deklaration und Initialisierung von den Objekten slash und botti stehen
+slash = SlashCommand(botti, sync_commands = True)
+import modules.slash  # MUSS unter der Deklaration und Initialisierung von den Objekten slash und botti stehen
 import modules.events # MUSS unter der Deklaration und Initialisierung vom Objekten botti stehen
 
 from modules.data.commandModule import commandModule             
@@ -46,8 +46,8 @@ async def on_ready():
 
     if botData.firstBoot:
         modules.bottiHelper._loadSettings(botData)
-        botData.totalSlashCommands = 0#len(slash.commands)
-        botData.slashCommandList = 0#list(slash.commands)
+        botData.totalSlashCommands = len(slash.commands)
+        botData.slashCommandList = list(slash.commands)
 
     data = discord.Embed(
         title = "[{emoji}] Online".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.ONLINE)),
@@ -112,7 +112,7 @@ async def on_message(message):
         if not message.content.startswith(botData.botPrefix):
             return
             
-        if modules.bottiHelper._logCommand(message, botData) == -1:
+        if modules.bottiHelper._logCommand(botData, message = message) == -1:
             await modules.bottiHelper._sendMessage(message, ":x: Funktionen in DM-Chats nicht verfügbar.")
             return
         
@@ -144,6 +144,7 @@ async def on_message(message):
                 if 0 not in module.allowedRoles:
                     if not await modules.guard._checkPerms(botti, message, module.allowedRoles, module.enableTrustet ):
                         return
+                        
                 await getattr(module.module, command)(botti, message, botData)
                 botData.befehlsCounter += 1
                 return
