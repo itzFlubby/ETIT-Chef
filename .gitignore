@@ -113,6 +113,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 modules/data/ids.py
+modules/data/bot.py
 modules/data/botData.py
 *.png
 *.xcf
@@ -120,9 +121,9 @@ modules/data/botData.py
 *.jpg
 modules/data/klausuren/klausuren.txt
 modules/data/mensa/mensaData.txt
-modules/data/images/fonts/Hannah-Regular.otf
-modules/data/images/fonts/readme.txt
-modules/data/images/thisisfine.gif
+modules/data/images/*
+modules/data/newLectureVideoCheck/setup.txt
+modules/data/newLectureVideoCheck/token.txt
 *.xls
 updateSlashCommand.py
 *.botti
