@@ -16,11 +16,16 @@ async def ban(botti, message, botData):
     !ban {@USER}
     {@USER} Nutzer-Erwähnung
     !ban @ETIT-Chef
-    """
+    """ 
     if len(message.mentions) == 0:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "ban"))      
-        return  
+        return      
+        
     user = message.mentions[0]
+    
+    if not await modules.bottiHelper._checkSufficientPrivileges(botti, message, user):
+        return
+    
     await message.guild.ban(user, reason = "Banned by User-Request.", delete_message_days = 0)
     channel = discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.ALLGEMEIN)
     await channel.trigger_typing()
@@ -39,6 +44,9 @@ async def deafen(botti, message, botData):
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "deafen"))      
         return  
     user = message.mentions[0]
+    
+    if not await modules.bottiHelper._checkSufficientPrivileges(botti, message, user):
+        return
     
     if user.voice.deaf is False:
         await user.edit(deafen = True)
@@ -119,6 +127,10 @@ async def kick(botti, message, botData):
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "kick"))      
         return  
     user = message.mentions[0]
+    
+    if not await modules.bottiHelper._checkSufficientPrivileges(botti, message, user):
+        return
+    
     await message.guild.kick(user, reason="Requestes by Admin.")
     
     await modules.bottiHelper._sendMessagePingAuthor(message, ":athletic_shoe: Der Nutzer **{0}#{1}** wurde erfolgreich gekickt.".format(user.name, user.discriminator))
@@ -154,6 +166,9 @@ async def mute(botti, message, botData):
         return  
     user = message.mentions[0]
     
+    if not await modules.bottiHelper._checkSufficientPrivileges(botti, message, user):
+        return
+    
     if not user.voice.mute:
         await user.edit(mute = True)
         await modules.bottiHelper._sendMessagePingAuthor(message, ":microphone2: Der Nutzer {0} wurde **stumm** geschaltet.".format(user.mention))
@@ -173,24 +188,23 @@ async def nick(botti, message, botData):
     user = message.author
     if len(message.mentions) != 0:
         user = message.mentions[0]
-        
-    try:
-        nicknameStrings = str(message.content[6:]).split(" ")
-        length = len(nicknameStrings)
-        nickname = ""
-        
-        if length == 1:
-            await user.edit(nick = "")
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":name_badge: Der Nickname von **{0}#{1}** wurde zurückgesetzt.".format(user.name, str(user.discriminator)))
-            return
-            
-        for i in range(1, length):
-            nickname = nickname + nicknameStrings[i] + " "
-        await user.edit(nick = nickname)
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":name_badge: Der Nickname von **{0}#{1}** wurde auf **'{2}'** geändert.".format(user.name, str(user.discriminator), nickname[:-1]))
     
-    except discord.errors.Forbidden:
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Leider habe ich dazu keine Berechtigung")
+    if not await modules.bottiHelper._checkSufficientPrivileges(botti, message, user):
+        return
+    
+    nicknameStrings = str(message.content[6:]).split(" ")
+    length = len(nicknameStrings)
+    nickname = ""
+    
+    if length == 1:
+        await user.edit(nick = "")
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":name_badge: Der Nickname von **{0}#{1}** wurde zurückgesetzt.".format(user.name, str(user.discriminator)))
+        return
+        
+    for i in range(1, length):
+        nickname = nickname + nicknameStrings[i] + " "
+    await user.edit(nick = nickname)
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":name_badge: Der Nickname von **{0}#{1}** wurde auf **'{2}'** geändert.".format(user.name, str(user.discriminator), nickname[:-1]))
 
 async def purge(botti, message, botData):
     """

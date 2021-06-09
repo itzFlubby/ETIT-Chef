@@ -21,7 +21,17 @@ async def _checkPingTrigger(botti, botData, message):
             await message.reply(helpString)
         except:
             await _sendMessagePingAuthor(message, helpString)
-        
+
+async def _checkSufficientPrivileges(botti, message, user):
+    roles = message.guild.roles
+    botRole = message.guild.get_role(ids.roleIDs.ETIT_BOT)
+    
+    if (roles.index(user.top_role) >= roles.index(botRole)) and (user.id != botti.user.id):
+        await _sendMessagePingAuthor(message, ":x: Leider fehlt mir dazu die Berechtigung.")
+        return False
+    return True
+    
+    
 async def _checkPurgemaxConfirm(message, botData):
     if (botData.purgemaxConfirm) and (message.content != "{prefix}purgemax".format(prefix = botData.botPrefix)):
         await _sendMessagePingAuthor(message, ":exclamation: Purgemax abgebrochen.")
