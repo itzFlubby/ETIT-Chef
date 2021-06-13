@@ -55,7 +55,7 @@ async def timer(botti, message, botData):
         description = ""
     )
     
-    data.add_field(name = "Im Auftrag von", value = message.author.name + "#" + str(message.author.discriminator))
+    data.add_field(name = "Im Auftrag von", value = message.author.mention)
     data.add_field(name = "ID", value = hex(id)[2:])
     data.add_field(name = "Läuft ab in", value = str(seconds) + "s")
     
@@ -76,7 +76,7 @@ async def timercancel(botti, message, botData):
     try:
         timer = message.content.split(" ")[1]
     except IndexError:
-        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "timercancel"))      
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "timercancel"))     
         return
         
     for i in range(len(botData.activeTimers) - 1):
@@ -106,7 +106,7 @@ async def timerNotify(botti, delay, message, id):
         description = ""
     )
     
-    data.add_field(name = "Im Auftrag von", value = message.author.name + "#" + str(message.author.discriminator))
+    data.add_field(name = "Im Auftrag von", value = message.author.mention)
     data.add_field(name = "ID", value = hex(id)[2:])
     data.add_field(name = "Dauer", value = str(delay) + "s")
     
