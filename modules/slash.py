@@ -27,7 +27,7 @@ from modules.data.botData import botData
 async def _wochenplan(ctx: SlashContext, date = ""):
     modules.bottiHelper._logCommand(botData, ctx = ctx)
     date = date if date != "" else datetime.datetime.now().strftime("%d.%m.%Y")
-    dummyMessage = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, "{prefix}wochenplan {date} slash".format(prefix = botData.botPrefix, date = date))
+    dummyMessage = modules.construct._constructDummyMessage(ctx.author, ctx.channel, "{prefix}wochenplan {date} slash".format(prefix = botData.botPrefix, date = date))
     embed = await modules.calendar.wochenplan(botti, dummyMessage, botData)
     await ctx.send(content = "Slash-Command: Wochenplan")
     await ctx.send(content = "{userMention} Dies ist dein **persönlicher** Wochenplan, basierend auf deinen Rollen!".format(userMention = ctx.author.mention), embed = embed, hidden = True)
@@ -67,14 +67,14 @@ async def _wochenplan(ctx: SlashContext, date = ""):
 async def _convert(ctx, typ, inhalt):
     modules.bottiHelper._logCommand(botData, ctx = ctx)
     
-    msg = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, "!convert " + typ + " " + inhalt)
+    msg = modules.construct._constructDummyMessage(ctx.author, ctx.channel, "!convert " + typ + " " + inhalt)
     await ctx.send(content = "Slash-Command: Convert")
     await modules.utils.convert(botti, msg, botData)
 
 @slash.slash(name="klausuren", description="Zeigt dir personalisiert deine anstehenden Klausuren an.", guild_ids = [ ids.serverIDs.ETIT_KIT ])
 async def _klausuren(ctx: SlashContext):
     modules.bottiHelper._logCommand(botData, ctx = ctx)
-    dummyMessage = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, "{prefix}klausuren slash".format(prefix = botData.botPrefix))
+    dummyMessage = modules.construct._constructDummyMessage(ctx.author, ctx.channel, "{prefix}klausuren slash".format(prefix = botData.botPrefix))
     examString = await modules.calendar.klausuren(botti, dummyMessage, botData)
     await ctx.send(content = "Slash-Command: Klausuren")   
     await ctx.send(content = "Dies sind deine **persönlichen** Klausuren, basierend auf deinen Rollen! {authorMention}\n{examString}".format(examString = examString, authorMention = ctx.author.mention), hidden = True)    
@@ -94,7 +94,7 @@ async def _lerngruppe(ctx, user):
     
     print(commandArgs)
     
-    msg = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, commandArgs, [ { "id": user.id } ])
+    msg = modules.construct._constructDummyMessage(ctx.author, ctx.channel, commandArgs, [ { "id": user.id } ])
     await ctx.send(content = "Slash-Command: Lerngruppe")
     await modules.lerngruppe.lerngruppe(botti, msg, botData)
 
@@ -107,7 +107,7 @@ async def _lerngruppe(ctx, user):
     )])
 async def _userinfo(ctx, benutzer):
     modules.bottiHelper._logCommand(botData, ctx = ctx)
-    msg = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, "")
+    msg = modules.construct._constructDummyMessage(ctx.author, ctx.channel, "")
     msg.mentions = [ benutzer ]
     await ctx.send(content = "Slash-Command: Userinfo")
     await modules.info.userinfo(botti, msg, botData)
@@ -179,13 +179,13 @@ async def _mensa(ctx, mensa = "adenauerring", wochentag = "none"):
     if wochentag != "none":
         commandArgs = commandArgs + wochentag
 
-    msg = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, commandArgs)
+    msg = modules.construct._constructDummyMessage(ctx.author, ctx.channel, commandArgs)
     await ctx.send(content = "Slash-Command: Mensa")
     await modules.mensa.mensa(botti, msg, botData)
 
 @botti.event
 async def on_slash_command_error(ctx, ex):
-    msg = modules.bottiHelper._createDummyMessage(ctx.author, ctx.channel, "")
+    msg = modules.construct._constructDummyMessage(ctx.author, ctx.channel, "")
     fullError = ""
     for i in traceback.format_exception(type(ex), ex, ex.__traceback__):
         fullError = fullError + i.replace(os.getcwd()[:-10], "..")

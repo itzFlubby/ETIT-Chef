@@ -61,7 +61,7 @@ async def on_member_remove(member):
     data.set_footer(text = "Stand: {0}".format(modules.bottiHelper._getTimestamp()))
     
     botMessage = await channel.send(embed = data)
-    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.PAYRESPECT))
+    await botMessage.add_reaction(modules.construct._constructEmojiStringNoBracket(ids.emojiIDs.PAYRESPECT))
     
 @botti.event
 async def on_raw_reaction_remove(payload):
@@ -182,10 +182,10 @@ async def on_raw_reaction_add(payload):
         if (message.author.id == botti.user.id) and ("lerngruppe-" in message.content.lower()):
             id = int(message.content.split("-")[1].split("**:")[0])
             
-            dummyMessage = modules.bottiHelper._createDummyMessage(payload.member, guild.get_channel(payload.channel_id), "{prefix}lerngruppe join {id}".format(prefix = botData.botPrefix, id = id))
+            dummyMessage = modules.construct._constructDummyMessage(payload.member, guild.get_channel(payload.channel_id), "{prefix}lerngruppe join {id}".format(prefix = botData.botPrefix, id = id))
             await modules.lerngruppe._subcommandJoin(dummyMessage, dummyMessage.content.split(" "), botData)
    
-    # DANKE               
+    # DANKE
     if payload.emoji.id == ids.emojiIDs.DANKE["id"]:
         channel = payload.member.guild.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)

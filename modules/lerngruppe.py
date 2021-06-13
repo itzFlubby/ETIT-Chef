@@ -134,7 +134,7 @@ async def _subcommandJoin(message, userInput, botData):
     if "[ö] lerngruppe-{id}".format(id = id) in allChannelNames: # If Lerngruppe is public
         for channel in allChannels:
             if "[ö] lerngruppe-{id}".format(id = id) in channel.name.lower():
-                dummyMessage = modules.bottiHelper._createDummyMessage(message.author, channel.text_channels[0])
+                dummyMessage = modules.construct._constructDummyMessage(message.author, channel.text_channels[0])
                 await _addUserToLerngruppe(channel, dummyMessage, message.author, ":books: {userMention} ist der Lerngruppe beigetreten!".format(userMention = message.author.mention))
                 return
     else:
@@ -187,8 +187,8 @@ async def _subcommandPromote(message, botData):
     channel = message.guild.get_channel(ids.channelIDs.LERNGRUPPE_FINDEN)
     id = int(message.channel.category.name.split("-")[1])
     
-    botMessage = await channel.send(":books: {authorMention} bewirbt **{promotedChannel}**:\n```\n{description}``` Trete mit `{prefix}lerngruppe join {id}`, oder indem du mit {emoji} reagierst, bei!".format(authorMention = message.author.mention, promotedChannel = message.channel.category.name.split(" ")[1], description = message.channel.topic, prefix = botData.botPrefix, id = id, emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.APPROVE)))
-    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.APPROVE))
+    botMessage = await channel.send(":books: {authorMention} bewirbt **{promotedChannel}**:\n```\n{description}``` Trete mit `{prefix}lerngruppe join {id}`, oder indem du mit {emoji} reagierst, bei!".format(authorMention = message.author.mention, promotedChannel = message.channel.category.name.split(" ")[1], description = message.channel.topic, prefix = botData.botPrefix, id = id, emoji = modules.construct._constructEmojiString(ids.emojiIDs.APPROVE)))
+    await botMessage.add_reaction(modules.construct._constructEmojiStringNoBracket(ids.emojiIDs.APPROVE))
  
 async def _subcommandRemove(message):
     if not (_isLerngruppenChannel(message.channel.category)):    

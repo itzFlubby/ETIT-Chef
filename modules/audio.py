@@ -118,7 +118,7 @@ async def play(botti, message, botData):
                 jsonData = json.load(jsonInfo)
                 
                 data = discord.Embed(
-                    title = "{emoji} Youtube-Video".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.YOUTUBE)),
+                    title = "{emoji} Youtube-Video".format(emoji = modules.construct._constructEmojiString(ids.emojiIDs.YOUTUBE)),
                     color = 0xff0000,
                     description = ""
                 )
@@ -199,7 +199,7 @@ async def queue(botti, message, botData):
         del musicQueue[0]
         await modules.bottiHelper._sendMessagePingAuthor(message, ":minidisc: Es wird zum nächsten Lied gesprungen!")
     elif option == "play":
-        dummyMessage = modules.bottiHelper._createDummyMessage(message.author, message.channel, "!play " + musicQueue[0])
+        dummyMessage = modules.construct._constructDummyMessage(message.author, message.channel, "!play " + musicQueue[0])
         del musicQueue[0]
         await play(botti, botData, dummyMessage)
         pass

@@ -4,6 +4,8 @@ import linecache
 import modules.data.ids as ids
 import os
 
+from __main__ import botti
+
 class BotError(Exception):
     pass
 
@@ -42,34 +44,7 @@ async def _createDM(botti, userID):
     if user.dm_channel is None:
         await user.create_dm()
     return user.dm_channel
-        
-def _createDummyMessage(author, channel, content = "", mentions = []):
-    dataDict = { 
-        "id": 0, 
-        "webhook_id": 0, 
-        "attachments": [], 
-        "embeds": {}, 
-        "application": 0, 
-        "activity": 0, 
-        "edited_timestamp": 0, 
-        "type": 0, 
-        "pinned": 0, 
-        "mention_everyone": 0, 
-        "tts": 0, 
-        "content": content, 
-        "nonce": 0,
-        "mentions": mentions
-    }
-    msg = discord.Message(state = 0, channel = channel, data = dataDict)
-    msg.author = author
-    return msg  
- 
-def _constructEmojiString(emoji):
-    return "<{emojiNoBracket}>".format(emojiNoBracket = _constructEmojiStringNoBracket(emoji))
-
-def _constructEmojiStringNoBracket(emoji):
-    return "{isAnimated}:{emojiName}:{emojiID}".format(isAnimated = ("a" if emoji["animated"] else ""), emojiName = emoji["name"], emojiID = emoji["id"])
- 
+    
 async def _errorMessage(botti, message, botData, error):
     await _sendMessage(message, "```css\n[FAIL]: {0}```:fly: Bug automatisch an <@!{1}> gemeldet!".format(error, ids.userIDs.ITZFLUBBY))
     raise BotError("")

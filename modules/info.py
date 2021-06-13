@@ -284,7 +284,7 @@ async def minecraft(botti, message, botData):
     !minecraft
     """    
     data = discord.Embed(
-        title = "{emoji} Server-Status".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.MINECRAFT)),
+        title = "{emoji} Server-Status".format(emoji = modules.construct._constructEmojiString(ids.emojiIDs.MINECRAFT)),
         color = 0x00ff00,
         description = botData.minecraftServerName
     )
@@ -338,10 +338,10 @@ async def permissions(botti, message, botData):
         channelPermissionsList.append([channelMentionStrig, permissionType])
      
     permissionTypeToEmoji = {
-        0: modules.bottiHelper._constructEmojiString(ids.emojiIDs.DND) + " Keine Rechte",
-        1: modules.bottiHelper._constructEmojiString(ids.emojiIDs.IDLE) + " Lese Rechte",
-        2: modules.bottiHelper._constructEmojiString(ids.emojiIDs.OFFLINE) + " Undefinierte Rechte", # SHOULD never occur
-        3: modules.bottiHelper._constructEmojiString(ids.emojiIDs.ONLINE) + " Lese- und Schreibrechte"
+        0: modules.construct._constructEmojiString(ids.emojiIDs.DND) + " Keine Rechte",
+        1: modules.construct._constructEmojiString(ids.emojiIDs.IDLE) + " Lese Rechte",
+        2: modules.construct._constructEmojiString(ids.emojiIDs.OFFLINE) + " Undefinierte Rechte", # SHOULD never occur
+        3: modules.construct._constructEmojiString(ids.emojiIDs.ONLINE) + " Lese- und Schreibrechte"
     }
     
     partialFieldStrings = [[], [], [], []]
@@ -596,9 +596,9 @@ async def test(botti, message, botData):
     !test
     """
     botMessage = await modules.bottiHelper._sendMessagePingAuthor(message, ":globe_with_meridians: Der Bot ist online und läuft ordnungsgemäß!")
-    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.NEIN))
-    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.DOCH))
-    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.OH))
+    await botMessage.add_reaction(modules.construct._constructEmojiStringNoBracket(ids.emojiIDs.NEIN))
+    await botMessage.add_reaction(modules.construct._constructEmojiStringNoBracket(ids.emojiIDs.DOCH))
+    await botMessage.add_reaction(modules.construct._constructEmojiStringNoBracket(ids.emojiIDs.OH))
 
 async def uptime(botti, message, botData):
     """ 

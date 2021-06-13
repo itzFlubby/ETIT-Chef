@@ -328,9 +328,9 @@ async def kekse(botti, message, botData):
     !kekse
     """
     botMessage = await modules.bottiHelper._sendMessage(message, "**Ich mag** :cookie::cookie::cookie: **OMNOMNOM**")
-    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.NEIN))
-    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.DOCH))
-    await botMessage.add_reaction(modules.bottiHelper._constructEmojiStringNoBracket(ids.emojiIDs.OH))
+    await botMessage.add_reaction(modules.construct._constructEmojiStringNoBracket(ids.emojiIDs.NEIN))
+    await botMessage.add_reaction(modules.construct._constructEmojiStringNoBracket(ids.emojiIDs.DOCH))
+    await botMessage.add_reaction(modules.construct._constructEmojiStringNoBracket(ids.emojiIDs.OH))
     await botMessage.add_reaction("🍪")
 
 async def our(botti, message, botData):

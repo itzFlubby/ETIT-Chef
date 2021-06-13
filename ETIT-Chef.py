@@ -23,6 +23,7 @@ import modules.audio
 import modules.banlist
 import modules.bottiHelper
 import modules.calendar
+import modules.construct
 import modules.dev
 import modules.gamble
 import modules.guard
@@ -49,10 +50,14 @@ async def on_ready():
         botData.totalSlashCommands = len(slash.commands)
         botData.slashCommandList = list(slash.commands)
 
-    data = discord.Embed(
-        title = "[{emoji}] Online".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.ONLINE)),
+    data = modules.construct._constructDefaultEmbed(
+        title = "```=-=-= Online =-=-=```",
         description = "[:shield:] Guard ist aktiv",
-        color = 0x00FF00
+        color = 0x00FF00,
+        thumbnail = modules.construct._constructAsset(ids.assetIDs.RASPI_ICON),
+        footer = {
+            "text": "Insgesamt {} Befehle • {} Slash-Befehle!\nGestartet am {}".format(botData.totalCommands, botData.totalSlashCommands, modules.bottiHelper._toSTRFTimestamp(botData.startTimestamp))
+        }
     )
     data.add_field(name = "API Version", value = modules.bottiHelper._versionInfo())
     data.add_field(name = "Server", value = platform.system() + "-" + str(os.name).upper() + "-" + platform.release())
@@ -60,18 +65,13 @@ async def on_ready():
     data.add_field(name = "Intents", value = str(botti.intents).split("=")[1][:-1])
     data.add_field(name = "Nutzer", value = len(botti.users))
     data.add_field(name = "Python Build", value = str(platform.python_build()).replace("'", "").replace("(", "").replace(")", ""))
-    data.set_footer(text = "[ID]: {}\nInsgesamt {} Befehle • {} Slash-Befehle!\nGestartet {}".format(str(botti.user.id), str(botData.totalCommands), str(botData.totalSlashCommands), modules.bottiHelper._toSTRFTimestamp(botData.startTimestamp)))
-    data.set_thumbnail(url = botti.user.avatar)
-    data.set_author(name = botti.user.name + "#" + botti.user.discriminator, icon_url="https://cdn.discordapp.com/app-assets/" + str(botti.user.id) + "/" + str(ids.assetIDs.PROFILE_PICTURE) + ".png")
-    
+
     if botData.firstBoot:
         if botData.maintenanceMode:
-            data.title = "[{emoji}] Wartungsarbeiten-Modus".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.DND))
-            data.description = "Verbindung etabliert `@" + modules.bottiHelper._getTimestamp() + "`"
+            data.title = "```=-=-= Wartungsarbeiten =-=-=```"
+            data.description = "Verbindung etabliert am `{timestamp}`".format(timestamp = modules.bottiHelper._getTimestamp())
             data.color = 0xFF0000
             await botti.change_presence(activity = discord.Game(name = "⚒ Wartungsarbeiten ⚒"), status = discord.Status.dnd)
-            
-            botti.loop.create_task(modules.newLectureVideoCheck._cyclicNewLectureVideoCheck())
         else:
             await modules.bottiHelper._setNormalStatus(botti, botData)
         
@@ -85,28 +85,27 @@ async def on_ready():
             botti.loop.create_task(modules.vod._cyclicVod())
 
             #botti.loop.create_task(modules.gamble._cyclicBotDetection(botti, botData, True))
-            
+
         botData.firstBoot = False
     else:
-        data.title = "[{emoji}] RECONNECT".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.ONLINE))
+        data.title = "[{emoji}] RECONNECT".format(emoji = modules.construct._constructEmojiString(ids.emojiIDs.ONLINE))
         data.description = "Verbindung wurde wiederhergestellt `@" + modules.bottiHelper._getTimestamp() + "`"
         data.color = 0x0000FF
         await modules.bottiHelper._setNormalStatus(botti, botData)
         
     await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.BOT_TEST_LOBBY).send(embed = data)
-
+    
 @botti.event
 async def on_message(message):
     try:
         # Die Reihenfolge der Abfragen hat einen Grund und sollte nicht geändert werden, um die Funktionlität zu erhalten.
         if message.author == botti.user:
             return
-            
+        
         if message.channel.type == discord.ChannelType.private:
             userDM = await modules.bottiHelper._createDM(botti, ids.userIDs.ITZFLUBBY)
             await userDM.send("**{author.name}#{author.discriminator}** ({author.id}) hat im Privat-Chat folgendes geschrieben: _'{content}'_. | {timestamp}".format(author = message.author, content = message.content, timestamp = modules.bottiHelper._getTimestamp()))
-            
-            
+        
         await modules.bottiHelper._checkPingTrigger(botti, botData, message)
         
         if not message.content.startswith(botData.botPrefix):
@@ -129,7 +128,7 @@ async def on_message(message):
         await message.delete()    
         
         if (message.author.id not in modules.guard.devIDs) and botData.maintenanceMode:
-            await modules.bottiHelper._sendMessagePingAuthor(message, ":tools: Der Bot befindet sich in Wartungsarbeiten. Bitte versuche es später erneut.")
+            await modules.bottiHelper._sendMessagePingAuthor(message, ":tools: Der Bot befindet sich gerade in Wartungsarbeiten. Bitte versuche es später erneut.")
             return       
                 
         command = message.content.lower().split(" ")[0][1:]
@@ -144,7 +143,6 @@ async def on_message(message):
                 if 0 not in module.allowedRoles:
                     if not await modules.guard._checkPerms(botti, message, module.allowedRoles, module.enableTrustet ):
                         return
-                        
                 await getattr(module.module, command)(botti, message, botData)
                 botData.befehlsCounter += 1
                 return

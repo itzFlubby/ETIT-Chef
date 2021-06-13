@@ -41,7 +41,7 @@ async def _dailyMensa(botti, botData):
         await asyncio.sleep(diff.seconds)
         
         if nextPing.weekday() < 4:
-            msg = modules.bottiHelper._createDummyMessage(botti.get_guild(ids.serverIDs.ETIT_KIT).get_member(botti.user.id), discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.MENSA), "")
+            msg = modules.construct._constructDummyMessage(botti.get_guild(ids.serverIDs.ETIT_KIT).get_member(botti.user.id), discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.MENSA), "")
             await modules.mensa.mensa(botti, msg, botData)
 
 async def mensa(botti, message, botData):
