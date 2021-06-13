@@ -8,7 +8,7 @@ import requests
 from __main__ import botti
 from modules.data.botData import botData
 
-async def _cyclicNewLectureVideoCheck():
+async def _cyclicVod():
     while(True):
         await asyncio.sleep(3600 * 4) # 2 hours
         accessToken, refreshToken = _getAccessAndRefreshToken()
@@ -18,10 +18,10 @@ async def _cyclicNewLectureVideoCheck():
         fileContent = response.text
         newLog = fileContent.split("\n")
            
-        with open(botData.modulesDirectory + "data/newLectureVideoCheck/" + botData.onedriveInfo["fileName"], 'r') as f:
+        with open(botData.modulesDirectory + "data/vod/" + botData.onedriveInfo["fileName"], 'r') as f:
             oldLog = f.read().split("\n")
             
-        with open(botData.modulesDirectory + "data/newLectureVideoCheck/" + botData.onedriveInfo["fileName"], 'w') as f:
+        with open(botData.modulesDirectory + "data/vod/" + botData.onedriveInfo["fileName"], 'w') as f:
             f.write(fileContent)
            
         lastCycleLineIndexNew = _getLastCycleDate(newLog)
@@ -30,7 +30,7 @@ async def _cyclicNewLectureVideoCheck():
         if newLog[lastCycleLineIndexNew] == oldLog[lastCycleLineIndexOld]:
             continue
         
-        elementsString = "{emoji} Letzter Zyklus `@{date}`\n".format(emoji = modules.bottiHelper._constructEmojiString(ids.emojiIDs.ILIAS), date = newLog[lastCycleLineIndexNew].split(" - ")[1])
+        elementsString = "{emoji} Letzter Zyklus `@{date}`\n".format(emoji = modules.construct._constructEmojiString(ids.emojiIDs.ILIAS), date = newLog[lastCycleLineIndexNew].split(" - ")[1])
         for run, line in enumerate(newLog[(lastCycleLineIndexNew+1):]):
             if ".mp4" in line:
                 elementsString += "```fix\n" + line[8:] + "```" # 8 = len("Writing ")
@@ -46,7 +46,7 @@ def _getLastCycleDate(log):
             return lineIndex
 
 def _getAccessAndRefreshToken():
-    with open(botData.modulesDirectory + "data/newLectureVideoCheck/token.txt", 'r') as f:
+    with open(botData.modulesDirectory + "data/vod/token.txt", 'r') as f:
         token = f.read()
     
     postParameters = {
@@ -56,6 +56,6 @@ def _getAccessAndRefreshToken():
     }
     response = requests.post('https://login.live.com/oauth20_token.srf', data = postParameters)
     refreshToken = response.json()['refresh_token']
-    with open(botData.modulesDirectory + "data/newLectureVideoCheck/token.txt", 'w+') as f:
+    with open(botData.modulesDirectory + "data/vod/token.txt", 'w+') as f:
         f.write(refreshToken)
     return response.json()['access_token'], refreshToken

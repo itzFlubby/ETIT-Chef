@@ -30,10 +30,10 @@ import modules.info
 import modules.lerngruppe
 import modules.mensa
 import modules.mod
-import modules.newLectureVideoCheck # MUSS unter der Deklaration und Initialisierung vom Objekten botti stehen
 import modules.polls
 import modules.timer
 import modules.utils
+import modules.vod # MUSS unter der Deklaration und Initialisierung vom Objekten botti stehen
 
 slash = SlashCommand(botti, sync_commands = True)
 import modules.slash  # MUSS unter der Deklaration und Initialisierung von den Objekten slash und botti stehen
@@ -81,9 +81,9 @@ async def on_ready():
             modules.banlist._loadBotBans(botData)
         
             botti.loop.create_task(modules.mensa._dailyMensa(botti, botData))
-            
-            botti.loop.create_task(modules.newLectureVideoCheck._cyclicNewLectureVideoCheck())
         
+            botti.loop.create_task(modules.vod._cyclicVod())
+
             #botti.loop.create_task(modules.gamble._cyclicBotDetection(botti, botData, True))
             
         botData.firstBoot = False
