@@ -2,7 +2,7 @@ import modules.banlist
 import modules.bottiHelper
 import modules.data.ids as ids
 
-devIDs = [ ids.userIDs.ITZFLUBBY, ids.userIDs.WUB ]
+devIDs = [ ids.userIDs.ITZFLUBBY, ids.userIDs.WUB, ids.userIDs.CHRISTOPH ]
 
 allowedIDs = [ ids.userIDs.ITZFLUBBY, ids.userIDs.WUB ]
 
