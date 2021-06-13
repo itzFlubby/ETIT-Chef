@@ -75,21 +75,21 @@ async def repostpoll(botti, message, botData):
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "repostpoll"))      
         return 
         
-    message = await message.channel.fetch_message(int(message.content.split(" ")[1]))
-    if message == None:
+    pollMessage = await message.channel.fetch_message(int(message.content.split(" ")[1]))
+    if pollMessage == None:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Diese Abstimmung konnte ich nicht finden!")
         return
         
-    if len(message.embeds) != 0:
-        if message.embeds[0].title != "Abstimmung":
+    if len(pollMessage.embeds) != 0:
+        if pollMessage.embeds[0].title != "Abstimmung":
             await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Bei dieser Nachricht handelt es sich um keine Abstimmung!")
             return  
             
     view = discord.ui.View(timeout = None)
-    for run, field in enumerate(message.embeds[0].fields):
-        if run == len(message.embeds[0].fields) - 1:
+    for run, field in enumerate(pollMessage.embeds[0].fields):
+        if run == len(pollMessage.embeds[0].fields) - 1:
             break # If last element reached, don't make "Abstimmung von" a button
         view.add_item(discord.ui.Button(style = discord.ButtonStyle.secondary, label = field.name, custom_id = field.name))
      
-    await message.delete()
-    await modules.bottiHelper._sendMessage(message, content = ":arrow_double_down: Die Umfrage wurde nach unten gezogen!", embed = message.embeds[0], view = view)
+    await pollMessage.delete()
+    await modules.bottiHelper._sendMessage(message, content = ":arrow_double_down: Die Umfrage wurde nach unten gezogen!", embed = pollMessage.embeds[0], view = view)
