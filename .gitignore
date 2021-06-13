@@ -122,8 +122,7 @@ modules/data/botData.py
 modules/data/klausuren/klausuren.txt
 modules/data/mensa/mensaData.txt
 modules/data/images/*
-modules/data/newLectureVideoCheck/setup.txt
-modules/data/newLectureVideoCheck/token.txt
+modules/data/vod/*
 *.xls
 updateSlashCommand.py
 *.botti
