@@ -192,10 +192,10 @@ async def on_raw_reaction_add(payload):
         if payload.user_id == message.author.id:
             await message.add_reaction("❌")
             return
-        for reaction in message.reactions:
-            if reaction.me == True:
-                return
         if modules.gamble._getBalance(botData, message.author.id) == -1:
             modules.gamble._createAccount(botData, message.author.id)
         modules.gamble._addBalance(botData, message.author.id, 1500)
+        for reaction in message.reactions:
+            if (reaction.me == True) and (reaction.emoji == "✅"):
+                return
         await message.add_reaction("✅")
