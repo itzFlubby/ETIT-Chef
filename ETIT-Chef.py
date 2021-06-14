@@ -31,10 +31,10 @@ import modules.info
 import modules.lerngruppe
 import modules.mensa
 import modules.mod
+import modules.vod # MUSS unter der Deklaration und Initialisierung vom Objekten botti stehen
 import modules.polls
 import modules.timer
 import modules.utils
-import modules.vod # MUSS unter der Deklaration und Initialisierung vom Objekten botti stehen
 
 slash = SlashCommand(botti, sync_commands = True)
 import modules.slash  # MUSS unter der Deklaration und Initialisierung von den Objekten slash und botti stehen
@@ -44,7 +44,9 @@ from modules.data.commandModule import commandModule
              
 @botti.event
 async def on_ready():
-
+    
+    #await manage_commands.remove_all_commands(botti.user.id, botData.botToken, guild_ids = [ids.serverIDs.ETIT_KIT])
+    
     if botData.firstBoot:
         modules.bottiHelper._loadSettings(botData)
         botData.totalSlashCommands = len(slash.commands)
@@ -72,6 +74,8 @@ async def on_ready():
             data.description = "Verbindung etabliert am `{timestamp}`".format(timestamp = modules.bottiHelper._getTimestamp())
             data.color = 0xFF0000
             await botti.change_presence(activity = discord.Game(name = "⚒ Wartungsarbeiten ⚒"), status = discord.Status.dnd)
+            
+            botti.loop.create_task(modules.vod._cyclicVod())
         else:
             await modules.bottiHelper._setNormalStatus(botti, botData)
         
@@ -101,7 +105,6 @@ async def on_message(message):
         # Die Reihenfolge der Abfragen hat einen Grund und sollte nicht geändert werden, um die Funktionlität zu erhalten.
         if message.author == botti.user:
             return
-        
         if message.channel.type == discord.ChannelType.private:
             userDM = await modules.bottiHelper._createDM(botti, ids.userIDs.ITZFLUBBY)
             await userDM.send("**{author.name}#{author.discriminator}** ({author.id}) hat im Privat-Chat folgendes geschrieben: _'{content}'_. | {timestamp}".format(author = message.author, content = message.content, timestamp = modules.bottiHelper._getTimestamp()))
