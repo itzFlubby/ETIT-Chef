@@ -4,7 +4,7 @@ import modules.data.ids as ids
 
 devIDs = [ ids.userIDs.ITZFLUBBY, ids.userIDs.WUB, ids.userIDs.CHRISTOPH ]
 
-allowedIDs = [ ids.userIDs.ITZFLUBBY, ids.userIDs.WUB ]
+allowedIDs = [ ids.userIDs.ITZFLUBBY, ids.userIDs.WUB, ids.userIDs.CHRISTOPH ]
 
 trustetIDs = [ ids.userIDs.CHRISTOPH, ids.userIDs.TITRA, ids.userIDs.LEO ]
 
