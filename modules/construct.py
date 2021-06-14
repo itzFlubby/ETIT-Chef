@@ -7,11 +7,12 @@ from __main__ import botti
 def _constructAsset(id):
     return "https://cdn.discordapp.com/app-assets/" + str(ids.userIDs.ETIT_CHEF) + "/" + str(id)
 
-def _constructDefaultEmbed(title, description, color = 0x0, thumbnail = None, footer = None, author = None):
+def _constructDefaultEmbed(title, description, color = 0x0, thumbnail = None, footer = None, author = None, url = discord.Embed.Empty):
     embed = discord.Embed(
         title = title,
         description = description,
         color = color,
+        url = url
     )
     
     embed.set_thumbnail(url = thumbnail if thumbnail != None else botti.user.avatar.url)
