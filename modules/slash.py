@@ -71,6 +71,33 @@ async def _convert(ctx, typ, inhalt):
     await ctx.send(content = "Slash-Command: Convert")
     await modules.utils.convert(botti, msg, botData)
 
+@slash.slash(name="fachschaft", description="Zeigt Wichtiges, und Interssantes aus der Fachschaft an.", guild_ids = [ ids.serverIDs.ETIT_KIT ], 
+    options = [ manage_commands.create_option(
+    name = "unterbefehl",
+    description = "Hier kannst du den unterbefehl auswählen.",
+    option_type = 3,
+    choices = [ {
+            "name": "News", 
+            "value": "news"
+        }, {
+            "name": "Link", 
+            "value": "link"
+        }, {
+            "name": "Sitzung", 
+            "value": "sitzung"
+        }, {
+            "name": "Öffnungszeiten", 
+            "value": "öffnungszeiten"
+        } 
+    ],
+    required = True)])
+async def _fachschaft(ctx, unterbefehl):
+    modules.bottiHelper._logCommand(botData, ctx = ctx)
+    
+    msg = modules.construct._constructDummyMessage(ctx.author, ctx.channel, "!fachschaft " + unterbefehl)
+    await ctx.send(content = "Slash-Command: Fachschaft")
+    await modules.info.fachschaft(botti, msg, botData)
+
 @slash.slash(name="klausuren", description="Zeigt dir personalisiert deine anstehenden Klausuren an.", guild_ids = [ ids.serverIDs.ETIT_KIT ])
 async def _klausuren(ctx: SlashContext):
     modules.bottiHelper._logCommand(botData, ctx = ctx)
