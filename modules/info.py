@@ -2,6 +2,8 @@ import datetime
 import discord
 import json
 import modules.bottiHelper
+import modules.calendar
+import modules.construct
 import modules.data.ids as ids
 import os
 import platform
@@ -198,7 +200,7 @@ async def fachschaft(botti, message, botData):
     Für alle ausführbar
     Dieser Befehl zeigt Info über die Fachschaft an.
     !fachschaft {OPTION} {PARAMS}
-    {OPTION} "news", "link", "sitzung"
+    {OPTION} "news", "link", "sitzung", "öffnungszeiten"
     {PARAMS} <leer>, Newspost in range(7)
     !fachschaft news\r!fachschaft news 1
     """
@@ -230,6 +232,35 @@ async def fachschaft(botti, message, botData):
             data.set_author(name = "🌐 Shortcut Link")   
             data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
             data.set_thumbnail(url = botData.fachschaftURL + "templates/joomlakit/images/britzel-white.png")
+            await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
+        elif options[1].lower() == "öffnungszeiten":
+            dates = modules.calendar._getOpenTimes(botData)
+            
+            data = modules.construct._constructDefaultEmbed(
+                title = "Anstehende Öffnungszeiten der Fachschaft",
+                color = 0x009AFF,
+                description = "",
+                url = botData.fachschaftCalendarURL,
+                thumbnail = botData.fachschaftURL + "templates/joomlakit/images/britzel-white.png"
+            )
+            
+            weekdayReplace = {
+                "Monday": "Montag",
+                "Tuesday": "Dienstag",
+                "Wednesday": "Mittwoch",
+                "Thursday": "Donnerstag",
+                "Friday": "Freitag",
+                "Saturday": "Samstag",
+                "Sunday": "Sonntag",   
+            }
+            
+            for component in dates:
+                date = component.decoded("dtstart").strftime("%A, %d.%m.%Y")
+                for key in weekdayReplace.keys():
+                    date = date.replace(key, weekdayReplace[key])
+                data.add_field(name = date, value = component.decoded("summary").decode("utf-8") + "\n`" + component.decoded("dtstart").strftime("%H:%M") + " - " + component.decoded("dtend").strftime("%H:%M`"))
+            
+            data.add_field(name = "⠀", value = "[Thumbnail-Quelle]({url})".format(url = data.thumbnail.url), inline = False)
             await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
         else:
             await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "fachschaft"))
