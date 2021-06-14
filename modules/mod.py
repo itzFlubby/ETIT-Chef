@@ -337,7 +337,7 @@ async def unban(botti, message, botData):
             
             await message.guild.unban(banned_user_entry.user)
             
-            channel = discord.utils.get(botti.get_all_channels(), id = ids.channelID.ALLGEMEIN)
+            channel = discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.ALLGEMEIN)
             await channel.send(":judge: Der Nutzer **{0}#{1}** wurde von {2} entbannt.".format(banned_user_entry.user.name, banned_user_entry.user.discriminator, message.author.mention))
             await modules.bottiHelper._sendMessagePingAuthor(message, ":judge: Der Nutzer **{0}** wurde entbannt.".format(banned_user_entry.user))
             return 
