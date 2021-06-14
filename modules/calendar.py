@@ -66,13 +66,31 @@ def _getCourseAndSemester(message):
         return None
         
     try:
-        sem = message.channel.category.name[0]
+        sem = message.channel.category.name[2]
         return buildInfo + sem
     except:
         return None
     
 def _getCurrentTime():
     return datetime.datetime.now(tzlocal())
+   
+def _getOpenTimes(botData):
+    content = ""
+    with open(botData.modulesDirectory + "data/calendar/Fachschaft.ical", "r") as f:
+        content += f.read()
+        
+    calendar = Calendar.from_ical(content)
+
+    opentimes = []
+    
+    now = datetime.datetime.now()
+    
+    for component in calendar.walk():
+        if component.name == "VEVENT":
+            decodedSummary = component.decoded("summary").decode()
+            if "Öffnungszeit" in decodedSummary and (_compareDate(component.decoded("dtstart"), now) == 0):
+                opentimes.append(component)
+    return opentimes
    
 def _getTimeInCorrectTimezone(component):
     dtstart = component.decoded("dtstart")
@@ -254,12 +272,18 @@ async def updatecalendar(botti, message, botData):
     """
     courseAndSemester = _getCourseAndSemester(message)
     
+    params = message.content.split(" ")
+    
+    if len(params) == 2:
+        if params[1] in botData.calendarURLs.keys():
+            courseAndSemester = params[1]
+    
     if courseAndSemester == None:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Semester und Studiengang wurde nicht erkannt. Verwende den Befehl in einem Text-Kanal von dem Semester, dessen Kalender aktualisiert werden soll!")    
         return
     
     if botData.calendarURLs[courseAndSemester] == None:
-        await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Für dieses Semester gibt es in diesem Studiengang noch kein Kalender!")    
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":calendar: Für {courseAndSemester} leider kein Kalender hinterlegt. Melde dich bitte bei einem Admin, oder Moderator!".format(courseAndSemester = courseAndSemester))    
         return
     
     request = requests.get(botData.calendarURLs[courseAndSemester])
