@@ -333,6 +333,41 @@ async def kekse(botti, message, botData):
     await botMessage.add_reaction(modules.construct._constructEmojiStringNoBracket(ids.emojiIDs.OH))
     await botMessage.add_reaction("🍪")
 
+async def mdtext(botti, message, botData):
+    """ 
+    Reserviert für Entwickler 
+    Dieser Befehl zeigt einen String in unterschiedlichen Markdown-Typen an.
+    !mdtext {INLINE} {TEXT} 
+    {INLINE} "-n" [Not inline]
+    {TEXT} String
+    !mdtext !"§$%&/()=?\r!mdtext -n !"§$%&/()=?
+    """    
+    try:
+        parameters = modules.bottiHelper._getParametersFromMessage(message.content, 10) # 10 = len("!mdtext -q")
+        textStart = 8 if len(parameters) == 0 else 11 # 8 = len("!mdtext ") | 11 = len("!mdtext ") + len("-q ")
+        showInline = False if "n" in parameters else True
+        
+        text = message.content[textStart:] if message.content[textStart:] != "" else "Beispiel Text! 1234567890 !\"§$%&/()='#*+-/<>{[]}\\" 
+        
+        markdownTypes = [ "asciidoc", "autohotkey", "bash", "coffescript", "cpp", "cs", "css", "diff", "fix", "glsl", "ini", "json", "md", "ml", "prolog", "py", "tex", "xl", "xml" ]
+        
+        data = discord.Embed(
+            title = "",
+            description = "",
+            color = 0x009aff
+        )
+        
+        for markdownType in markdownTypes:
+            data.add_field(name = markdownType, value = "```" + markdownType + "\n" + text + "```", inline = showInline)
+        
+        data.set_author(name = "🖊️ Markdown-Typen")
+        data.set_thumbnail(url = botti.user.avatar.url)
+
+        await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
+    except:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "mdtext"))      
+        return   
+
 async def our(botti, message, botData):
     """ 
     Für alle ausführbar
