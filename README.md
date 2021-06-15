@@ -20,5 +20,5 @@ pip install -r requirements.txt
 Links
 ------
 
-- `Dokumentation vom Python-Wrapper<https://discordpy.readthedocs.io/en/latest/index.html>`_
-- `Discord API <https://discord.gg/discord-api>`_
+- [Dokumentation vom Python-Wrapper](https://discordpy.readthedocs.io/en/latest/index.html>)
+- [Discord API](<https://discord.gg/discord-api>)
