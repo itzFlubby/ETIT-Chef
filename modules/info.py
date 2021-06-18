@@ -570,6 +570,57 @@ async def serverinfo(botti, message, botData):
     
     await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
+async def stackoverflow(botti, message, botData):
+    """ 
+    Für alle ausführbar
+    Dieser Befehl zeigt einen Stackoverflow-Nutzer an.
+    !stackoverflow {USER}
+    {USER} Username [string]
+    !stackoverflow Jon Skeet
+    """
+    params = message.content.split(" ")
+    
+    if len(params) < 2:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "stackoverflow"))      
+        return    
+
+    response = requests.get("https://api.stackexchange.com/users?site=stackoverflow&inname=" + message.content[15:].replace(" ", "%20"))
+    jsonData = json.loads(response.text)
+    
+    umlautCharmap = {   
+        "&#196;": "Ä", 
+        "&#228;": "ä",
+        "&#214;": "Ö",
+        "&#246;": "ö", 
+        "&#220;": "Ü", 
+        "&#252;": "ü" 
+    }
+    
+    if len(jsonData["items"]) == 0:
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Leider konnte dieser Nutzer nicht gefunden werden!")
+        return
+        
+    user = jsonData["items"][0]
+    
+    for key in umlautCharmap.keys():
+        user["display_name"] = user["display_name"].replace(key, umlautCharmap[key])
+    
+    data = modules.construct._constructDefaultEmbed(
+        title = "Stackoverflow Nutzer: " + jsonData["items"][0]["display_name"].translate(umlautCharmap),
+        description = "Zuletzt gesehen am {lastseen}\nAccount erstellt am {creationdate}".format(lastseen = modules.bottiHelper._toGermanTimestamp(datetime.datetime.fromtimestamp(user["last_access_date"])), creationdate = modules.bottiHelper._toGermanTimestamp(datetime.datetime.fromtimestamp(user["creation_date"]))),
+        color = 0xEF8236,
+        thumbnail = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Stack_Overflow_icon.svg/768px-Stack_Overflow_icon.svg.png",
+        url = user["link"]
+    )
+    
+    if user["reputation"] < 200:
+        data.set_image(url = "https://stackoverflow.com/users/flair/{user_id}.png?theme=dark".format(user_id = user["user_id"]))
+    else:
+        data.set_image(url = "https://stackexchange.com/users/flair/{account_id}.png".format(account_id = user["account_id"]))
+        
+    await modules.bottiHelper._sendMessagePingAuthor(message, embed = data)
+    return
+    
 async def stats(botti, message, botData):
     """ 
     Für alle ausführbar
