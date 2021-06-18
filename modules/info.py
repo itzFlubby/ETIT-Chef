@@ -167,39 +167,62 @@ async def corona(botti, message, botData):
     """ 
     Für alle ausführbar
     Dieser Befehl zeigt Informationen über das Corona-Virus an.
-    !corona {ORT}
+    !corona {ORT}[,{ORT2}]
     {ORT} "karlsruhe", "ludwigsburg", "wetteraukreis", "heilbronn"
+    {ORT2} "karlsruhe", "ludwigsburg", "wetteraukreis", "heilbronn"
+    !corona\r!corona karlsruhe\r!corona karlsruhe,ludwigsburg
     """
     params = message.content.split(" ")
-    if len(params) < 2:
-        output = requests.get(botData.coronaAPI["url"]["karlsruhe"])
-    else:
-        if params[1] not in botData.coronaAPI["url"].keys():
-            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "corona"))      
-            return
-        output = requests.get(botData.coronaAPI["url"][params[1]])
+    firstCounty = "karlsruhe"
+    secondCounty = ""
+    if len(params) > 1:
+        if "," in params[1]:
+            locations = params[1].split(",")
+            if not all(location in botData.coronaAPI["url"].keys() for location in locations):
+                await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "corona"))      
+                return
+            firstCounty = locations[0]
+            secondCounty = locations[1]
+        else:
+            if params[1] not in botData.coronaAPI["url"].keys():
+                await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "corona"))      
+                return
+                
+            firstCounty = params[1]
     
-    jsonData = json.loads(output.content.decode('utf8'))["features"][0]["attributes"]
+    outputFirstCounty = requests.get(botData.coronaAPI["url"][firstCounty])
+        
+    jsonDataFirstCounty = json.loads(outputFirstCounty.content.decode('utf8'))["features"][0]["attributes"]
+    
+    jsonDataSecondCounty = jsonDataFirstCounty.copy()
+    if secondCounty == "":
+        for key in jsonDataSecondCounty.keys():
+            jsonDataSecondCounty[key] = "⠀"
+    else:
+        jsonDataSecondCounty = json.loads(requests.get(botData.coronaAPI["url"][secondCounty]).content.decode('utf8'))["features"][0]["attributes"]
+    
     
     data = discord.Embed(
-        title = "{bez} {gen}".format(bez = jsonData["BEZ"], gen = jsonData["GEN"]),
-        description = "{debkg_id} {nuts}".format(debkg_id = jsonData["DEBKG_ID"], nuts = jsonData["NUTS"]),
+        title = "{bez} {gen}".format(bez = jsonDataFirstCounty["BEZ"], gen = jsonDataFirstCounty["GEN"]),
+        description = "{debkg_id} {nuts}".format(debkg_id = jsonDataFirstCounty["DEBKG_ID"], nuts = jsonDataFirstCounty["NUTS"]),
         color = 0xf55d42
     )
     
-    data.add_field(name = "7 Tage Inzidenz (pro 100k)\n{county}".format(county = jsonData["county"]), value = "{:.2f}".format(jsonData["cases7_per_100k"]))
-    data.add_field(name = "⠀", value = "⠀") # spacer
-    data.add_field(name = "⠀\n{bl}".format(bl = jsonData["BL"]), value = "{:.2f}".format(jsonData["cases7_bl_per_100k"]))
-    data.add_field(name = "Neuinfektionen pro Woche\n{county}".format(county = jsonData["county"]), value = jsonData["cases7_lk"])
-    data.add_field(name = "⠀", value = "⠀") # spacer
-    data.add_field(name = "⠀\n{bl}".format(bl = jsonData["BL"]), value = jsonData["cases7_bl"])
-    data.add_field(name = "Todesfälle pro Woche\n{county}".format(county = jsonData["county"]), value = jsonData["death7_lk"])
-    data.add_field(name = "⠀", value = "⠀") # spacer
-    data.add_field(name = "⠀\n{bl}".format(bl = jsonData["BL"]), value = jsonData["death7_bl"])
+    data.add_field(name = "7 Tage Inzidenz (pro 100k)\n{county}".format(county = jsonDataFirstCounty["county"]), value = "{:.2f}".format(jsonDataFirstCounty["cases7_per_100k"]))
+    data.add_field(name = "⠀\n{county}".format(county = jsonDataSecondCounty["county"]), value = ("{:.2f}".format(jsonDataSecondCounty["cases7_per_100k"])) if secondCounty != "" else "⠀")
+    data.add_field(name = "⠀\n{bl}".format(bl = jsonDataFirstCounty["BL"]), value = "{:.2f}".format(jsonDataFirstCounty["cases7_bl_per_100k"]))
+    
+    data.add_field(name = "Neuinfektionen pro Woche\n{county}".format(county = jsonDataFirstCounty["county"]), value = jsonDataFirstCounty["cases7_lk"])
+    data.add_field(name = "⠀\n{county}".format(county = jsonDataSecondCounty["county"]), value = jsonDataSecondCounty["cases7_lk"])
+    data.add_field(name = "⠀\n{bl}".format(bl = jsonDataFirstCounty["BL"]), value = jsonDataFirstCounty["cases7_bl"])
+    
+    data.add_field(name = "Todesfälle pro Woche\n{county}".format(county = jsonDataFirstCounty["county"]), value = jsonDataFirstCounty["death7_lk"])
+    data.add_field(name = "⠀\n{county}".format(county = jsonDataSecondCounty["county"]), value = jsonDataSecondCounty["death7_lk"])
+    data.add_field(name = "⠀\n{bl}".format(bl = jsonDataFirstCounty["BL"]), value = jsonDataFirstCounty["death7_bl"])
     
     data.add_field(name = "⠀", value = "[Quelle]({source})\n[Thumbnail-Quelle]({thumbnail})".format(source = botData.coronaAPI["source"], thumbnail = botData.coronaAPI["thumbnail"]))
     data.set_thumbnail(url = botData.coronaAPI["thumbnail"])
-    data.set_footer(text = "Letztes Update: {updateTimestamp}.\nJegliche Angaben ohne Gewähr.".format(updateTimestamp = jsonData["last_update"]))
+    data.set_footer(text = "Letztes Update: {updateTimestamp}.\nJegliche Angaben ohne Gewähr.".format(updateTimestamp = jsonDataFirstCounty["last_update"]))
     
     await modules.bottiHelper._sendMessagePingAuthor(message, embed = data)
 
