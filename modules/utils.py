@@ -349,7 +349,7 @@ async def mdtext(botti, message, botData):
         
         text = message.content[textStart:] if message.content[textStart:] != "" else "Beispiel Text! 1234567890 !\"§$%&/()='#*+-/<>{[]}\\" 
         
-        markdownTypes = [ "asciidoc", "autohotkey", "bash", "coffescript", "cpp", "cs", "css", "diff", "fix", "glsl", "ini", "json", "md", "ml", "prolog", "py", "tex", "xl", "xml" ]
+        markdownTypes = [ "asciidoc", "autohotkey", "bash", "cpp", "cs", "css", "coffescript", "diff", "fix", "glsl", "html", "ini", "json", "js", "matlab", "md", "ml", "php", "prolog", "py", "tex", "xl", "xml", "yaml" ]
         
         data = discord.Embed(
             title = "",
