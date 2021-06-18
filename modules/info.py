@@ -167,9 +167,17 @@ async def corona(botti, message, botData):
     """ 
     Für alle ausführbar
     Dieser Befehl zeigt Informationen über das Corona-Virus an.
-    !corona
+    !corona {ORT}
+    {ORT} "karlsruhe", "ludwigsburg", "wetteraukreis", "heilbronn"
     """
-    output = requests.get(botData.coronaAPI["url"])
+    params = message.content.split(" ")
+    if len(params) < 2:
+        output = requests.get(botData.coronaAPI["url"]["karlsruhe"])
+    else:
+        if params[1] not in botData.coronaAPI["url"].keys():
+            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "corona"))      
+            return
+        output = requests.get(botData.coronaAPI["url"][params[1]])
     
     jsonData = json.loads(output.content.decode('utf8'))["features"][0]["attributes"]
     
@@ -180,14 +188,14 @@ async def corona(botti, message, botData):
     )
     
     data.add_field(name = "7 Tage Inzidenz (pro 100k)\n{county}".format(county = jsonData["county"]), value = "{:.2f}".format(jsonData["cases7_per_100k"]))
+    data.add_field(name = "⠀", value = "⠀") # spacer
     data.add_field(name = "⠀\n{bl}".format(bl = jsonData["BL"]), value = "{:.2f}".format(jsonData["cases7_bl_per_100k"]))
-    data.add_field(name = "⠀", value = "⠀") # spacer
     data.add_field(name = "Neuinfektionen pro Woche\n{county}".format(county = jsonData["county"]), value = jsonData["cases7_lk"])
+    data.add_field(name = "⠀", value = "⠀") # spacer
     data.add_field(name = "⠀\n{bl}".format(bl = jsonData["BL"]), value = jsonData["cases7_bl"])
-    data.add_field(name = "⠀", value = "⠀") # spacer
     data.add_field(name = "Todesfälle pro Woche\n{county}".format(county = jsonData["county"]), value = jsonData["death7_lk"])
-    data.add_field(name = "⠀\n{bl}".format(bl = jsonData["BL"]), value = jsonData["death7_bl"])
     data.add_field(name = "⠀", value = "⠀") # spacer
+    data.add_field(name = "⠀\n{bl}".format(bl = jsonData["BL"]), value = jsonData["death7_bl"])
     
     data.add_field(name = "⠀", value = "[Quelle]({source})\n[Thumbnail-Quelle]({thumbnail})".format(source = botData.coronaAPI["source"], thumbnail = botData.coronaAPI["thumbnail"]))
     data.set_thumbnail(url = botData.coronaAPI["thumbnail"])
