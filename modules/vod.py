@@ -10,7 +10,7 @@ from modules.data.botData import botData
 
 async def _cyclicVod():
     while(True):
-        await asyncio.sleep(3600 * 4) # 2 hours
+        await asyncio.sleep(3600 * 2) # 2 hours
         accessToken, refreshToken = _getAccessAndRefreshToken()
         authenticationHeader = {'Authorization': 'Bearer ' + accessToken}
         response = requests.get("https://graph.microsoft.com/v1.0/me/drive/root:/{filePath}{fileName}:/content".format(filePath = botData.onedriveInfo["filePath"], fileName = botData.onedriveInfo["fileName"]), headers = authenticationHeader)
@@ -21,17 +21,16 @@ async def _cyclicVod():
         with open(botData.modulesDirectory + "data/vod/" + botData.onedriveInfo["fileName"], 'r') as f:
             oldLog = f.read().split("\n")
             
-        with open(botData.modulesDirectory + "data/vod/" + botData.onedriveInfo["fileName"], 'w') as f:
+        with open(botData.modulesDirectory + "data/vod/" + botData.onedriveInfo["fileName"], 'w', encoding="utf-8") as f:
             f.write(fileContent)
            
-        lastCycleLineIndexNew = _getLastCycleDate(newLog)
-        lastCycleLineIndexOld = _getLastCycleDate(oldLog)
-        
+        lastCycleLineIndexNew = _getLastCycleDate(newLog) if _getLastCycleDate(newLog) != None else 0
+        lastCycleLineIndexOld = _getLastCycleDate(oldLog) if _getLastCycleDate(oldLog) != None else 0
         if newLog[lastCycleLineIndexNew] == oldLog[lastCycleLineIndexOld]:
             continue
         
         elementsString = "{emoji} Letzter Zyklus `@{date}`\n".format(emoji = modules.construct._constructEmojiString(ids.emojiIDs.ILIAS), date = newLog[lastCycleLineIndexNew].split(" - ")[1])
-        for run, line in enumerate(newLog[(lastCycleLineIndexNew+1):]):
+        for run, line in enumerate(newLog[(lastCycleLineIndexOld+1):]):
             if ".mp4" in line:
                 elementsString += "```fix\n" + line[8:] + "```" # 8 = len("Writing ")
            
@@ -39,7 +38,7 @@ async def _cyclicVod():
             continue
             
         await discord.utils.get(botti.get_all_channels(), id = ids.channelIDs.VOD_PING).send(elementsString)
-    
+        
 def _getLastCycleDate(log):
     for lineIndex in range(len(log) - 1, 0, -1): # step in reversed order
         if "Cycle" in log[lineIndex]:
