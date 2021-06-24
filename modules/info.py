@@ -451,9 +451,10 @@ async def quicklink(botti, message, botData):
     """ 
     Für alle ausführbar
     Dieser Befehl schickt einen Quicklink.
-    !quicklink {LINK}
+    !quicklink {LINK} {@USER}
     {LINK} "dontask", "exmatrikulation", "kw", "duden", "github", "stackoverflow"
-    !quicklink dontask\r!quicklink duden
+    {@USER} @ETIT-Chef
+    !quicklink dontask\r!quicklink duden\r!quicklink stackoverflow @ETIT-Chef
     """
     linksDict = {
         "dontask": Quicklink(
@@ -506,7 +507,7 @@ async def quicklink(botti, message, botData):
     }
     
     arguments = message.content.split(" ")
-    if len(arguments) != 2:
+    if len(arguments) < 2:
         await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "quicklink"))
         return
         
@@ -529,6 +530,9 @@ async def quicklink(botti, message, botData):
 
     data.set_author(name = "🌐 Shortcut Link")   
     data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
+    
+    if len(message.mentions) != 0:
+        message.author = message.mentions[0]
     
     await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
@@ -582,10 +586,6 @@ async def serverinfo(botti, message, botData):
     data.add_field(name = "Name", value = message.guild.name)
     data.add_field(name = "Region", value = str(message.guild.region))
     data.add_field(name = "Eigentümer", value = message.guild.owner.mention)
-    
-    data.add_field(name = "Mitglieder", value = message.guild.member_count)
-    data.add_field(name = "Rollen", value = len(message.guild.roles))
-    data.add_field(name = "Emojis", value = len(message.guild.emojis))
     
     data.add_field(name = "Kategorien", value = len(message.guild.categories))
     data.add_field(name = "Text-Kanäle", value = len(message.guild.text_channels))
