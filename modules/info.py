@@ -591,13 +591,37 @@ async def serverinfo(botti, message, botData):
     data.add_field(name = "Text-Kanäle", value = len(message.guild.text_channels))
     data.add_field(name = "Sprach-Kanäle", value = len(message.guild.voice_channels))
     
-    data.add_field(name = "Erstellt am", value = modules.bottiHelper._toUTCTimestamp(message.guild.created_at), )
+    data.add_field(name = "Rollen", value = len(message.guild.roles))
+    data.add_field(name = "Emojis / Sticker", value = "{} / {}".format(len(message.guild.emojis), len(message.guild.emojis)))
+    data.add_field(name = "Boosts", value = message.guild.premium_subscription_count)
     
-    data.add_field(name = "Icon", value = message.guild.icon.url, inline = False)
+    memberStatusCounts = {
+        "online": 0,
+        "idle": 0,
+        "dnd": 0,
+        "offline": 0
+    }
+    
+    for member in message.guild.members:
+        try:
+            memberStatusCounts[str(member.status)] += 1
+        except:
+            pass
+    data.add_field(name = "{count} Mitglieder".format(count = message.guild.member_count), 
+        value = "{online} {onlineCount}\n".format(online = modules.construct._constructEmojiString(ids.emojiIDs.ONLINE), onlineCount = memberStatusCounts["online"]) +
+                "{idle} {idleCount}\n".format(idle = modules.construct._constructEmojiString(ids.emojiIDs.IDLE), idleCount = memberStatusCounts["idle"]) +
+                "{dnd} {dndCount}\n".format(dnd = modules.construct._constructEmojiString(ids.emojiIDs.DND), dndCount = memberStatusCounts["dnd"]) +
+                "{offline} {offlineCount}\n".format(offline = modules.construct._constructEmojiString(ids.emojiIDs.OFFLINE), offlineCount = memberStatusCounts["offline"]))
+    
+    
+    data.add_field(name = "Erstellt am", value = modules.bottiHelper._toUTCTimestamp(message.guild.created_at))
+    data.add_field(name = "ID", value = str(message.guild.id))
+    
+    data.add_field(name = "⠀", value = "[Icon]({url})".format(url = message.guild.icon.url), inline = False)
     
     data.set_author(name = "📱 Server-Info")
     data.set_thumbnail(url = message.guild.icon.url)
-    data.set_footer(text = "ID: {0}\nStand: {1}".format(str(message.guild.id), modules.bottiHelper._getTimestamp()))
+    data.set_footer(text = "Stand: {}".format(modules.bottiHelper._getTimestamp()))
     
     await modules.bottiHelper._sendMessagePingAuthor(message = message, embed = data)
 
