@@ -13,7 +13,7 @@ from discord_slash.utils import manage_commands
 bottiIntents = discord.Intents.default()
 bottiIntents.members = True
 bottiIntents.reactions = True
-bottiIntents.presences = False
+bottiIntents.presences = True
 botti = discord.Client(intents = bottiIntents, guild_subscriptions = True)
 
 from modules.data.botData import botData
