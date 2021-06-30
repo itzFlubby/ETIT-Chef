@@ -176,6 +176,42 @@ async def mute(botti, message, botData):
         await user.edit(mute = False)
         await modules.bottiHelper._sendMessagePingAuthor(message, ":microphone2: Der Nutzer {0} wurde **frei** geschaltet.".format(user.mention))
 
+async def newrole(botti, message, botData): 
+    """
+    Reserviert für Moderator oder höher
+    Dieser Befehl erstellt eine neue Rolle.
+    !newrole {NAME} {COLOR}
+    {NAME} [String]
+    {COLOR} [hex]
+    !newrole "Test-Rolle" 0x123456
+    """
+    params = message.content.split(" ")
+    if len(params) < 2 or len(message.content.split("\"")) < 2:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "newrole"))      
+        return  
+        
+    try:
+        roleColor = int(message.content[-8:], 16)
+    except ValueError:
+        await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "newrole"))      
+        return  
+        
+    roleName = message.content.split("\"")[1]
+    
+    
+    newRole = await message.guild.create_role(name = roleName, color = roleColor)
+    
+    rolePermissions = discord.PermissionOverwrite.from_pair(allow = discord.Permissions.text(), deny = discord.Permissions.none())
+
+    overwrites = {
+        message.guild.default_role: discord.PermissionOverwrite(read_messages = False),
+        newRole: rolePermissions
+    }
+    
+    category = discord.utils.get(message.guild.categories, id = ids.categoryIDs.WEITERE_MODULE)
+    newChannel = await message.guild.create_text_channel(name = roleName, category = category, overwrites = overwrites)
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":white_check_mark: Die Rolle <@&{roleID}>, sowie der Kanal <#{channelID}> wurden erstellt.".format(roleID = newRole.id, channelID = newChannel.id))
+    
 async def nick(botti, message, botData):
     """
     Reserviert für Moderator oder höher
