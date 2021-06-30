@@ -103,7 +103,7 @@ async def _subcommandCreateLerngruppe(message, userInput):
        
     newCategory = await message.guild.create_category(name = "{type} Lerngruppe-{id}".format(type = types[type], id = nextFreeID), overwrites = overwrites)
     newChannel = await message.guild.create_text_channel(name = "📚Lerngruppe-{id}".format(id = nextFreeID), category = newCategory)
-    await message.guild.create_voice_channel(name = "📚Lerngruppe-{id}".format(id = nextFreeID), category = newCategory)
+    await message.guild.create_voice_channel(name = "📚Lerngruppe-{id}".format(id = nextFreeID), category = newCategory, bitrate = 384000)
     
     await modules.bottiHelper._sendMessagePingAuthor(message, ":books: Deine Lerngruppe _(mit der ID: {id})_ wurde erstellt!".format(id = nextFreeID))
     await newChannel.send(":books: Lerngruppe-{id} {type}\n:books: Eigentümer: {owner}\n:books: Erstellt: {created}".format(id = nextFreeID, type = types[type], owner = message.author.mention, created = modules.bottiHelper._getTimestamp()))
