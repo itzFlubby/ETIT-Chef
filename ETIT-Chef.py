@@ -34,6 +34,7 @@ import modules.mod
 import modules.vod # MUSS unter der Deklaration und Initialisierung vom Objekten botti stehen
 import modules.polls
 import modules.timer
+import modules.updater
 import modules.utils
 
 slash = SlashCommand(botti, sync_commands = True)
@@ -44,9 +45,6 @@ from modules.data.commandModule import commandModule
              
 @botti.event
 async def on_ready():
-    
-    #await manage_commands.remove_all_commands(botti.user.id, botData.botToken, guild_ids = [ids.serverIDs.ETIT_KIT])
-    
     if botData.firstBoot:
         modules.bottiHelper._loadSettings(botData)
         botData.totalSlashCommands = len(slash.commands)
@@ -74,8 +72,7 @@ async def on_ready():
             data.description = "Verbindung etabliert am `{timestamp}`".format(timestamp = modules.bottiHelper._getTimestamp())
             data.color = 0xFF0000
             await botti.change_presence(activity = discord.Game(name = "⚒ Wartungsarbeiten ⚒"), status = discord.Status.dnd)
-            
-            botti.loop.create_task(modules.vod._cyclicVod())
+
         else:
             await modules.bottiHelper._setNormalStatus(botti, botData)
         
@@ -88,7 +85,9 @@ async def on_ready():
         
             botti.loop.create_task(modules.vod._cyclicVod())
 
-            #botti.loop.create_task(modules.gamble._cyclicBotDetection(botti, botData, True))
+            #botti.loop.create_task(modules.gamble._cyclicBotDetection(botti, botData, True
+            
+            botti.loop.create_task(modules.updater._cyclicUpdater())
 
         botData.firstBoot = False
     else:
