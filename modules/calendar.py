@@ -8,6 +8,61 @@ from dateutil.tz import tzlocal
 from icalendar import Calendar, vDatetime
 from os.path import exists
 
+replacementDict = {
+        "Höhere Mathematik": {
+            "emoji": ":chart_with_upwards_trend:",
+            "value": "HM"
+        },
+        "Hoehere Mathematik": {
+            "emoji": ":chart_with_upwards_trend:",
+            "value": "HM"
+        },
+        "Inverted Classroom": {
+            "emoji": "",
+            "value": "IC"
+        },
+        "Elektronische Schaltungen": {
+            "emoji": ":radio:",
+            "value": "ES"
+        },
+        "Elektromagnetische Felder": {
+            "emoji": ":magnet:",
+            "value": "EMF"
+        },
+        "Komplexe Analysis und Integraltransformationen": {
+            "emoji": ":triangular_ruler:",
+            "value": "KAI"
+        },
+        "Informationstechnik": {
+            "emoji": ":computer:",
+            "value": "IT"
+        },
+        "Optik und Festkörperelektronik": {
+            "emoji": ":eyes:",
+            "value": "OFE"
+        },
+        "Optik und Festkoerperelektronik": {
+            "emoji": ":eyes:",
+            "value": "OFE"
+        },
+        "Grundlagen der Hochfrequenztechnik": {
+            "emoji": ":satellite:",
+            "value": "GHF"
+        },
+        "Maschinenkonstruktionslehre": {
+            "emoji": ":gear:",
+            "value": "MKL"
+        },
+        "Technische Mechanik": {
+            "emoji": ":wrench:",
+            "value": "TM"
+        },
+        "Elektroenergiesysteme": {
+            "emoji": ":battery:",
+            "value": "EES"
+        }
+    }
+
 class Exam:
     def __init__(self, pName, pDate, pDuration, pLocation):
         self.name = pName
@@ -154,53 +209,6 @@ def _retrieveExams(botData, courseAndSemester):
             f.write(exam)
 
 def _shortenSummary(summary):
-    replacementDict = {
-        "Höhere Mathematik": {
-            "emoji": ":chart_with_upwards_trend:",
-            "value": "HM"
-        },
-        "Inverted Classroom": {
-            "emoji": "",
-            "value": "IC"
-        },
-        "Elektronische Schaltungen": {
-            "emoji": ":radio:",
-            "value": "ES"
-        },
-        "Elektromagnetische Felder": {
-            "emoji": ":magnet:",
-            "value": "EMF"
-        },
-        "Komplexe Analysis und Integraltransformationen": {
-            "emoji": ":triangular_ruler:",
-            "value": "KAI"
-        },
-        "Informationstechnik": {
-            "emoji": ":computer:",
-            "value": "IT"
-        },
-        "Optik und Festkörperelektronik": {
-            "emoji": ":eyes:",
-            "value": "OFE"
-        },
-        "Grundlagen der Hochfrequenztechnik": {
-            "emoji": ":satellite:",
-            "value": "GHF"
-        },
-        "Maschinenkonstruktionslehre": {
-            "emoji": ":gear:",
-            "value": "MKL"
-        },
-        "Technische Mechanik": {
-            "emoji": ":wrench:",
-            "value": "TM"
-        },
-        "Elektroenergiesysteme": {
-            "emoji": ":battery:",
-            "value": "EES"
-        }
-    }
-    
     for key in replacementDict:
         if key in summary:
             summary = "{emoji} {summary}".format(emoji = replacementDict[key]["emoji"], summary = summary.replace(key, replacementDict[key]["value"]))
