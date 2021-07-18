@@ -104,6 +104,7 @@ def _logCommand(botData, message = None, ctx = None):
     botData.lastCommands[0] = entryElement
     
     botData.log.append(entryElement)
+    botData.befehlsCounter += 1
     if len(botData.log) > 10:
         with open(botData.modulesDirectory + "data/log/log.txt", "a+") as f:
             for entry in botData.log:

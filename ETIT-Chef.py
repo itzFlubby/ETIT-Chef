@@ -146,7 +146,6 @@ async def on_message(message):
                     if not await modules.guard._checkPerms(botti, message, module.allowedRoles, module.enableTrustet ):
                         return
                 await getattr(module.module, command)(botti, message, botData)
-                botData.befehlsCounter += 1
                 return
                 
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Der Befehl **'{0}'** existiert nicht!".format(message.content))        
