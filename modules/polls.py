@@ -7,23 +7,24 @@ def _getStringAfter(string, after):
 async def _updatePoll(message, vote, user, botData):
     embed = message.embeds[0]
     for run, field in enumerate(embed.fields):
-        if field.name == vote:
-            if user.mention in field.value: # If user already voted
-                mentionBegin = field.value.find(user.mention)
-                mentionEnd = mentionBegin + len(user.mention)
-                clicked = field.value[mentionEnd:].split("`")[0]
-                restValue = _getStringAfter(field.value[mentionEnd:], "`\n`")
-                
-                if not clicked:
-                    clicked = 2
-                else:
-                    clicked = int(clicked[3:]) + 1
-                
-                newValue = field.value[:mentionEnd] + " x " + str(clicked) + "`\n`" + restValue
-                embed.set_field_at(index = run, name = field.name, value = newValue)
+        if field.name != None and vote != None:
+            if field.name.strip() == vote.strip():
+                if user.mention in field.value: # If user already voted
+                    mentionBegin = field.value.find(user.mention)
+                    mentionEnd = mentionBegin + len(user.mention)
+                    clicked = field.value[mentionEnd:].split("`")[0]
+                    restValue = _getStringAfter(field.value[mentionEnd:], "`\n`")
+                    
+                    if not clicked:
+                        clicked = 2
+                    else:
+                        clicked = int(clicked[3:]) + 1
+                    
+                    newValue = field.value[:mentionEnd] + " x " + str(clicked) + "`\n`" + restValue
+                    embed.set_field_at(index = run, name = field.name, value = newValue)
+                    break
+                embed.set_field_at(index = run, name = field.name, value = (user.mention + "`\n`") if (field.value == "Keine Stimmen") else field.value + user.mention + "`\n`")
                 break
-            embed.set_field_at(index = run, name = field.name, value = (user.mention + "`\n`") if (field.value == "Keine Stimmen") else field.value + user.mention + "`\n`")
-            break
     await message.edit(embed = embed)
     
 async def createpoll(botti, message, botData):
