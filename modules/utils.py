@@ -5,6 +5,7 @@ import io
 import modules.audio
 import modules.banlist
 import modules.bottiHelper
+import modules.calendar
 import modules.data.ids as ids
 import modules.dev
 import modules.gamble
@@ -474,18 +475,37 @@ async def thisisfine(botti, message, botData):
     except:
         pass
     
-    numberOfDays = (datetime.datetime(2021, 8, 9, 0, 0, 0) - datetime.datetime.now()).days
+    courseAndSemester = modules.calendar._getCourseAndSemester(message)
     
+    additionalInfo = ""
+    if courseAndSemester == None:
+        courseAndSemester = "all"
+        userRoleNames = [ role.name for role in message.author.roles ]
+    else:
+        userRoleNames = None
+    
+    exams = modules.calendar._parseExams(message, botData, courseAndSemester, userRoleNames)
+    
+    if len(exams) == 0:
+        await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Gerade sind keine anstehenden Klausuren vermerkt!")
+        return
+    
+    numberOfDays = (exams[0].date - datetime.datetime.now()).days
+    
+    for key in modules.calendar.replacementDict:
+        if key in exams[0].name:
+            exams[0].name = exams[0].name.replace(key, modules.calendar.replacementDict[key]["value"])
+            
     if not isGIFResquested:
-        file = botData.modulesDirectory + "/data/images/temp/thisisfine_{}.jpg".format(str(numberOfDays))
+        file = botData.modulesDirectory + "/data/images/temp/thisisfine_{}_{}.jpg".format(exams[0].name, str(numberOfDays))
         imageToEdit = Image.open(botData.modulesDirectory + "/data/images/thisisfine.jpg")
     else:
-        file = botData.modulesDirectory + "/data/images/temp/thisisfine_{}.gif".format(str(numberOfDays))
+        file = botData.modulesDirectory + "/data/images/temp/thisisfine_{}_{}.gif".format(exams[0].name, str(numberOfDays))
         imageToEdit = Image.open(botData.modulesDirectory + "/data/images/thisisfine.gif")
     
     titleFont = ImageFont.truetype(botData.modulesDirectory + "/data/images/fonts/impact.ttf", 35) 
 
-    imageString = "* KAI in {} Tagen *".format(numberOfDays)  
+    imageString = "* {exam} in {days} Tagen *".format(exam = exams[0].name, days = numberOfDays)  
     shadowcolor = "black"    
     fontColor = (255, 255, 255)    
     cacheString = ""
