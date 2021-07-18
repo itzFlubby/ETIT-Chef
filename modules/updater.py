@@ -17,7 +17,6 @@ async def _cyclicUpdater():
         await asyncio.sleep(3600 * 12) # every 12 hours
         updatedCalendars = "```\n"
         for calendar in botData.calendarURLs.keys():
-            print(calendar)
             if botData.calendarURLs[calendar] != None:
                 
                 request = requests.get(botData.calendarURLs[calendar])
