@@ -480,7 +480,9 @@ async def thisisfine(botti, message, botData):
     additionalInfo = ""
     if courseAndSemester == None:
         courseAndSemester = "all"
-        userRoleNames = [ role.name for role in message.author.roles ]
+        umlautCharmap = { ord("ä"): "ae", ord("ü"): "ue", ord("ö"): "oe", ord("ß"): "ss" }
+        userRoleNames = [ role.name.translate(umlautCharmap) for role in message.author.roles ]
+        
     else:
         userRoleNames = None
     
