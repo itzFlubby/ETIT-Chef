@@ -16,6 +16,7 @@ emojiToRoleID = {   "💬": ids.roleIDs.ZITATE,
                     "🍺": ids.roleIDs.SPONTAN_IN_KA,
                     "💥": ids.roleIDs.DISKUSSION,
                     "🎨": ids.roleIDs.KUNST_UND_FOTOGRAPHIE,
+                    "🍕": ids.roleIDs.KOCHEN_ESSEN,
                 }        
 
 async def _addRoles(member, addIDs):
