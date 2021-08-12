@@ -485,27 +485,37 @@ async def thisisfine(botti, message, botData):
         userRoleNames = None
     
     exams = modules.calendar._parseExams(message, botData, courseAndSemester, userRoleNames)
-    
-    if len(exams) == 0:
+    nextExam = None
+
+    for exam in exams:
+        if exam.name in userRoleNames:
+            if nextExam != None:
+                if exam.date < nextExam.date and exam.date > datetime.datetime.now():
+                    nextExam = exam
+            else:
+                if (exam.date - datetime.datetime.now()).days > 0:
+                    nextExam = exam
+        
+    if nextExam == None:
         await modules.bottiHelper._sendMessagePingAuthor(message, ":x: Gerade sind keine anstehenden Klausuren vermerkt!")
         return
     
-    numberOfDays = (exams[0].date - datetime.datetime.now()).days
+    numberOfDays = (nextExam.date - datetime.datetime.now()).days
     
     for key in modules.calendar.replacementDict:
-        if key in exams[0].name:
-            exams[0].name = exams[0].name.replace(key, modules.calendar.replacementDict[key]["value"])
+        if key in nextExam.name:
+            nextExam.name = nextExam.name.replace(key, modules.calendar.replacementDict[key]["value"])
             
     if not isGIFResquested:
-        file = botData.modulesDirectory + "/data/images/temp/thisisfine_{}_{}.jpg".format(exams[0].name, str(numberOfDays))
+        file = botData.modulesDirectory + "/data/images/temp/thisisfine_{}_{}.jpg".format(nextExam.name, str(numberOfDays))
         imageToEdit = Image.open(botData.modulesDirectory + "/data/images/thisisfine.jpg")
     else:
-        file = botData.modulesDirectory + "/data/images/temp/thisisfine_{}_{}.gif".format(exams[0].name, str(numberOfDays))
+        file = botData.modulesDirectory + "/data/images/temp/thisisfine_{}_{}.gif".format(nextExam.name, str(numberOfDays))
         imageToEdit = Image.open(botData.modulesDirectory + "/data/images/thisisfine.gif")
     
     titleFont = ImageFont.truetype(botData.modulesDirectory + "/data/images/fonts/impact.ttf", 35) 
 
-    imageString = "* {exam} in {days} Tagen *".format(exam = exams[0].name, days = numberOfDays)  
+    imageString = "* {exam} in {days} Tagen *".format(exam = nextExam.name, days = numberOfDays)  
     shadowcolor = "black"    
     fontColor = (255, 255, 255)    
     cacheString = ""
