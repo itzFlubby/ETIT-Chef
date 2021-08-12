@@ -592,7 +592,7 @@ async def serverinfo(botti, message, botData):
     data.add_field(name = "Sprach-Kanäle", value = len(message.guild.voice_channels))
     
     data.add_field(name = "Rollen", value = len(message.guild.roles))
-    data.add_field(name = "Emojis / Sticker", value = "{} / {}".format(len(message.guild.emojis), len(message.guild.emojis)))
+    data.add_field(name = "Emojis / Sticker", value = "{} / {}".format(len(message.guild.emojis), len(message.guild.stickers)))
     data.add_field(name = "Boosts", value = message.guild.premium_subscription_count)
     
     memberStatusCounts = {
