@@ -112,6 +112,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+server-icons/*
 modules/data/ids.py
 modules/data/bot.py
 modules/data/botData.py
