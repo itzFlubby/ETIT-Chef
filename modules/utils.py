@@ -514,6 +514,7 @@ async def thisisfine(botti, message, botData):
             drawImage = ImageDraw.Draw(imageToEdit)
             x = 192 - int(titleFont.getsize(imageString)[0] / 2)
             y = 5
+            
             drawImage.text((x-2, y-2), imageString, font=titleFont, fill=shadowcolor)
             drawImage.text((x+2, y-2), imageString, font=titleFont, fill=shadowcolor)
             drawImage.text((x-2, y+2), imageString, font=titleFont, fill=shadowcolor)
@@ -523,18 +524,21 @@ async def thisisfine(botti, message, botData):
             
             imageToEdit.save(file)
         else:
+            x = 250 - int(titleFont.getsize(imageString)[0] / 2)
+            y = 25
+            
             frames = []
             for frame in ImageSequence.Iterator(imageToEdit):
                 frame = frame.convert('RGBA')
                 drawImage = ImageDraw.Draw(frame)
-                x, y = titleFont.getsize(imageString)
+
                 
-                drawImage.text(((x/2)-2, (y/2)-2 + 10), imageString, font=titleFont, fill=shadowcolor)
-                drawImage.text(((x/2)+2, (y/2)-2 + 10), imageString, font=titleFont, fill=shadowcolor)
-                drawImage.text(((x/2)-2, (y/2)+2 + 10), imageString, font=titleFont, fill=shadowcolor)
-                drawImage.text(((x/2)+2, (y/2)+2 + 10), imageString, font=titleFont, fill=shadowcolor)
-            
-                drawImage.text((x/2, y/2 + 10), imageString, fontColor, font=titleFont)
+                drawImage.text((x-2, y-2), imageString, font=titleFont, fill=shadowcolor)
+                drawImage.text((x+2, y-2), imageString, font=titleFont, fill=shadowcolor)
+                drawImage.text((x-2, y+2), imageString, font=titleFont, fill=shadowcolor)
+                drawImage.text((x+2, y+2), imageString, font=titleFont, fill=shadowcolor)
+                
+                drawImage.text((x, y), imageString, fontColor, font=titleFont)
                 
                 del drawImage
                 
