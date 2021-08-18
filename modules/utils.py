@@ -475,16 +475,9 @@ async def thisisfine(botti, message, botData):
     except:
         pass
     
-    courseAndSemester = modules.calendar._getCourseAndSemester(message)
-    
-    additionalInfo = ""
-    if courseAndSemester == None:
-        courseAndSemester = "all"
-        umlautCharmap = { ord("ä"): "ae", ord("ü"): "ue", ord("ö"): "oe", ord("ß"): "ss" }
-        userRoleNames = [ role.name.translate(umlautCharmap) for role in message.author.roles ]
-        
-    else:
-        userRoleNames = None
+    courseAndSemester = "all"
+    umlautCharmap = { ord("ä"): "ae", ord("ü"): "ue", ord("ö"): "oe", ord("ß"): "ss" }
+    userRoleNames = [ role.name.translate(umlautCharmap) for role in message.author.roles ]
     
     exams = modules.calendar._parseExams(message, botData, courseAndSemester, userRoleNames)
     nextExam = None
