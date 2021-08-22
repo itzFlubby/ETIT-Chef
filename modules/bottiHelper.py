@@ -64,6 +64,12 @@ def _formatSlashCommandLog(ctx):
         time = _toUTCTimestamp(ctx.message.created_at)
     return "=== BEFEHL ERHALTEN ===\nSLC: {}\nUSR: {}#{} ({})\nTME: {}\nCNL: {} ( {} )\n".format(ctx.name, ctx.author.name, str(ctx.author.discriminator), str(ctx.author.id), time, ctx.channel.name, str(ctx.channel.id))
     
+def _formatContextMenuLog(ctx):
+    time = "UNKNOWN"
+    if self.target_message is not None:
+        time = _toUTCTimestamp(self.target_message.created_at)
+    return "=== BEFEHL ERHALTEN ===\nCMU: {}\nUSR: {}#{} ({})\nTME: {}\nCNL: {} ( {} )\n".format(ctx.name, ctx.target_author, str(ctx.author.discriminator), str(ctx.author.id), time, ctx.target_message.channel.name, str(ctx.target_message.channel.id))
+    
 def _getParametersFromMessage(content, maxLength):
     positions = [i for i in range(maxLength) if content.startswith("-", i)] 
     parameters = []
@@ -110,8 +116,10 @@ def _logCommand(botData, message = None, ctx = None):
             for entry in botData.log:
                 if type(entry) is discord.Message:
                     f.write(_formatCommandLog(entry))
-                else:
+                elif type(entry) is SlashContext:
                     f.write(_formatSlashCommandLog(entry))
+                else:
+                    f.write(_formatContextMenuLog(entry))
         botData.log.clear()
                     
     if type(entryElement.channel) is discord.DMChannel:
@@ -132,8 +140,11 @@ def _maintenanceChange(configFile):
             
 async def _sendMessage(message, content = "", embed = None, file = None, view = None):
     await message.channel.trigger_typing()
-    return await message.channel.send(content, embed = embed, file = file, view = view)
-
+    if(view != None):
+        return await message.channel.send(content, embed = embed, file = file, view = view)
+    else:
+        return await message.channel.send(content, embed = embed, file = file)
+        
 async def _sendMessagePingAuthor(message, content = "", embed = None, file = None, view = None):
     return await _sendMessage(message = message, content = "{} {}".format(content, message.author.mention), embed = embed, file = file)
         

@@ -9,6 +9,9 @@ import traceback
 from discord_slash import SlashCommand
 from discord_slash import SlashContext
 from discord_slash.utils import manage_commands
+from discord_slash.context import ComponentContext, MenuContext
+from discord_slash.model import ContextMenuType
+from typing import Union
 
 bottiIntents = discord.Intents.default()
 bottiIntents.members = True
@@ -40,6 +43,7 @@ import modules.utils
 slash = SlashCommand(botti, sync_commands = True)
 import modules.slash  # MUSS unter der Deklaration und Initialisierung von den Objekten slash und botti stehen
 import modules.events # MUSS unter der Deklaration und Initialisierung vom Objekten botti stehen
+import modules.contexts # MUSS unter der Deklaration und Initialisierung vom Objekten botti stehen
 
 from modules.data.commandModule import commandModule             
              
