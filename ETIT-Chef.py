@@ -89,7 +89,7 @@ async def on_ready():
         
             botti.loop.create_task(modules.vod._cyclicVod())
 
-            #botti.loop.create_task(modules.gamble._cyclicBotDetection(botti, botData, True
+            #botti.loop.create_task(modules.gamble._cyclicBotDetection(botti, botData, True))
             
             botti.loop.create_task(modules.updater._cyclicUpdater())
 
