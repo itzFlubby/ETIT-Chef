@@ -32,6 +32,42 @@ async def ban(botti, message, botData):
     await channel.send(":judge: Der Nutzer **{0}#{1}** wurde von {2} gebannt. Der Bann-Hammer hat gesprochen.".format(user.name, user.discriminator, message.author.mention))
     await modules.bottiHelper._sendMessagePingAuthor(message, ":judge: Der Nutzer **{0}#{1}** wurde gebannt.".format(user.name, user.discriminator))
 
+async def chatlog(botti, message, botData):
+    """
+    Reserviert für Moderator oder höher
+    Dieser Befehl erstellt einen Chatlog.
+    !chatlog {AMOUNT}
+    {AMOUNT} Integer > 0
+    !chatlog 100\r!chatlog
+    """ 
+    amount = None
+    filename = botData.modulesDirectory + "temp/chatlog_" + message.channel.name[1:] + ".txt"
+    if " " in message.content:
+        try:
+            amount = int(message.content.split(" ")[1])
+            if amount < 1:
+                raise IndexError
+        except:
+            await modules.bottiHelper._sendMessagePingAuthor(message, modules.bottiHelper._invalidParams(botData, "chatlog"))      
+            return  
+            
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":pencil: Chatlog wird erstellt... Dies kann je nach Anzahl der Nachrichten etwas dauern...\n")
+    
+    fin = open(filename, "w+", encoding = "utf-8")
+    
+    count = 0
+    async for msg in message.channel.history(limit = amount):
+        fin.write("{timestamp} | {author.name}#{author.discriminator} ({author.id}):\n{content}\n\n".format(timestamp = modules.bottiHelper._toUTCTimestamp(msg.created_at), author = msg.author, content = msg.content))
+        count += 1
+        
+    fin.close()
+     
+    filesize = os.path.getsize(filename)
+    
+    await modules.bottiHelper._sendMessagePingAuthor(message, ":pencil: Chatlog erstellt ({filesize}). Er beinhaltet `{count}` Nachrichten, die zurückreichen bis `{timestamp}`!\n".format(filesize = modules.bottiHelper._convert_byte_sizes(filesize), count = count, timestamp = modules.bottiHelper._toUTCTimestamp(msg.created_at)))
+       
+    
+
 async def deafen(botti, message, botData):
     """
     Reserviert für Moderator oder höher

@@ -39,6 +39,14 @@ async def _checkPurgemaxConfirm(message, botData):
         await _sendMessagePingAuthor(message, ":exclamation: Purgemax abgebrochen.")
         botData.purgemaxConfirm = False
 
+def _convert_byte_sizes(size):
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if size < 1024.0:
+            return "%3.1f %s" % (size, x)
+        size /= 1024.0
+
+    return size
+
 async def _createDM(botti, userID):
     user = botti.get_user(userID)
     if user.dm_channel is None:
