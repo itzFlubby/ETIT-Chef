@@ -514,6 +514,9 @@ async def thisisfine(botti, message, botData):
     shadowcolor = "black"    
     fontColor = (255, 255, 255)    
     cacheString = ""
+    
+    await message.channel.trigger_typing() # Because sending GIF or Image takes some time...
+    
     if not exists(file):
         if not isGIFResquested:
             drawImage = ImageDraw.Draw(imageToEdit)
