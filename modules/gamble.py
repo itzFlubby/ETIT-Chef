@@ -296,7 +296,7 @@ async def norisknofun(botti, message, botData):
         except:
             randomint = randint(0, 100)
               
-            if randomint == 3:
+            if randomint == 69:
                 await modules.bottiHelper._sendMessagePingAuthor(message, "{currency} <@&{channelID}> UNGLAUBLICHER GEWINN!!! Damit hast du **{win}** {currency} gewonnen!".format(currency = botData.botCurrency["emoji"], channelID = ids.roleIDs.SPIELHALLE, win = modules.bottiHelper._spaceIntToString(int(userBalance* 100))))
                 _addBalance(botData, message.author.id, userBalance * 100) 
             else:
