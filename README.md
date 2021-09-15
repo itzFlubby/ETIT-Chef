@@ -2,6 +2,10 @@ ETIT-Chef
 =========
 Ein Discord-Bot, der mit viel Liebe und Frustration in Python geschrieben wurde, um den ETIT-Discord-Server zu unterstützen!
 
+Disclaimer
+----------
+Discord.py wird nicht länger weiterentwickelt. Deshalb wird schweren Herzens die Entwicklung dieses Bots ebenso eingestellt.
+
 Grundlegende Fähigkeiten
 ------------------------
 - Moderative Tools wie bannen, kicken, muten, u.v.m
